@@ -13,6 +13,8 @@ description
 - [ ] A Create exercise
 - [ ] A Edit/Delete any public workouts
 
+User can download workout to phone and edit it (changes will be local).
+
 ### Additional functionality
 - [ ] Chat room
 - [ ] Instagram like workouts share (main page works similar to instagram)
@@ -28,15 +30,16 @@ description
 - Video/Gif
 - Type (time, repeats)
 
-### Exercise_workout
+### Exercise_workout (workout plan)
 - FK Workout
 - FK Exercise
 - Order number
-- Repeats
-- Time
-- Series count
+- Repeats - Optional
+- Time - Optional if type series
+- Series count - Optional if type time
 
 ### Workouts
+- Author
 - Title
 - Description
 - Sum of calories burn rate
@@ -45,3 +48,21 @@ description
 - Foreign key to exercises
 - Avg. time to complete
 - Workout cycles
+
+### Ratings
+- FK User
+- FK Workout
+- Rate
+
+### Stats_calories
+- Date
+- FK User
+- Calories
+
+### Stats_exercise
+- Date
+- FK User
+- FK Exercise
+- Repeats - Optional
+- Time - Optional if type series
+- Weight
