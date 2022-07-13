@@ -21,6 +21,8 @@ User can download workout to phone and edit it (changes will be local).
 - [ ] Friends list
 - [ ] Rating public workouts
 
+![Database Model](https://github.com/justdodo27/gymshare/blob/main/db_model.png)
+
 ### Exercises
 - Title
 - Description
