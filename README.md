@@ -2,6 +2,14 @@
 
 description
 
+## Installation
+- Build images ```docker-compose build```
+- Run the containers ```docker-compose up```
+- To delete containers ```docker-compose down -v```
+
+TODO:
+- [ ] Add react to docker-compose
+
 ## Functionality
 - [ ] U Create account
 - [ ] UA Login to account
