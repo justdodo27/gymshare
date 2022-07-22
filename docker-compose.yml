@@ -26,6 +26,17 @@ services:
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - db
+  react:
+    container_name: gymshare_frontend
+    build: 
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
+    depends_on:
+      - web
   nginx:
     build: ./nginx
     volumes:
