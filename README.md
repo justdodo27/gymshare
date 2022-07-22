@@ -1,6 +1,6 @@
 # Gymshare
 
-description
+Color theme from MUI: [Blue Grey 800](https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=37474F)
 
 ## Installation
 - Build images ```docker-compose build```
