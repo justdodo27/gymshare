@@ -5,7 +5,6 @@ Color theme from MUI: [Blue Grey 800](https://material.io/resources/color/#!/?vi
 ## Installation
 - Build images ```docker-compose build```
 - Run the containers ```docker-compose up```
-- Create superuser/admin ```docker-compose exec web python manage.py createsuperuser``` - when containers are running
 - To delete containers ```docker-compose down -v```
 - Server is running on [localhost:1337](http://localhost:1337)
 
