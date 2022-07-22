@@ -10,6 +10,7 @@ description
 
 TODO:
 - [ ] Add react to docker-compose
+- [ ] Add dark/light theme switch
 
 ## Functionality
 - [ ] U Create account
