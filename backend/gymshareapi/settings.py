@@ -18,7 +18,12 @@ ALLOWED_HOSTS = ['*']
 
 # Admins accounts
 ADMINS = [
-    ('admin', 'admin@admin.com'),
+    ('admin', 'admin@admin.com', 'Strong2137'),
+]
+
+# Users accounts
+USERS = [
+    ('dodo', 'dodo@dodo.com', 'Strong2137'),
 ]
 
 # Application definition
@@ -116,7 +121,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -130,4 +136,11 @@ REST_FRAMEWORK  = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
+}
+
+# CSRF Trusted origins
+CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:1337",]
+
+SWAGGER_SETTINGS = {
+    'DEFAULT_API_URL': 'http://localhost:8000/',
 }
