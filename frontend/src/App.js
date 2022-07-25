@@ -5,6 +5,7 @@ import HomePage from './components/homePage';
 import ChangePassword from './components/changePassword';
 import ResetPassword from './components/resetPassword';
 import Profile from './components/profileView';
+import EditProfile from './components/editProfile';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
     <Route path="/change" element={<ChangePassword/>} />
     <Route path="/forgot" element={<ResetPassword/>} />
     <Route path="/profile" element={<Profile/>} />
+    <Route path="/edit" element={<EditProfile/>} />
     </Routes>
   );
 }
