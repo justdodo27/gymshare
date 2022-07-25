@@ -4,6 +4,7 @@ import { Routes, Route} from "react-router-dom";
 import HomePage from './components/homePage';
 import ChangePassword from './components/changePassword';
 import ResetPassword from './components/resetPassword';
+import Profile from './components/profileView';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
     <Route path="/login" element={<SignIn/>} />
     <Route path="/change" element={<ChangePassword/>} />
     <Route path="/forgot" element={<ResetPassword/>} />
+    <Route path="/profile" element={<Profile/>} />
     </Routes>
   );
 }
