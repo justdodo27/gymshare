@@ -12,6 +12,7 @@ const sections = [
   { title: 'Change Password', url: '/change' },
   { title: 'Forgot Password', url: '/forgot' },
   { title: 'Your Profile', url: '/profile' },
+  { title: 'Edit Profile', url: '/edit' },
 ];
 
 
