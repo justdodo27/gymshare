@@ -48,11 +48,41 @@ export default function SignUp() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+      const email = data.get('email')
+      const password = data.get('password')
+      const username = data.get('username')
+      const firstName = data.get('firstName')
+      const lastName = data.get('lastName')
+      console.log(email, password, username, firstName, lastName);
+
+      fetch("http://localhost:1337/accounts/users/", {
+        method: 'POST',
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          username: username
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((data) => {
+              let errorMessage = 'Authentication failed!';
+              throw new Error(errorMessage);
+            });
+          }
+        })
+        .then((data) => {
+          console.log(data)
+        })
+        .catch((err) => {
+          alert(err.message);
+        });
+    };
 
   return (
     <Fragment>
@@ -75,31 +105,7 @@ export default function SignUp() {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2} >
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  inputProps={{ style: { color: "white" } }}
-                  InputLabelProps={{ style: { color: '#fff' }} }
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                inputProps={{ style: { color: "white" } }}
-                InputLabelProps={{ style: { color: '#fff' }}}
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                />
-              </Grid>
+              
               <Grid item xs={12}>
                 <TextField
                 inputProps={{ style: { color: "white" } }}
@@ -118,11 +124,46 @@ export default function SignUp() {
                 InputLabelProps={{ style: { color: '#fff' }}}
                   required
                   fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: '#fff' }}}
+                  required
+                  fullWidth
                   name="password"
                   label="Password"
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  inputProps={{ style: { color: "white" } }}
+                  InputLabelProps={{ style: { color: '#fff' }} }
+                  autoComplete="given-name"
+                  name="firstName"
+                  fullWidth
+                  id="firstName"
+                  label="First Name"
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: '#fff' }}}
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  name="lastName"
+                  autoComplete="family-name"
                 />
               </Grid>
               <Grid item xs={12}>
