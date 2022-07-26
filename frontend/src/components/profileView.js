@@ -124,7 +124,7 @@ export default function Profile() {
             </Grid>
             <Grid container justifyContent="flex-start">
               <Grid item>
-                <Link href="/change" variant="body2">
+                <Link href="/edit" variant="body2">
                   Edit profile
                 </Link>
               </Grid>

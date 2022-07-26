@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,9 +10,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { blueGrey, indigo } from '@mui/material/colors';
 import icon from '../pictures/icon.jpg'
+import { useState } from 'react';
 
 function Copyright(props) {
   return (
@@ -26,6 +26,16 @@ function Copyright(props) {
       {'.'}
     </Typography>
   );
+}
+
+function validateEmail (email) {
+  const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return regexp.test(email);
+}
+
+function validatePassword (password) {
+  const regexp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/;
+  return regexp.test(password);
 }
 
 const theme = createTheme({
@@ -45,16 +55,39 @@ const theme = createTheme({
 );
 
 export default function SignUp() {
+  const [emailError, setEmailError] = useState(false)
+  const [passwordError, setPasswordError] = useState(false)
+
+  let emailErrorCheck = false
+  let passwordErrorCheck = false
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-      const email = data.get('email')
-      const password = data.get('password')
-      const username = data.get('username')
-      const firstName = data.get('firstName')
-      const lastName = data.get('lastName')
-      console.log(email, password, username, firstName, lastName);
+      let email = data.get('email')
+      let password = data.get('password')
+      let username = data.get('username')
+      let firstName = data.get('firstName')
+      let lastName = data.get('lastName')
+      
 
+      if (validateEmail(email)) {
+        setEmailError(false)
+        emailErrorCheck = true
+      } else {
+        setEmailError(true)
+      }
+
+      if (validatePassword(password)) {
+        setPasswordError(false)
+        passwordErrorCheck = true
+      } else {
+        setPasswordError(true)
+      }
+
+    console.log(emailError, setPasswordError)
+
+    if (emailErrorCheck === true && passwordErrorCheck === true) {
       fetch("http://localhost:1337/accounts/users/", {
         method: 'POST',
         body: JSON.stringify({
@@ -71,7 +104,7 @@ export default function SignUp() {
             return res.json();
           } else {
             return res.json().then((data) => {
-              let errorMessage = 'Authentication failed!';
+              let errorMessage = 'Username or email are already taken!';
               throw new Error(errorMessage);
             });
           }
@@ -83,6 +116,7 @@ export default function SignUp() {
           alert(err.message);
         });
     };
+  }
 
   return (
     <Fragment>
@@ -106,7 +140,7 @@ export default function SignUp() {
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2} >
               
-              <Grid item xs={12}>
+              {!emailError && <Grid item xs={12}>
                 <TextField
                 inputProps={{ style: { color: "white" } }}
                 InputLabelProps={{ style: { color: '#fff' }}}
@@ -117,7 +151,20 @@ export default function SignUp() {
                   name="email"
                   autoComplete="email"
                 />
-              </Grid>
+              </Grid>}
+              {emailError && <Grid item xs={12}>
+                <TextField
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: '#fff' }}}
+                  error
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  helperText="Please enter valid email"
+                />
+              </Grid>}
               <Grid item xs={12}>
                 <TextField
                 inputProps={{ style: { color: "white" } }}
@@ -130,7 +177,7 @@ export default function SignUp() {
                   autoComplete="username"
                 />
               </Grid>
-              <Grid item xs={12}>
+              {!passwordError && <Grid item xs={12}>
                 <TextField
                 inputProps={{ style: { color: "white" } }}
                 InputLabelProps={{ style: { color: '#fff' }}}
@@ -142,7 +189,21 @@ export default function SignUp() {
                   id="password"
                   autoComplete="new-password"
                 />
-              </Grid>
+              </Grid>}
+              {passwordError && <Grid item xs={12}>
+                <TextField
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: '#fff' }}}
+                  error
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  helperText="Password should be at least 8 characters"
+                />
+              </Grid>}
               <Grid item xs={12} sm={6}>
                 <TextField
                   inputProps={{ style: { color: "white" } }}
