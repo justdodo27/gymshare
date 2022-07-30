@@ -20,6 +20,12 @@ class Exercise(models.Model):
     video = models.FileField(null=True, blank=True)
     exercise_type = models.CharField(max_length=30, choices=EXERCISE_TYPES, default=WITH_A_WEIGHT)
 
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        ordering = ['id']
+
 
 class Workout(models.Model):
     PUBLIC = 'Public'
@@ -39,6 +45,12 @@ class Workout(models.Model):
     avg_time = models.FloatField()
     cycles = models.PositiveIntegerField()
 
+    def __str__(self) -> str:
+        return f'{self.title} by {self.author}'
+
+    class Meta:
+        ordering = ['id']
+
 
 class ExcerciseInWorkout(models.Model):
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
@@ -47,3 +59,9 @@ class ExcerciseInWorkout(models.Model):
     repeats = models.PositiveIntegerField(null=True, blank=True)
     time = models.FloatField(null=True, blank=True)
     series = models.PositiveIntegerField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f'{self.exercise} in {self.workout}'
+
+    class Meta:
+        ordering = ['id']
