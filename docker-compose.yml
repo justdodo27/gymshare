@@ -24,6 +24,9 @@ services:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL=dominik.gymshare@gmail.com
+      - EMAIL_PASSWORD=aiograbddpxtkzyt
     depends_on:
       - db
   react:
@@ -43,6 +46,13 @@ services:
       - static_volume:/backend/staticfiles
     ports:
       - 1337:80
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL=dominik.gymshare@gmail.com
+      - EMAIL_PASSWORD=aiograbddpxtkzyt
     depends_on:
       - web
 volumes:
