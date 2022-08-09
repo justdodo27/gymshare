@@ -7,11 +7,8 @@ import { blueGrey, indigo } from '@mui/material/colors';
 
 
 const sections = [
-  { title: 'Change Password', url: '/change' },
-  { title: 'Forgot Password', url: '/forgot' },
-  { title: 'Your Profile', url: '/profile' },
-  { title: 'Edit Profile', url: '/edit' },
-  { title: 'Logout', url: '/logout' },
+  { title: 'Sign Up', url: '/register' },
+  { title: 'Sign In', url: '/login' },
 ];
 
 
@@ -31,7 +28,7 @@ const theme = createTheme({
   }
   );
 
-export default function Home() {
+export default function Main() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

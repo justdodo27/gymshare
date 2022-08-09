@@ -3,7 +3,8 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom';
+import { Link } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -17,7 +18,7 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
+      <Link component={RouterLink} to='/' color="inherit">
         Gymshare
       </Link>{' '}
       {new Date().getFullYear()}
@@ -97,8 +98,8 @@ export default function ResetPassword() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link href="/login" variant="body2">
-                  {"Back to login view"}
+                <Link component={RouterLink} to='/registration' variant="body2">
+                  {"Back to registration view"}
                 </Link>
               </Grid>
             </Grid>
