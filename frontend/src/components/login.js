@@ -5,7 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom';
+import { Link } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -14,12 +15,16 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Fragment } from 'react';
 import { blueGrey, indigo} from '@mui/material/colors';
 import icon from "../pictures/icon.jpg"
+import { useHistory} from 'react-router-dom';
+import { useDispatch} from 'react-redux';
+import { authActions } from '../store/auth';
+import jwt_decode from "jwt-decode";
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
+      <Link component={RouterLink} to='/' color="inherit">
         Gymshare
       </Link>{' '}
       {new Date().getFullYear()}
@@ -45,13 +50,47 @@ const theme = createTheme({
 );
 
 export default function SignIn() {
+  const history = useHistory();
+  const dispatch = useDispatch();
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const password = data.get('password')
+    const username = data.get('username')
+    console.log(password, username);
+
+    fetch("http://localhost:1337/api/token/", {
+      method: 'POST',
+      body: JSON.stringify({
+        password: password,
+        username: username
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = 'Wrong username or password!';
+            throw new Error(errorMessage);
+          });
+        }
+      })
+      .then((data) => {
+        console.log(data)
+        const decodedData = jwt_decode(data.access)
+        const decodedId = decodedData.user_id
+        dispatch(authActions.login([data.idToken, decodedId]))
+        history.replace('/');
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
   };
 
   return (
@@ -79,10 +118,10 @@ export default function SignIn() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
               autoFocus
             />
             <TextField
@@ -111,12 +150,12 @@ export default function SignIn() {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="/forgot" variant="body2">
+                <Link component={RouterLink} to='/forgot' variant="body2">
                   Forgot password?
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="/register" variant="body2">
+                <Link component={RouterLink} to='/register' variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

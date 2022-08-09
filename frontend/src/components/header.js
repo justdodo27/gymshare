@@ -2,7 +2,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom';
+import { Link } from '@mui/material';
 
 function Header(props) {
   const { sections, title } = props;
@@ -28,11 +29,11 @@ function Header(props) {
       >
         {sections.map((section) => (
           <Link
+            component={RouterLink} to={section.url}
             color="inherit"
             noWrap
             key={section.title}
             variant="body2"
-            href={section.url}
             sx={{ p: 1, flexShrink: 0 }}
           >
             {section.title}

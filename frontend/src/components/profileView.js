@@ -1,7 +1,8 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import CssBaseline from '@mui/material/CssBaseline';
-import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom';
+import { Link } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -17,9 +18,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 function Copyright(props) {
   return (
-    <Typography variant="body2" color="primary.main" align="center" {...props}>
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
+      <Link component={RouterLink} to='/' color="inherit">
         Gymshare
       </Link>{' '}
       {new Date().getFullYear()}
@@ -117,14 +118,14 @@ export default function Profile() {
     <p></p>
     <Grid container justifyContent="flex-start">
               <Grid item>
-                <Link href="/change" variant="body2">
+                <Link component={RouterLink} to='/change' variant="body2">
                 Change password
                 </Link>
               </Grid>
             </Grid>
             <Grid container justifyContent="flex-start">
               <Grid item>
-                <Link href="/change" variant="body2">
+                <Link component={RouterLink} to='/edit' variant="body2">
                   Edit profile
                 </Link>
               </Grid>

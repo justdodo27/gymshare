@@ -3,7 +3,8 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
+import { Link as RouterLink } from 'react-router-dom';
+import { Link } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -17,7 +18,7 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
+      <Link component={RouterLink} to='/' color="inherit">
         Gymshare
       </Link>{' '}
       {new Date().getFullYear()}
@@ -92,7 +93,7 @@ export default function ChangePassword() {
               name="password"
               label="Current password"
               type="password"
-              id="password"
+              id="currentpassword"
               autoComplete="current-password"
             />
             <TextField
@@ -104,7 +105,7 @@ export default function ChangePassword() {
               name="password"
               label="New password"
               type="password"
-              id="password"
+              id="newpassword"
               autoComplete="new-password"
             />
             <TextField
@@ -116,7 +117,7 @@ export default function ChangePassword() {
               name="password"
               label="Repeat new password"
               type="password"
-              id="password"
+              id="repeatpassword"
               autoComplete="repeat-new-password"
             />
             <Button
@@ -129,8 +130,8 @@ export default function ChangePassword() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link href="/login" variant="body2">
-                  {"Back to login view"}
+                <Link component={RouterLink} to='/profile' variant="body2">
+                  {"Back to profile view"}
                 </Link>
               </Grid>
             </Grid>
