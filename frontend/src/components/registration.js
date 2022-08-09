@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Fragment, useEffect } from 'react';
+import { Fragment} from 'react';
 import { blueGrey, indigo } from '@mui/material/colors';
 import icon from '../pictures/icon.jpg'
 import { useState } from 'react';
