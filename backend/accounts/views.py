@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics, status
+from rest_framework.response import Response
+from rest_framework.exceptions import NotAuthenticated
 
 from . import serializers, models
 
@@ -25,3 +27,38 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = models.Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
     permission_classes = [permissions.AllowAny]
+
+
+class ChangePasswordView(generics.UpdateAPIView):
+    """
+    API endpoint for changing user password.
+    """
+    serializer_class = serializers.ChangePasswordSerializer
+    model = User
+
+    def get_user_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        user_object = self.get_user_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if user_object.is_anonymous:
+             raise NotAuthenticated("No Token Provided")
+
+        if serializer.is_valid():
+            if not user_object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": "Wrong password."}, status=status.HTTP_400_BAD_REQUEST)
+            user_object.set_password(serializer.data.get("new_password"))
+            user_object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Password updated successfully',
+                'data': []
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

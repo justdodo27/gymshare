@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ["DJANGO_SECRET"]
+SECRET_KEY = 'aSASDDSFFFFFFFFFFFFFFFFFSSSS'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -29,6 +29,7 @@ USERS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'workouts.apps.WorkoutsConfig',
     'accounts.apps.AccountsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,12 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'drf_yasg',
     'rest_framework',
+    'django_rest_passwordreset',
     'rest_framework_simplejwt',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -56,7 +60,7 @@ ROOT_URLCONF = 'gymshareapi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, '/templates/'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -71,6 +75,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gymshareapi.wsgi.application'
 
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('EMAIL', 'dominik.gymshare@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'aiograbddpxtkzyt')
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -144,3 +157,6 @@ CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:1337",]
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': 'http://localhost:8000/',
 }
+
+# CORS SETTINGS
+CORS_ALLOW_ALL_ORIGINS = True

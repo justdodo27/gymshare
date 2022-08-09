@@ -9,12 +9,11 @@ Color theme from MUI: [Blue Grey 800](https://material.io/resources/color/#!/?vi
 - Server is running on [localhost:1337](http://localhost:1337)
 
 TODO:
-- [ ] Add react to docker-compose
 - [ ] Add dark/light theme switch
 
 ## Functionality
-- [ ] U Create account
-- [ ] UA Login to account
+- [x] U Create account
+- [x] UA Login to account
 - [ ] UA Create workouts from exercises
 - [ ] UA Run any workout from mobile app
 - [ ] UA View profile with stats etc.

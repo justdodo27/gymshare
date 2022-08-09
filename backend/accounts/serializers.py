@@ -16,12 +16,10 @@ class UserSerializer(serializers.ModelSerializer):
 class UserCreateSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
 
-    class Meta:
-        model = User
-        fields = ('email', 'username', 'password')
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('A user with that email already exists.')
+        return value
 
     def save(self):
         user = User(
@@ -33,6 +31,13 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
         return user
 
+    class Meta:
+        model = User
+        fields = ('email', 'username', 'password')
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -40,3 +45,10 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Profile
         fields = '__all__'
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
