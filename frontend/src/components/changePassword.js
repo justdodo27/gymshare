@@ -13,6 +13,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Fragment } from 'react';
 import { blueGrey, indigo } from '@mui/material/colors';
 import icon from "../pictures/icon.jpg"
+import { useHistory} from 'react-router-dom';
+import { useState } from 'react';
 
 function Copyright(props) {
   return (
@@ -43,14 +45,60 @@ const theme = createTheme({
 }
 );
 
+function validatePassword (password) {
+  const regexp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/;
+  return regexp.test(password);
+}
+
 export default function ChangePassword() {
+
+  const history = useHistory();
+  const [passwordError, setPasswordError] = useState(false)
+  let passwordErrorCheck = false
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const password = data.get('password')
+    const newPassword = data.get('newpassword')
+    const repeatPassword = data.get('repeatpassword')
+
+    if (validatePassword(newPassword)) {
+      setPasswordError(false)
+      passwordErrorCheck = true
+    } else {
+      setPasswordError(true)
+    }
+
+    if (passwordErrorCheck === true) {
+    fetch("http://localhost:1337/accounts/change-password/", {
+      method: 'PATCH',
+        body: JSON.stringify({
+          old_password: password,
+          new_password: newPassword
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = 'Wrong username or password!';
+            throw new Error(errorMessage);
+          });
+        }
+      })
+      .then((data) => {
+        console.log(data)
+        history.replace('/');
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+    }
   };
 
   return (
@@ -78,44 +126,47 @@ export default function ChangePassword() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-            />
-            <TextField
-            inputProps={{ style: { color: "white" } }}
-            InputLabelProps={{ style: { color: '#fff' }} }
-              margin="normal"
-              required
-              fullWidth
               name="password"
-              label="Current password"
+              label="password"
               type="password"
-              id="currentpassword"
+              id="password"
               autoComplete="current-password"
             />
+            {!passwordError && <Grid item xs={12}>
+                <TextField
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: '#fff' }}}
+                  required
+                  fullWidth
+                  name="newpassword"
+                  label="newpassword"
+                  type="password"
+                  id="newpassword"
+                  autoComplete="new-password"
+                />
+              </Grid>}
+              {passwordError && <Grid item xs={12}>
+                <TextField
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: '#fff' }}}
+                  error
+                  fullWidth
+                  name="newpassword"
+                  label="newpassword"
+                  type="password"
+                  id="newpassword"
+                  autoComplete="new-password"
+                  helperText="Password should be at least 8 characters"
+                />
+              </Grid>}
             <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
               margin="normal"
               required
               fullWidth
-              name="password"
-              label="New password"
-              type="password"
-              id="newpassword"
-              autoComplete="new-password"
-            />
-            <TextField
-            inputProps={{ style: { color: "white" } }}
-            InputLabelProps={{ style: { color: '#fff' }} }
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Repeat new password"
+              name="repeatpassword"
+              label="repeatpassword"
               type="password"
               id="repeatpassword"
               autoComplete="repeat-new-password"

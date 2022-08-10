@@ -15,7 +15,7 @@ function Header(props) {
   return (
     <React.Fragment>
       <Grid container spacing={2} sx={{ borderBottom: 1, borderColor: 'divider', margin:'auto' }}>
-        <Grid Item xs = {4}>
+        <Grid item xs = {4}>
         <Toolbar >
         <Link component={RouterLink} to='/' color="inherit">
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
@@ -23,7 +23,7 @@ function Header(props) {
         </Link>
       </Toolbar>
         </Grid>
-        <Grid Item xs = {8}>
+        <Grid item xs = {8}>
         <Toolbar
         component="nav"
         variant="dense"

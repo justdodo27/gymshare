@@ -55,22 +55,23 @@ const sections = [
 
 export default function Profile() {
 
-  let myId = useSelector(state => state.auth.userId);
-  console.log("MyId: ", myId)
+  const userId = useSelector(state => state.auth.userId);
 
-  const [users, setUsers] = useState([])
+  const [height, setHeight] = useState(null)
+  const [weight, setWeight] = useState(null)
 
 
   const fetchData = () => {
 
-    fetch("http://localhost:1337/accounts/profiles/"+myId+"/")
+    fetch("http://localhost:1337/accounts/profiles/" +userId)
 
       .then(response => {
         return response.json()
       })
       .then(data => {
-        setUsers(data)
-        console.log("Hello")
+        console.log(data)
+        setHeight(data.height)
+        setWeight(data.weight)
       })
   }
 
@@ -78,14 +79,8 @@ export default function Profile() {
     fetchData()
   }, [])
 
-  //console.log(users.user.username)
-  //let name = users.user.username
-  let name = "UserName"
-  //let weight = users.weight
-  //let height = users.height
   return (
     <Fragment>
-      
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="lg">
         <CssBaseline />
@@ -100,11 +95,7 @@ export default function Profile() {
             color: "primary.main",
           }}
         >
-          <Typography component="h1" variant="h5">
-            Hello {name} !
-          </Typography>
-          <p></p>
-          <div>
+          <div marginbottom="25">
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
@@ -115,8 +106,7 @@ export default function Profile() {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            Your current height: cm
-        <p></p>
+            Your current height: {height}cm
           </Typography>
         </AccordionDetails>
       </Accordion>
@@ -130,8 +120,7 @@ export default function Profile() {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            Your current weight: kg
-            <p></p>
+            Your current weight: {weight}kg
           </Typography>
         </AccordionDetails>
       </Accordion>
@@ -146,20 +135,19 @@ export default function Profile() {
         <AccordionDetails>
         <Typography>
         You burned 800 calories today. Click to  see your statistics.
-            <p></p>
           </Typography>
         </AccordionDetails>
       </Accordion>
     </div>
     <p></p>
-    <Grid container justifyContent="flex-start">
+    <Grid container justifyContent="flex-start" marginLeft={50}>
               <Grid item>
                 <Link component={RouterLink} to='/change' variant="body2">
                 Change password
                 </Link>
               </Grid>
             </Grid>
-            <Grid container justifyContent="flex-start">
+            <Grid container justifyContent="flex-start" marginLeft={50}>
               <Grid item>
                 <Link component={RouterLink} to='/edit' variant="body2">
                   Edit profile
