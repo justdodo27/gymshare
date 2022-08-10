@@ -15,6 +15,9 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Header from "../components/header.js"
+import { useState, useEffect } from "react";
+import { useSelector } from 'react-redux';
 
 function Copyright(props) {
   return (
@@ -45,13 +48,43 @@ const theme = createTheme({
 }
 );
 
+const sections = [
+  { title: 'Profile', url: '/profile' },
+  { title: 'Logout', url: '/logout' },
+];
+
 export default function Profile() {
+
+  const userId = useSelector(state => state.auth.userId);
+
+  const [height, setHeight] = useState(null)
+  const [weight, setWeight] = useState(null)
+
+
+  const fetchData = () => {
+
+    fetch("http://localhost:1337/accounts/profiles/" +userId)
+
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        console.log(data)
+        setHeight(data.height)
+        setWeight(data.weight)
+      })
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   return (
     <Fragment>
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="lg">
         <CssBaseline />
+        <Header title="Gymshare" sections={sections} />
         <Box
           sx={{
             marginTop: 8,
@@ -62,13 +95,7 @@ export default function Profile() {
             color: "primary.main",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Your profile
-          </Typography>
-          <p></p>
-          <div>
+          <div marginbottom="25">
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
@@ -79,8 +106,7 @@ export default function Profile() {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            Your current height: 182cm
-        <p></p>
+            Your current height: {height}cm
           </Typography>
         </AccordionDetails>
       </Accordion>
@@ -94,8 +120,7 @@ export default function Profile() {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            Your current weight: 75kg
-            <p></p>
+            Your current weight: {weight}kg
           </Typography>
         </AccordionDetails>
       </Accordion>
@@ -110,20 +135,19 @@ export default function Profile() {
         <AccordionDetails>
         <Typography>
         You burned 800 calories today. Click to  see your statistics.
-            <p></p>
           </Typography>
         </AccordionDetails>
       </Accordion>
     </div>
     <p></p>
-    <Grid container justifyContent="flex-start">
+    <Grid container justifyContent="flex-start" marginLeft={50}>
               <Grid item>
                 <Link component={RouterLink} to='/change' variant="body2">
                 Change password
                 </Link>
               </Grid>
             </Grid>
-            <Grid container justifyContent="flex-start">
+            <Grid container justifyContent="flex-start" marginLeft={50}>
               <Grid item>
                 <Link component={RouterLink} to='/edit' variant="body2">
                   Edit profile

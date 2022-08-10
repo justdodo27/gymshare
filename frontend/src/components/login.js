@@ -106,8 +106,10 @@ export default function SignIn() {
             alignItems: 'center',
           }}
         >
+          <Link component={RouterLink} to='/' variant="body2">
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
           </Avatar>
+          </Link>
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>

@@ -14,6 +14,8 @@ import { Fragment } from 'react';
 import { blueGrey, indigo } from '@mui/material/colors';
 import icon from "../pictures/icon.jpg"
 import { useState } from 'react';
+import { useSelector} from 'react-redux';
+import { useHistory} from 'react-router-dom';
 
 function Copyright(props) {
   return (
@@ -57,6 +59,8 @@ export default function EditProfile() {
   const [emailError, setEmailError] = useState(false)
   const [heightError, setHeightError] = useState(false)
   const [weightError, setWeightError] = useState(false)
+  const userId = useSelector(state => state.auth.userId);
+  const history = useHistory();
 
   let emailErrorCheck = false
   let weightErrorCheck = false
@@ -72,6 +76,9 @@ export default function EditProfile() {
     let weight = data.get('weight')
     let firstName = data.get('firstName')
     let lastName = data.get('lastName')
+
+    console.log(height)
+   
 
     enteredHeight = height
     enteredWeight = weight
@@ -101,7 +108,7 @@ export default function EditProfile() {
     }
 
     if (emailErrorCheck === true && heightErrorCheck === true && weightErrorCheck === true) {
-      fetch("http://localhost:1337/accounts/profiles/3", {
+      fetch("http://localhost:1337/accounts/profiles/" + userId +"/", {
         method: 'PATCH',
         body: JSON.stringify({
           height: height,
@@ -122,7 +129,7 @@ export default function EditProfile() {
           }
         })
         .then((data) => {
-          console.log(data)
+          history.replace('/profile');
         })
         .catch((err) => {
           alert(err.message);
@@ -273,8 +280,8 @@ export default function EditProfile() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link component={RouterLink} to='/' variant="body2">
-                  {"Back to main page"}
+                <Link component={RouterLink} to='/Profile' variant="body2">
+                  {"Back to Profile"}
                 </Link>
               </Grid>
             </Grid>

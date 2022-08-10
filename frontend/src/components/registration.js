@@ -15,6 +15,8 @@ import { Fragment} from 'react';
 import { blueGrey, indigo } from '@mui/material/colors';
 import icon from '../pictures/icon.jpg'
 import { useState } from 'react';
+import { useHistory} from 'react-router-dom';
+
 
 function Copyright(props) {
   return (
@@ -58,6 +60,7 @@ const theme = createTheme({
 export default function SignUp() {
   const [emailError, setEmailError] = useState(false)
   const [passwordError, setPasswordError] = useState(false)
+  const history = useHistory();
 
   let emailErrorCheck = false
   let passwordErrorCheck = false
@@ -112,6 +115,7 @@ export default function SignUp() {
         })
         .then((data) => {
           console.log(data)
+        history.replace('/');
         })
         .catch((err) => {
           alert(err.message);
@@ -133,8 +137,10 @@ export default function SignUp() {
             color: "primary.main",
           }}
         >
+          <Link component={RouterLink} to='/' variant="body2">
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
           </Avatar>
+          </Link>
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
