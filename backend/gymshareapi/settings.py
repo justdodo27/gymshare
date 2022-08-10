@@ -146,6 +146,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Rest Framework Configuration
 
 REST_FRAMEWORK  = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
@@ -156,6 +159,14 @@ CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:1337",]
 
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': 'http://localhost:8000/',
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'JWT authorization',
+        }
+    },
 }
 
 # CORS SETTINGS
