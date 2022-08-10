@@ -273,8 +273,8 @@ export default function EditProfile() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link component={RouterLink} to='/' variant="body2">
-                  {"Back to main page"}
+                <Link component={RouterLink} to='/Profile' variant="body2">
+                  {"Back to Profile"}
                 </Link>
               </Grid>
             </Grid>

@@ -133,8 +133,10 @@ export default function SignUp() {
             color: "primary.main",
           }}
         >
+          <Link component={RouterLink} to='/' variant="body2">
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
           </Avatar>
+          </Link>
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>

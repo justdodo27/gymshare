@@ -15,6 +15,9 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Header from "../components/header.js"
+import { useState, useEffect } from "react";
+import { useSelector } from 'react-redux';
 
 function Copyright(props) {
   return (
@@ -45,13 +48,48 @@ const theme = createTheme({
 }
 );
 
+const sections = [
+  { title: 'Profile', url: '/profile' },
+  { title: 'Logout', url: '/logout' },
+];
+
 export default function Profile() {
 
+  let myId = useSelector(state => state.auth.userId);
+  console.log("MyId: ", myId)
+
+  const [users, setUsers] = useState([])
+
+
+  const fetchData = () => {
+
+    fetch("http://localhost:1337/accounts/profiles/"+myId+"/")
+
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        setUsers(data)
+        console.log("Hello")
+      })
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  //console.log(users.user.username)
+  //let name = users.user.username
+  let name = "UserName"
+  //let weight = users.weight
+  //let height = users.height
   return (
     <Fragment>
+      
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="lg">
         <CssBaseline />
+        <Header title="Gymshare" sections={sections} />
         <Box
           sx={{
             marginTop: 8,
@@ -62,10 +100,8 @@ export default function Profile() {
             color: "primary.main",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
-          </Avatar>
           <Typography component="h1" variant="h5">
-            Your profile
+            Hello {name} !
           </Typography>
           <p></p>
           <div>
@@ -79,7 +115,7 @@ export default function Profile() {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            Your current height: 182cm
+            Your current height: cm
         <p></p>
           </Typography>
         </AccordionDetails>
@@ -94,7 +130,7 @@ export default function Profile() {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            Your current weight: 75kg
+            Your current weight: kg
             <p></p>
           </Typography>
         </AccordionDetails>

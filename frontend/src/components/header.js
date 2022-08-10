@@ -1,31 +1,33 @@
 import * as React from 'react';
+import Avatar from '@mui/material/Avatar';
+import icon from "../pictures/icon.jpg"
 import PropTypes from 'prop-types';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@mui/material';
+import { Button } from '@mui/material';
+import { Grid } from '@mui/material';
 
 function Header(props) {
   const { sections, title } = props;
 
   return (
     <React.Fragment>
-      <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Typography
-          component="h2"
-          variant="h5"
-          color="inherit"
-          align="center"
-          noWrap
-          sx={{ flex: 1 }}
-        >
-          {title}
-        </Typography>
+      <Grid container spacing={2} sx={{ borderBottom: 1, borderColor: 'divider', margin:'auto' }}>
+        <Grid Item xs = {4}>
+        <Toolbar >
+        <Link component={RouterLink} to='/' color="inherit">
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
+          </Avatar>
+        </Link>
       </Toolbar>
-      <Toolbar
+        </Grid>
+        <Grid Item xs = {8}>
+        <Toolbar
         component="nav"
         variant="dense"
-        sx={{ justifyContent: 'center', overflowX: 'auto' }}
+        sx={{ justifyContent: 'right', overflowX: 'auto'}}
       >
         {sections.map((section) => (
           <Link
@@ -36,10 +38,23 @@ function Header(props) {
             variant="body2"
             sx={{ p: 1, flexShrink: 0 }}
           >
-            {section.title}
+            <Button size='large'>{section.title}</Button>
+            
           </Link>
         ))}
       </Toolbar>
+        </Grid>
+      </Grid>
+      <Typography
+          component="h1"
+          variant="h5"
+          color="inherit"
+          align="center"
+          noWrap
+          sx={{ flex: 1 }}
+        >
+          {title}
+        </Typography>
     </React.Fragment>
   );
 }

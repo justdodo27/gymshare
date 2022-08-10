@@ -66,8 +66,10 @@ export default function ResetPassword() {
             alignItems: 'center',
           }}
         >
+          <Link component={RouterLink} to='/' variant="body2">
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
           </Avatar>
+          </Link>
           <Typography component="h1" variant="h5">
             Reset Password
           </Typography>
@@ -98,8 +100,8 @@ export default function ResetPassword() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link component={RouterLink} to='/registration' variant="body2">
-                  {"Back to registration view"}
+                <Link component={RouterLink} to='/login' variant="body2">
+                  {"Back to login"}
                 </Link>
               </Grid>
             </Grid>

@@ -39,8 +39,8 @@ function App() {
       {!isAuth && <Redirect to='/' />}
     </Route>
     <Route path='/forgot'>
-      {isAuth && <ResetPasswordPage/>}
-      {!isAuth && <Redirect to='/' />}
+      {!isAuth && <ResetPasswordPage/>}
+      {isAuth && <Redirect to='/' />}
     </Route>
     <Route path='/edit'>
       {isAuth && <EditProfilePage/>}
