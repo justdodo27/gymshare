@@ -19,6 +19,14 @@ class UserViewSet(viewsets.ModelViewSet):
             return serializers.UserCreateSerializer
         return serializers.UserSerializer
 
+    def get_permissions(self):
+        if self.action in ['create']:
+            self.permission_classes = [permissions.AllowAny]
+        else:
+            self.permission_classes = [permissions.IsAuthenticated]
+
+        return super().get_permissions()
+
 
 class ProfileViewSet(viewsets.ModelViewSet):
     """
