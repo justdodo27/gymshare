@@ -61,6 +61,7 @@ export default function EditProfile() {
   const [weightError, setWeightError] = useState(false)
   const userId = useSelector(state => state.auth.userId);
   const history = useHistory();
+  let token = useSelector(state => state.auth.token);
 
   let emailErrorCheck = false
   let weightErrorCheck = false
@@ -116,6 +117,7 @@ export default function EditProfile() {
         }),
         headers: {
           'Content-Type': 'application/json',
+          Authorization: "Bearer " +token
         },
       })
         .then((res) => {
@@ -156,34 +158,6 @@ export default function EditProfile() {
             Edit Profile
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            {!emailError && <TextField
-            inputProps={{ style: { color: "white" } }}
-            InputLabelProps={{ style: { color: '#fff' }} }
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              defaultValue="mikolajsimon.nt@gmail.com"
-              autoFocus
-            />
-            }
-            {emailError && <TextField
-            inputProps={{ style: { color: "white" } }}
-            InputLabelProps={{ style: { color: '#fff' }} }
-              margin="normal"
-              error
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              helperText="Please enter valid email"
-              autoFocus
-            />
-            }
             <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
