@@ -12,7 +12,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            self.permission_classes = [permissions.AllowAny]
+            self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.AllowAny]
 
@@ -28,7 +28,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            self.permission_classes = [permissions.AllowAny]
+            self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.AllowAny]
 
@@ -44,7 +44,7 @@ class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            self.permission_classes = [permissions.AllowAny]
+            self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.AllowAny]
 

@@ -3,6 +3,7 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import NotAuthenticated
 
+
 from . import serializers, models
 
 
@@ -12,7 +13,6 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = serializers.UserSerializer
-    permissions = [permissions.AllowAny]
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -26,7 +26,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     """
     queryset = models.Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
-    permission_classes = [permissions.AllowAny]
 
 
 class ChangePasswordView(generics.UpdateAPIView):
