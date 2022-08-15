@@ -85,7 +85,8 @@ export default function SignIn() {
         console.log(data)
         const decodedData = jwt_decode(data.access)
         const decodedId = decodedData.user_id
-        dispatch(authActions.login([data.idToken, decodedId]))
+        console.log(data.access)
+        dispatch(authActions.login([data.access, decodedId]))
         history.replace('/');
       })
       .catch((err) => {

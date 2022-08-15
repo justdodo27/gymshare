@@ -16,6 +16,7 @@ import icon from "../pictures/icon.jpg"
 import { useState } from 'react';
 import { useSelector} from 'react-redux';
 import { useHistory} from 'react-router-dom';
+import { useEffect } from 'react';
 
 function Copyright(props) {
   return (
@@ -28,11 +29,6 @@ function Copyright(props) {
       {'.'}
     </Typography>
   );
-}
-
-function validateEmail (email) {
-  const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return regexp.test(email);
 }
 
 function validateNumber (number) {
@@ -55,42 +51,60 @@ const theme = createTheme({
 }
 );
 
+
 export default function EditProfile() {
-  const [emailError, setEmailError] = useState(false)
-  const [heightError, setHeightError] = useState(false)
-  const [weightError, setWeightError] = useState(false)
   const userId = useSelector(state => state.auth.userId);
   const history = useHistory();
   let token = useSelector(state => state.auth.token);
 
-  let emailErrorCheck = false
+
+  const [heightError, setHeightError] = useState(false)
+  const [weightError, setWeightError] = useState(false)
+  const [heightGet, setHeight] = useState("")
+  const [weightGet, setWeight] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+
   let weightErrorCheck = false
   let heightErrorCheck = false
-  let enteredWeight = ''
-  let enteredHeight = ''
+  
+
+  console.log(token)
+
+  const fetchData = () => {
+  fetch("http://localhost:1337/accounts/profiles/" +userId, {
+      headers: {
+        Authorization: "Bearer " +token
+      },
+    })
+
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        setHeight(data.height)
+        setWeight(data.weight)
+        setFirstName(data.user.first_name)
+        setLastName(data.user.last_name)
+        
+      })
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    let email = data.get('email')
     let height = data.get('height')
     let weight = data.get('weight')
-    let firstName = data.get('firstName')
-    let lastName = data.get('lastName')
+    let first_Name = data.get('first_name')
+    let last_Name = data.get('last_name')
 
-    console.log(height)
-   
-
-    enteredHeight = height
-    enteredWeight = weight
-
-    if (validateEmail(email)) {
-      setEmailError(false)
-      emailErrorCheck = true
-    } else {
-      setEmailError(true)
-      emailErrorCheck = false
-    }
+    console.log(first_Name)
+    console.log(last_Name)
+  
 
     if (validateNumber(weight)) {
       setWeightError(false)
@@ -108,12 +122,16 @@ export default function EditProfile() {
       heightErrorCheck = false
     }
 
-    if (emailErrorCheck === true && heightErrorCheck === true && weightErrorCheck === true) {
+    if (heightErrorCheck === true && weightErrorCheck === true) {
       fetch("http://localhost:1337/accounts/profiles/" + userId +"/", {
         method: 'PATCH',
-        body: JSON.stringify({
+        body: ({
+          user: {
+            first_name: first_Name,
+            last_name: last_Name
+          },
           height: height,
-          weight: weight
+          weight: weight,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -131,6 +149,7 @@ export default function EditProfile() {
           }
         })
         .then((data) => {
+          console.log(data)
           history.replace('/profile');
         })
         .catch((err) => {
@@ -138,6 +157,7 @@ export default function EditProfile() {
         });
     };
   };
+
 
   return (
     <Fragment>
@@ -167,8 +187,8 @@ export default function EditProfile() {
               label="First name"
               type="first_name"
               id="first_name"
-              autoComplete="first_name"
-              defaultValue="Mikołaj"
+              value={firstName}
+              onChange={event => setFirstName(event.target.value)}
               autoFocus
             />
             <TextField
@@ -180,8 +200,8 @@ export default function EditProfile() {
               label="Last name"
               type="last_name"
               id="last_name"
-              autoComplete="last-name"
-              defaultValue="Simon"
+              value={lastName}
+              onChange={event => setLastName(event.target.value)}
               autoFocus
             />
             {!heightError && <TextField
@@ -193,8 +213,8 @@ export default function EditProfile() {
               label="Height"
               type="height"
               id="height"
-              autoComplete="height"
-              defaultValue="182"
+              value={heightGet}
+              onChange={event => setHeight(event.target.value)}
               autoFocus
             />
             }
@@ -208,10 +228,10 @@ export default function EditProfile() {
               label="Height"
               type="height"
               id="height"
-              autoComplete="height"
               helperText="Please enter valid height"
               autoFocus
-              defaultValue={enteredHeight}
+              defaultValue={heightGet}
+              onChange={event => setHeight(event.target.value)}
             />
             }
             {!weightError && <TextField
@@ -223,8 +243,8 @@ export default function EditProfile() {
               label="Weight"
               type="weight"
               id="weight"
-              autoComplete="weight"
-              defaultValue="75"
+              value={weightGet}
+              onChange={event => setWeight(event.target.value)}
               autoFocus
             />
             }
@@ -238,10 +258,10 @@ export default function EditProfile() {
               label="Weight"
               type="weight"
               id="weight"
-              autoComplete="weight"
               helperText="Please enter valid weight"
               autoFocus
-              defaultValue={enteredWeight}
+              defaultValue={weightGet}
+              onChange={event => setWeight(event.target.value)}
             />
             }
             <Button
