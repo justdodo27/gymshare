@@ -121,15 +121,14 @@ export default function EditProfile() {
       setHeightError(true)
       heightErrorCheck = false
     }
+    
 
     if (heightErrorCheck === true && weightErrorCheck === true) {
       fetch("http://localhost:1337/accounts/profiles/" + userId +"/", {
-        method: 'PATCH',
-        body: ({
-          user: {
-            first_name: first_Name,
-            last_name: last_Name
-          },
+        method: 'PUT',
+        body: JSON.stringify({
+          first_name: first_Name,
+          last_name: last_Name,
           height: height,
           weight: weight,
         }),

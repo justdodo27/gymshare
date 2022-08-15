@@ -95,7 +95,6 @@ export default function Profile() {
       <Container component="main" maxWidth="lg">
         <CssBaseline />
         <Header title="Gymshare" sections={sections} />
-        <Typography variant='h1'>Hey, {firstName} {lastName}</Typography>
         <Box
           sx={{
             marginTop: 8,
@@ -107,6 +106,34 @@ export default function Profile() {
           }}
         >
           <div marginbottom="25">
+          <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>First Name</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            {firstName}
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>Last Name</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            {lastName}
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
