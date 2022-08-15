@@ -47,6 +47,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+
+    class Meta:
+        model = models.Profile
+        fields = ['height', 'weight', 'first_name', 'last_name']
+
+
 class ChangePasswordSerializer(serializers.Serializer):
     model = User
 
