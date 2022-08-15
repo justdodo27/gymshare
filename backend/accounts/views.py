@@ -35,6 +35,44 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = models.Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
 
+    def get_serializer_class(self):
+        if self.action in ['update', 'partial_update']:
+            return serializers.ProfileUpdateSerializer
+        return serializers.ProfileSerializer
+
+    def get_user_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        user_object = self.get_user_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if user_object.is_anonymous:
+             raise NotAuthenticated("No Token Provided")
+
+        if serializer.is_valid():
+            profile_object = models.Profile.objects.get(user__id=user_object.id)
+            profile_object.height = serializer.data.get('height')
+            profile_object.weight = serializer.data.get('weight')
+            profile_object.save()
+
+            user_object.first_name = serializer.data.get('first_name')
+            user_object.last_name = serializer.data.get('last_name')
+            user_object.save()
+
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Profile updated successfully',
+                'data': serializer.data
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class ChangePasswordView(generics.UpdateAPIView):
     """

@@ -29,6 +29,7 @@ USERS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'stats.apps.StatsConfig',
     'workouts.apps.WorkoutsConfig',
     'accounts.apps.AccountsConfig',
     'django.contrib.admin',
