@@ -6,10 +6,12 @@ from django.core.validators import MinValueValidator
 class Exercise(models.Model):
     WITH_OWN_BODY_WEIGHT = 'With own body weight'
     WITH_A_WEIGHT = 'With a weight'
+    WITH_TIME = 'With time'
 
     EXERCISE_TYPES = [
         (WITH_OWN_BODY_WEIGHT, 'With own body weight'),
         (WITH_A_WEIGHT, 'With a weight'),
+        (WITH_TIME, 'With time'),
     ]
 
     title = models.CharField(max_length=80)
