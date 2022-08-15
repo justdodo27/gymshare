@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from backend.workouts.models import Exercise
+from workouts.models import Exercise
 
 class StatisticCalories(models.Model):
     date = models.DateField(auto_now_add=True)
@@ -19,7 +19,7 @@ class StatisticExercise(models.Model):
     exercise = models.ForeignKey(Exercise, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     repeats = models.IntegerField(null=True, blank=True)
-    time = models.DecimalField(decimal_places=3, null=True, blank=True)
+    time = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
     weight = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
 
     def __str__(self) -> str:
