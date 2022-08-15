@@ -71,8 +71,6 @@ export default function SignUp() {
       let email = data.get('email')
       let password = data.get('password')
       let username = data.get('username')
-      let firstName = data.get('firstName')
-      let lastName = data.get('lastName')
       
 
       if (validateEmail(email)) {
@@ -97,7 +95,8 @@ export default function SignUp() {
         body: JSON.stringify({
           email: email,
           password: password,
-          username: username
+          username: username,
+
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -211,29 +210,6 @@ export default function SignUp() {
                   helperText="Password should be at least 8 characters"
                 />
               </Grid>}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  inputProps={{ style: { color: "white" } }}
-                  InputLabelProps={{ style: { color: '#fff' }} }
-                  autoComplete="given-name"
-                  name="firstName"
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                inputProps={{ style: { color: "white" } }}
-                InputLabelProps={{ style: { color: '#fff' }}}
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                />
-              </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
                   control={<Checkbox value="allowExtraEmails" color="primary" />}

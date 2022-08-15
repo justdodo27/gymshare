@@ -56,14 +56,21 @@ const sections = [
 export default function Profile() {
 
   const userId = useSelector(state => state.auth.userId);
+  let token = useSelector(state => state.auth.token)
 
   const [height, setHeight] = useState(null)
   const [weight, setWeight] = useState(null)
+  const [firstName, setFirstName] = useState(null)
+  const [lastName, setLastName] = useState(null)
 
 
   const fetchData = () => {
 
-    fetch("http://localhost:1337/accounts/profiles/" +userId)
+    fetch("http://localhost:1337/accounts/profiles/" +userId, {
+      headers: {
+        Authorization: "Bearer " +token
+      },
+    })
 
       .then(response => {
         return response.json()
@@ -72,6 +79,9 @@ export default function Profile() {
         console.log(data)
         setHeight(data.height)
         setWeight(data.weight)
+        setFirstName(data.user.first_name)
+        setLastName(data.user.last_name)
+        
       })
   }
 
@@ -96,6 +106,34 @@ export default function Profile() {
           }}
         >
           <div marginbottom="25">
+          <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>First Name</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            {firstName}
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>Last Name</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            {lastName}
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}

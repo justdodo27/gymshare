@@ -15,6 +15,7 @@ import { blueGrey, indigo } from '@mui/material/colors';
 import icon from "../pictures/icon.jpg"
 import { useHistory} from 'react-router-dom';
 import { useState } from 'react';
+import { useSelector} from 'react-redux';
 
 function Copyright(props) {
   return (
@@ -55,6 +56,7 @@ export default function ChangePassword() {
   const history = useHistory();
   const [passwordError, setPasswordError] = useState(false)
   let passwordErrorCheck = false
+  let token = useSelector(state => state.auth.token);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -79,6 +81,7 @@ export default function ChangePassword() {
       }),
       headers: {
         'Content-Type': 'application/json',
+        Authorization: "Bearer " +token
       },
     })
       .then((res) => {
@@ -127,7 +130,7 @@ export default function ChangePassword() {
               required
               fullWidth
               name="password"
-              label="password"
+              label="current password"
               type="password"
               id="password"
               autoComplete="current-password"
@@ -139,7 +142,7 @@ export default function ChangePassword() {
                   required
                   fullWidth
                   name="newpassword"
-                  label="newpassword"
+                  label="new password"
                   type="password"
                   id="newpassword"
                   autoComplete="new-password"
@@ -152,7 +155,7 @@ export default function ChangePassword() {
                   error
                   fullWidth
                   name="newpassword"
-                  label="newpassword"
+                  label="new password"
                   type="password"
                   id="newpassword"
                   autoComplete="new-password"
@@ -166,7 +169,7 @@ export default function ChangePassword() {
               required
               fullWidth
               name="repeatpassword"
-              label="repeatpassword"
+              label="repeat password"
               type="password"
               id="repeatpassword"
               autoComplete="repeat-new-password"
