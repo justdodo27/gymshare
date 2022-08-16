@@ -13,6 +13,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Fragment } from 'react';
 import { blueGrey, indigo} from '@mui/material/colors';
 import icon from "../pictures/icon.jpg"
+import { useHistory} from 'react-router-dom';
+import { useState } from 'react';
+
 
 function Copyright(props) {
   return (
@@ -48,20 +51,40 @@ const theme = createTheme({
 }
 );
 
-export default function ResetPassword() {
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const token = urlParams.get('reset_token')
+
+export default function ConfirmPassword() {
+
+    const history = useHistory();
+  const [passwordError, setPasswordError] = useState(false)
+  let passwordErrorCheck = false
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const email = data.get('email')
+    const password = data.get('password')
+    console.log(password)
+    console.log(token)
+
+
+    if (validatePassword(password)) {
+        setPasswordError(false)
+        passwordErrorCheck = true
+      } else {
+        setPasswordError(true)
+      }
     
 
     
 
-    
-    fetch("http://localhost:1337/api/password-reset/", {
+      if (passwordErrorCheck === true) {
+    fetch("http://localhost:1337/api/password-reset/confirm/", {
       method: 'POST',
         body: JSON.stringify({
-          email: email
+          password: password,
+          token: token  
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -79,13 +102,15 @@ export default function ResetPassword() {
       })
       .then((data) => {
         console.log(data)
+        history.replace('/');
       })
       .catch((err) => {
         alert(err.message);
       });
   };
+}
 
-  return (
+return (
     <Fragment>
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -98,29 +123,57 @@ export default function ResetPassword() {
             alignItems: 'center',
           }}
         >
-          <Link component={RouterLink} to='/' variant="body2">
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
           </Avatar>
-          </Link>
           <Typography component="h1" variant="h5">
-            Reset Password
+            New Password
           </Typography>
           <p></p>
           <Typography component="h1" variant="body1">
-            Please enter your email address. You will receive a link to create a new password via email.
+            Please enter your new password. 
+From now, you will be able to log in with this password.
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            {!passwordError && <Grid item xs={12}>
+                <TextField
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: '#fff' }}}
+                  required
+                  margin="normal"
+                  fullWidth
+                  name="password"
+                  label="New password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                />
+              </Grid>}
+              {passwordError && <Grid item xs={12}>
+                <TextField
+                inputProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: '#fff' }}}
+                  error
+                  margin="normal"
+                  fullWidth
+                  name="password"
+                  label="New password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  helperText="Password should be at least 8 characters"
+                />
+              </Grid>}
             <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
+              name="repeatpassword"
+              label="Repeat password"
+              type="password"
+              id="repeatpassword"
+              autoComplete="repeat-new-password"
             />
             <Button
               type="submit"
@@ -128,12 +181,12 @@ export default function ResetPassword() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-               Send link
+              Change Password
             </Button>
             <Grid container>
               <Grid item>
-                <Link component={RouterLink} to='/login' variant="body2">
-                  {"Back to login"}
+                <Link component={RouterLink} to='/profile' variant="body2">
+                  {"Back to profile view"}
                 </Link>
               </Grid>
             </Grid>

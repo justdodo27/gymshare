@@ -8,6 +8,7 @@ import ProfileViewPage from './pages/ProfileViewPage';
 import EditProfilePage from './pages/EditProfilePage';
 import LogoutPage from './pages/LogoutPage';
 import { useSelector } from 'react-redux';
+import ConfirmPasswordPage from './pages/ConfirmPasswordPage';
 
 
 function App() {
@@ -49,6 +50,10 @@ function App() {
     <Route path='/logout'>
       {isAuth && <LogoutPage/>}
       {!isAuth && <Redirect to='/' />}
+    </Route>
+    <Route path='/confirm'>
+      {!isAuth && <ConfirmPasswordPage/>}
+      {isAuth && <Redirect to='/' />}
     </Route>
     <Route path='*'>
       <Redirect to='/' />
