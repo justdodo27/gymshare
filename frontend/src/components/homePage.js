@@ -9,6 +9,7 @@ import { blueGrey, indigo } from '@mui/material/colors';
 const sections = [
   { title: 'Profile', url: '/profile' },
   { title: 'Logout', url: '/logout' },
+  { title: 'Exercise', url: '/addExercise' },
 ];
 
 

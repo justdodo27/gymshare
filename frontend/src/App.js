@@ -9,6 +9,7 @@ import EditProfilePage from './pages/EditProfilePage';
 import LogoutPage from './pages/LogoutPage';
 import { useSelector } from 'react-redux';
 import ConfirmPasswordPage from './pages/ConfirmPasswordPage';
+import AddExercisePage from './adminPages.js/addExercisePage';
 
 
 function App() {
@@ -54,6 +55,10 @@ function App() {
     <Route path='/confirm'>
       {!isAuth && <ConfirmPasswordPage/>}
       {isAuth && <Redirect to='/' />}
+    </Route>
+    <Route path='/addExercise'>
+      {isAuth && <AddExercisePage/>}
+      {!isAuth && <Redirect to='/' />}
     </Route>
     <Route path='*'>
       <Redirect to='/' />
