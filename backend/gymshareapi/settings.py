@@ -16,16 +16,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-# Admins accounts
-ADMINS = [
-    ('admin', 'admin@admin.com', 'Strong2137'),
-]
-
-# Users accounts
-USERS = [
-    ('dodo', 'dodo@dodo.com', 'Strong2137'),
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -137,6 +127,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

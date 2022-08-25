@@ -18,8 +18,8 @@ class Exercise(models.Model):
     description = models.TextField(max_length=300, null=True, blank=True)
     difficulty = models.PositiveIntegerField()
     calories_burn_rate = models.FloatField(validators=[MinValueValidator(0)])
-    thumbnail = models.ImageField(null=True, blank=True)
-    video = models.FileField(null=True, blank=True)
+    thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
+    video = models.FileField(upload_to='videos/', null=True, blank=True)
     exercise_type = models.CharField(max_length=30, choices=EXERCISE_TYPES, default=WITH_A_WEIGHT)
 
     def __str__(self) -> str:

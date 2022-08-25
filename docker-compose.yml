@@ -14,10 +14,11 @@ services:
     restart: always
     build: 
       context: ./backend
-    command: bash -c "python manage.py collectstatic --clear --noinput && python manage.py migrate && python manage.py initaccounts && gunicorn gymshareapi.wsgi:application -w 2 -b :8000 --reload"
+    command: bash -c "python manage.py collectstatic --clear --noinput && python manage.py migrate && python manage.py initaccounts && python manage.py initexercises && gunicorn gymshareapi.wsgi:application -w 2 -b :8000 --reload"
     volumes:
       - ./backend:/backend
       - static_volume:/backend/staticfiles
+      - media_volume:/backend/mediafiles
     ports:
       - "8000:8000"
     environment:
@@ -44,6 +45,7 @@ services:
     build: ./nginx
     volumes:
       - static_volume:/backend/staticfiles
+      - media_volume:/backend/mediafiles
     ports:
       - 1337:80
     environment:
@@ -58,3 +60,4 @@ services:
 volumes:
   postgres_data:
   static_volume:
+  media_volume:
