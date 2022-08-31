@@ -14,7 +14,7 @@ services:
     restart: always
     build: 
       context: ./backend
-    command: bash -c "python manage.py collectstatic --clear --noinput && python manage.py migrate && python manage.py initaccounts && python manage.py initexercises && python manage.py initstats && gunicorn gymshareapi.wsgi:application -w 2 -b :8000 --reload"
+    command: bash -c "python manage.py collectstatic --clear --noinput && python manage.py migrate && python manage.py initaccounts && python manage.py initexercises && python manage.py initstats && python manage.py initworkouts && gunicorn gymshareapi.wsgi:application -w 2 -b :8000 --reload"
     volumes:
       - ./backend:/backend
       - static_volume:/backend/staticfiles

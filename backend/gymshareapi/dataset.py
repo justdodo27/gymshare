@@ -1,4 +1,4 @@
-from workouts.models import Exercise
+from workouts.models import Exercise, Workout
 
 # Admins accounts
 ADMINS = (
@@ -42,8 +42,44 @@ EXERCISES = [
 ]
 
 # Workouts
-WORKOUT = [
-    
+WORKOUTS = [
+    (
+        1,
+        'Turbo Admin Workout',
+        'Workout only for admin\'s',
+        0,
+        0,
+        Workout.PUBLIC,
+        3600,
+        2
+    )
+]
+
+EXERCISE_IN_WORKOUTS = [
+    (
+        1,
+        1,
+        1,
+        10,
+        None,
+        3
+    ),
+    (
+        2,
+        1,
+        2,
+        10,
+        None,
+        3
+    ),
+    (
+        3,
+        1,
+        3,
+        None,
+        3600,
+        1
+    ),
 ]
 
 # Statistics
