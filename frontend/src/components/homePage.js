@@ -11,6 +11,7 @@ const sections = [
   { title: 'Logout', url: '/logout' },
   { title: 'Exercise', url: '/addExercise' },
   { title: 'Ex In Work', url: '/addExerciseToWorkout' },
+  { title: 'AddWorkout', url: '/addWorkout' }
 ];
 
 

@@ -11,6 +11,8 @@ import { useSelector } from 'react-redux';
 import ConfirmPasswordPage from './pages/ConfirmPasswordPage';
 import AddExercisePage from './adminPages.js/addExercisePage';
 import AddExerciseToWorkoutPage from './pages/AddExerciseToWorkoutPAge';
+import AddWorkoutPage from './pages/addWorkoutPage';
+
 
 
 function App() {
@@ -63,6 +65,8 @@ function App() {
     </Route>
     <Route path='/addExerciseToWorkOut'>
       {isAuth && <AddExerciseToWorkoutPage/>}
+    <Route path='/addWorkout'>
+      {isAuth && <AddWorkoutPage/>}
       {!isAuth && <Redirect to='/' />}
     </Route>
     <Route path='*'>
