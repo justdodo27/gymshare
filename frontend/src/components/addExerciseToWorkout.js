@@ -23,6 +23,9 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 function Copyright(props) {
   return (
@@ -53,18 +56,66 @@ const theme = createTheme({
 }
 );
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const names = [
+  'Oliver Hansen',
+  'Van Henry',
+  'April Tucker',
+  'Ralph Hubbard',
+  'Omar Alexander',
+  'Carlos Abbott',
+  'Miriam Wagner',
+  'Bradley Wilkerson',
+  'Virginia Andrews',
+  'Kelly Snyder',
+];
+
+function getStyles(name, personName, theme) {
+  return {
+    fontWeight:
+      personName.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
 
 const Input = styled(MuiInput)`
   width: 42px;
 `;
 
-export default function AddExercise() {
+export default function AddExerciseToWork() {
 
   const history = useHistory();
   const [passwordError, setPasswordError] = useState(false)
   const [value, setValue] = React.useState(5);
   const [calories, setCalories] = React.useState(100);
+  const [time, setTime] = React.useState(10);
   const [type, setType] = React.useState('');
+  const [alignment, setAlignment] = React.useState('repeats');
+  const [personName, setPersonName] = React.useState('');
+
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setPersonName(value);
+  };
+
+  const handleChange1 = (event, newAlignment) => {
+    setAlignment(newAlignment);
+  };
+
   let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
 
@@ -80,6 +131,10 @@ export default function AddExercise() {
     setCalories(newValue);
   };
 
+  const handleTimeSliderChange = (event, newValue) => {
+    setTime(newValue);
+  };
+
   const handleInputChange = (event) => {
     setValue(event.target.value === '' ? '' : Number(event.target.value));
   };
@@ -88,11 +143,23 @@ export default function AddExercise() {
     setCalories(event.target.value === '' ? '' : Number(event.target.value));
   };
 
+  const handleTimeInputChange = (event) => {
+    setTime(event.target.value === '' ? '' : Number(event.target.value));
+  };
+
   const handleBlur = () => {
     if (value < 0) {
       setValue(0);
     } else if (value > 100) {
       setValue(100);
+    }
+  };
+
+  const handleTimeBlur = () => {
+    if (value < 0) {
+      setValue(0);
+    } else if (value > 60) {
+      setValue(60);
     }
   };
 
@@ -167,36 +234,49 @@ export default function AddExercise() {
             Add New Exercise
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} fullWidth>
-            <TextField
-            inputProps={{ style: { color: "white" } }}
-            InputLabelProps={{ style: { color: '#fff' }} }
-              margin="normal"
-              required
-              fullWidth
-              label="Title"
-              type="text"
-              id="title"
-              name='title'
-              autoComplete='off'
-            />
-            <Grid item xs={12}>
-                <TextField
-                inputProps={{ style: { color: "white" } }}
-                InputLabelProps={{ style: { color: '#fff' }}}
-                  fullWidth
-                  name="description"
-                  label="Description"
-                  type="text"
-                  id="description"
-                  autoComplete="off"
-                  multiline
-                  rows={3}
-                />
-              </Grid>
-              <Typography id="input-slider" gutterBottom marginTop={2}>
-        Difficulty
-      </Typography>
-      <Grid container spacing={2} alignItems="center">
+          <div>
+      <FormControl sx={{ m: 1, width: 300, mt: 3 }}>
+        <Select
+          value={personName}
+          onChange={handleChange}
+          input={<OutlinedInput />}
+          renderValue={(selected) => {
+            return selected;
+          }}
+          MenuProps={MenuProps}
+          inputProps={{ 'aria-label': 'Without label' }}
+        >
+          {names.map((name) => (
+            <MenuItem
+              key={name}
+              value={name}
+              style={getStyles(name, personName, theme)}
+            >
+              {name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+    <Grid container spacing={2} alignItems="center">
+    <Grid item marginTop={2} alignItems="center">
+    <ToggleButtonGroup
+      color="primary"
+      value={alignment}
+      exclusive
+      onChange={handleChange1}
+      aria-label="Platform"
+      size='large'
+    >
+      <ToggleButton size='medium' value="repeats">On Repeats</ToggleButton>
+      <ToggleButton size='medium' value="time">On Time</ToggleButton>
+    </ToggleButtonGroup>
+    </Grid>
+    </Grid>
+              {alignment==='repeats' && <Typography id="input-slider" gutterBottom marginTop={2}>
+        Repeats
+      </Typography>}
+      {alignment==='repeats' && <Grid container spacing={2} alignItems="center">
       <Grid item xs>
           <Slider
             value={typeof value === 'number' ? value : 0}
@@ -221,11 +301,11 @@ export default function AddExercise() {
             }}
           />
         </Grid>
-      </Grid>
-      <Typography id="input-slider" gutterBottom marginTop={2}>
-        Calories Burn Rate
-      </Typography>
-      <Grid container spacing={2} alignItems="center">
+      </Grid>}
+      {alignment==='repeats' && <Typography id="input-slider" gutterBottom marginTop={2}>
+        Series
+      </Typography>}
+      {alignment==='repeats' && <Grid container spacing={2} alignItems="center">
       <Grid item xs>
           <Slider
             value={typeof calories === 'number' ? calories : 0}
@@ -250,31 +330,51 @@ export default function AddExercise() {
             }}
           />
         </Grid>
-      </Grid>
-        <div>
-      <FormControl sx={{ m: 1, minWidth: 300 }}>
-        <InputLabel id="demo-simple-select-autowidth-label">Exercise Type</InputLabel>
-        <Select
-          labelId="demo-simple-select-autowidth-label"
-          id="demo-simple-select-autowidth"
-          value={type}
-          onChange={handleTypeChange}
-          fullWidth
-          label="Exercise Type"
-        >
-          <MenuItem value="With own body weight">With own body weight</MenuItem>
-          <MenuItem value="With a weight">With a weight</MenuItem>
-          <MenuItem value="With time">With time</MenuItem>
-        </Select>
-      </FormControl>
-    </div>
+      </Grid>}
+      {alignment==='time' && <Typography id="input-slider" gutterBottom marginTop={2}>
+        Time
+      </Typography>}
+      {alignment==='time' && <Grid container spacing={2} alignItems="center">
+      <Grid item xs>
+          <Slider
+            value={typeof time === 'number' ? time : 0}
+            onChange={handleTimeSliderChange}
+            aria-labelledby="input-slider"
+            min={1}
+            max={60}
+          />
+        </Grid>
+        <Grid item marginBottom={3}>
+          <Input
+            value={time}
+            size="small"
+            onChange={handleTimeInputChange}
+            onBlur={handleTimeBlur}
+            inputProps={{
+              step: 1,
+              min: 1,
+              max: 60,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            }}
+          />
+        </Grid>
+      </Grid>}
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Add Exercise
+              Add next Exercise
+            </Button>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Create your workout
             </Button>
             <Grid container>
               <Grid item>

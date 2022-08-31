@@ -10,6 +10,7 @@ const sections = [
   { title: 'Profile', url: '/profile' },
   { title: 'Logout', url: '/logout' },
   { title: 'Exercise', url: '/addExercise' },
+  { title: 'Ex In Work', url: '/addExerciseToWorkout' },
   { title: 'AddWorkout', url: '/addWorkout' }
 ];
 
