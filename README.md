@@ -14,12 +14,12 @@ TODO:
 ## Functionality
 - [x] U Create account
 - [x] UA Login to account
-- [ ] UA Create workouts from exercises
+- [x] UA Create workouts from exercises
 - [ ] UA Run any workout from mobile app
 - [ ] UA View profile with stats etc.
 - [ ] UA Search/Filter other accounts
 - [ ] UA Add to favorites
-- [ ] A Create exercise
+- [x] A Create exercise
 - [ ] A Edit/Delete any public workouts
 
 User can download workout to phone and edit it (changes will be local).
