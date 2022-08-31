@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from accounts import urls as accounts_urls
 from accounts.views import MyTokenObtainPairView
 from workouts import urls as workouts_urls
+from stats import urls as stats_urls
 
 # Documentation schema
 schema_view = get_schema_view(
@@ -29,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/password-reset/', include('django_rest_passwordreset.urls', namespace='password-reset')),
+    path('stats/', include(stats_urls)),
 
     # Documentation urls
     re_path(r'^docs(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
