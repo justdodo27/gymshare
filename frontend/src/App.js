@@ -65,6 +65,8 @@ function App() {
     </Route>
     <Route path='/addExerciseToWorkOut'>
       {isAuth && <AddExerciseToWorkoutPage/>}
+      {!isAuth && <Redirect to='/' />}
+    </Route>
     <Route path='/addWorkout'>
       {isAuth && <AddWorkoutPage/>}
       {!isAuth && <Redirect to='/' />}
