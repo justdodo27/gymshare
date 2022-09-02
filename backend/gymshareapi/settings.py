@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'drf_yasg',
     'rest_framework',
     'django_rest_passwordreset',
@@ -146,7 +147,7 @@ REST_FRAMEWORK  = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
 }
 
 # CSRF Trusted origins
