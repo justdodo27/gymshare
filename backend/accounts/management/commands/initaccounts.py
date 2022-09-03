@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
-from django.conf import settings
+from gymshareapi.dataset import ADMINS, USERS
 
 class Command(BaseCommand):
     """
@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if User.objects.count() == 0:
-            for user in settings.ADMINS:
+            for user in ADMINS:
                 username = user[0]
                 email = user[1]
                 password = user[2]
@@ -21,7 +21,7 @@ class Command(BaseCommand):
                 admin.is_staff = True
                 admin.is_superuser = True
                 admin.save()
-            for user in settings.USERS:
+            for user in USERS:
                 username = user[0]
                 email = user[1]
                 password = user[2]
