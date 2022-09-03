@@ -30,6 +30,7 @@ import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
+import mario from "../pictures/mario.jpg"
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -80,6 +81,7 @@ const sections = [
 export default function Profile() {
 
   const userId = useSelector(state => state.auth.userId);
+  const username = useSelector(state => state.auth.username);
   let token = useSelector(state => state.auth.token)
 
   const [height, setHeight] = useState(null)
@@ -88,6 +90,7 @@ export default function Profile() {
   const [lastName, setLastName] = useState(null)
   const [alignment, setAlignment] = React.useState('your');
   const [expanded, setExpanded] = React.useState(false);
+  const [workouts, setWorkouts] = React.useState([]);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -117,16 +120,42 @@ export default function Profile() {
       })
   }
 
+  const fetchWorkout = () => {
+
+    fetch("http://localhost:1337/workouts/plans/?search="+username, {
+      headers: {
+        Authorization: "Bearer " +token
+      },
+    })
+
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        const myWorkouts = []
+        for (let i = 0; i < data.length; i++){
+          if(data[i].author == userId){
+            myWorkouts.push(data[i])
+          }
+        }
+        setWorkouts(myWorkouts);
+      })
+  }
+
   useEffect(() => {
     fetchData()
+    fetchWorkout()
   }, [])
-
+  
   return (
     <Fragment>
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="lg">
         <CssBaseline />
         <Header title="Gymshare" sections={sections} />
+        <Typography component="h1" variant="h2" color="inherit" align="center" noWrap sx={{ flex: 1 }}>
+          @{username}
+        </Typography>
         <Box
           sx={{
             marginTop: 8,
@@ -247,24 +276,26 @@ export default function Profile() {
       <ToggleButton size='medium' value="your">Your Workouts</ToggleButton>
       <ToggleButton size='medium' value="liked">Liked Workouts</ToggleButton>
     </ToggleButtonGroup>
+    {alignment==='your' && <Grid container spacing={0}>
 
-    {alignment==='your' && <Card sx={{ maxWidth: 545, minWidth: 645 }}>
+    {workouts.map((workout) => (<Grid item sx={2}>
+    <Card sx={{ minWidth: 575 }}>
       <CardActionArea>
         <CardMedia
           component="img"
-          height="340"
-          image="/static/images/cards/contemplative-reptile.jpg"
-          alt="gracjan r"
+          height="450"
+          image={icon}
+          alt="sample img"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            Trening Piwosza
+            {workout.title}
           </Typography>
           <Typography gutterBottom variant="h7" component="div">
-            @dodo
+            @{username}
           </Typography>
           <p>Rating: 2.1</p>
-          <p>Difficulty: 3.7</p>
+          <p>Difficulty: {workout.difficulty}</p>
         </CardContent>
         <IconButton aria-label="add to favorites">
           <FavoriteIcon />
@@ -284,22 +315,27 @@ export default function Profile() {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
         <Typography variant="body2" color="text.secondary">
-            Dupnij se browarka byq
+            {workout.description}
           </Typography>
         </CardContent>
         </Collapse>
-    </Card>}
-    {alignment==='liked' && <Card sx={{ maxWidth: 645, minWidth: 645 }}>
+    </Card>
+    </Grid>))}
+    </Grid>}
+
+    {alignment==='liked' && <Grid container spacing={0}>
+    <Grid item sx={2}>
+    <Card sx={{ minWidth: 575, maxWidth: 575 }}>
       <CardActionArea>
         <CardMedia
           component="img"
-          height="340"
-          image="/frontend/src/pictures/icon.jpg"
+          height="450"
+          image={mario}
           alt="mario pudzian"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            Fiuto-pompki
+            Example Workout (Raw in code)
           </Typography>
           <Typography gutterBottom variant="h7" component="div">
             @PolskaGUROM200
@@ -325,12 +361,14 @@ export default function Profile() {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
         <Typography variant="body2" color="text.secondary">
-        Fiuto-pompki to ćwiczenie pobudzające zarówno mase mięśniową w okolicy bioder 
-            ale również brzucha. Idealne ćwiczenie dla początkującego ruchacza dymacza.
+        Na morza dnie na morza dnie, tam gdzie jest sucho może być krucho. Posłuchaj mnie
+        na morza dnie oni na górze uwierz mi w słońcu charują całe dni my tylko jemy i dryfujemy a gdzie? Na morza dnie.
           </Typography>
         </CardContent>
         </Collapse>
-    </Card>}
+    </Card>
+    </Grid>
+    </Grid>}
     </Box>
         <Copyright sx={{ mt: 5 }} />
       </Container>
