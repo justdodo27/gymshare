@@ -16,8 +16,6 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'description',]
     filterset_fields = ['exercise_type',]
     ordering_fields = ['title', 'calories_burn_rate', 'difficulty',]
-    pagination_class = PageNumberPagination
-    pagination_class.page_size = 2
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
