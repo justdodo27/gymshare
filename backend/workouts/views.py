@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions, filters
+from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, When, Case
+from django.db.models import Q
 
 from . import serializers, models
 
@@ -15,6 +16,8 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'description',]
     filterset_fields = ['exercise_type',]
     ordering_fields = ['title', 'calories_burn_rate', 'difficulty',]
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 2
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -35,6 +38,8 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'description', 'author__username']
     filterset_fields = ['visibility',]
     ordering_fields = ['title', 'sum_of_cb', 'difficulty', 'avg_time']
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 2
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -57,7 +62,6 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             self.serializer_class = serializers.WorkoutSerializer
         else:
             self.serializer_class = serializers.WorkoutSerializerWithAuthor
-            
         return super().get_serializer_class()
 
 
