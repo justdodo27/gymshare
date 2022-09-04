@@ -11,6 +11,10 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     """
     queryset = models.Exercise.objects.all()
     serializer_class = serializers.ExerciseSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['title', 'description',]
+    filterset_fields = ['exercise_type',]
+    ordering_fields = ['title', 'calories_burn_rate', 'difficulty',]
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
