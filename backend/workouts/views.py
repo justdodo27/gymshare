@@ -52,6 +52,14 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             return self.queryset.filter( queryset_for_public )    
         return self.queryset.filter( queryset_for_public | queryset_for_hidden )
 
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            self.serializer_class = serializers.WorkoutSerializer
+        else:
+            self.serializer_class = serializers.WorkoutSerializerWithAuthor
+            
+        return super().get_serializer_class()
+
 
 class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
     """
