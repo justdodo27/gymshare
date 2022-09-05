@@ -133,9 +133,10 @@ export default function Profile() {
       })
       .then(data => {
         const myWorkouts = []
-        for (let i = 0; i < data.length; i++){
-          if(data[i].author == userId){
-            myWorkouts.push(data[i])
+        console.log(data.results.length)
+        for (let i = 0; i < data.results.length; i++){
+          if(data.results[i].author.id == userId){
+            myWorkouts.push(data.results[i])
           }
         }
         setWorkouts(myWorkouts);
@@ -292,7 +293,7 @@ export default function Profile() {
             {workout.title}
           </Typography>
           <Typography gutterBottom variant="h7" component="div">
-            @{username}
+            @{workout.author.username}
           </Typography>
           <p>Rating: 2.1</p>
           <p>Difficulty: {workout.difficulty}</p>
