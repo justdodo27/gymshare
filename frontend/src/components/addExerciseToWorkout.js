@@ -23,9 +23,16 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import {
+  ListSubheader,
+  InputAdornment
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { useMemo } from 'react';
+import { useCallback } from 'react';
+import { useEffect } from 'react';
 
 function Copyright(props) {
   return (
@@ -56,40 +63,6 @@ const theme = createTheme({
 }
 );
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
-
-function getStyles(name, personName, theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
-
-
 const Input = styled(MuiInput)`
   width: 42px;
 `;
@@ -97,20 +70,84 @@ const Input = styled(MuiInput)`
 export default function AddExerciseToWork() {
 
   const history = useHistory();
-  const [passwordError, setPasswordError] = useState(false)
-  const [value, setValue] = React.useState(5);
-  const [calories, setCalories] = React.useState(100);
-  const [time, setTime] = React.useState(10);
+  const [repeats, setRepeats] = React.useState(5);
+  const [series, setSeries] = React.useState(5);
+  const [time, setTime] = React.useState(30);
   const [type, setType] = React.useState('');
-  const [alignment, setAlignment] = React.useState('repeats');
-  const [personName, setPersonName] = React.useState('');
+  const [alignment, setAlignment] = React.useState('series');
+  const [array, setArray] = React.useState([''])
+  const [indexes, setIndexes] = React.useState([''])
+  const [description, setDescription] = React.useState([''])
+  const [order, setOrder] = React.useState(0)
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(value);
-  };
+
+  const containsText = (text, searchText) =>
+  text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
+
+
+  const [selectedOption, setSelectedOption] = useState(array[0]);
+  console.log(selectedOption + '--Selected')
+
+  const [searchText, setSearchText] = useState("zzzzzzz");
+  console.log(searchText)
+  const displayedOptions = useMemo(
+    () => array.filter((option) => containsText(option, searchText)),
+    [searchText, array]
+  );
+
+  console.log(searchText)
+
+  const fetchMoviesHandler = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:1337/workouts/exercises/?search=" + searchText);
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+      const data = await response.json();
+      const arrayInput = data.map(data => data.title);
+      const arrayIndex = data.map(data => data.id);
+      console.log(arrayInput)
+      console.log(data)
+      setArray(arrayInput)
+      setIndexes(arrayIndex)
+      
+
+    } catch (error) {
+      return<p>Error</p>;
+    }
+    ;
+  }, [searchText]);
+
+  useEffect(() => {
+    fetchMoviesHandler();
+  }, [fetchMoviesHandler]);
+
+  const test = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:1337/workouts/exercises/?search=" + selectedOption);
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+      const data = await response.json();
+      const descriptions = data.map(data => data.description)
+      setDescription(descriptions[0])
+
+    } catch (error) {
+      return<p>Error</p>;
+    }
+    ;
+  }, [selectedOption]);
+
+  useEffect(() => {
+    test();
+  }, [test]);
+
+  const temp = array.indexOf(selectedOption)
+    const index = indexes[temp]
+    console.log(index + "--INDEX")
+
+  const descriptionData= description[temp]
+    console.log(descriptionData + "--DESCR")
 
   const handleChange1 = (event, newAlignment) => {
     setAlignment(newAlignment);
@@ -118,9 +155,10 @@ export default function AddExerciseToWork() {
 
   let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
+  console.log(token)
 
   const handleSliderChange = (event, newValue) => {
-    setValue(newValue);
+    setRepeats(newValue);
   };
 
   const handleTypeChange = (event) => {
@@ -128,7 +166,7 @@ export default function AddExerciseToWork() {
   };
 
   const handleCaloriesSliderChange = (event, newValue) => {
-    setCalories(newValue);
+    setSeries(newValue);
   };
 
   const handleTimeSliderChange = (event, newValue) => {
@@ -136,11 +174,11 @@ export default function AddExerciseToWork() {
   };
 
   const handleInputChange = (event) => {
-    setValue(event.target.value === '' ? '' : Number(event.target.value));
+    setRepeats(event.target.value === '' ? '' : Number(event.target.value));
   };
 
   const handleCaloriesInputChange = (event) => {
-    setCalories(event.target.value === '' ? '' : Number(event.target.value));
+    setSeries(event.target.value === '' ? '' : Number(event.target.value));
   };
 
   const handleTimeInputChange = (event) => {
@@ -148,27 +186,31 @@ export default function AddExerciseToWork() {
   };
 
   const handleBlur = () => {
-    if (value < 0) {
-      setValue(0);
-    } else if (value > 100) {
-      setValue(100);
+    if (repeats < 0) {
+      setRepeats(1);
+    } else if (repeats > 10) {
+      setRepeats(10);
     }
   };
 
   const handleTimeBlur = () => {
-    if (value < 0) {
-      setValue(0);
-    } else if (value > 60) {
-      setValue(60);
+    if (time < 0) {
+      setTime(1);
+    } else if (time > 60) {
+      setTime(60);
     }
   };
 
   const handleCaloriesBlur = () => {
-    if (value < 0) {
-      setValue(0);
-    } else if (value > 500) {
-      setValue(500);
+    if (series< 0) {
+      setRepeats(1);
+    } else if (series> 20) {
+      setRepeats(20);
     }
+  };
+
+  const end = (event) => {
+    history.replace('/');
   };
 
   const handleSubmit = (event) => {
@@ -179,17 +221,17 @@ export default function AddExerciseToWork() {
     const description = data.get('description')
     console.log(description)
     console.log(type)
-    console.log(value)
-    console.log(calories)
 
-    fetch("http://localhost:1337/workouts/exercises/", {
+    console.log(selectedOption)
+    if(alignment==="series"){
+    fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
       method: 'POST',
         body: JSON.stringify({
-          title: title,
-          description: description,
-          difficulty: value,
-          calories_burn_rate: calories,
-          exercise_type: type
+          order: order,
+          repeats: repeats,
+          series: series,
+          exercise: index,
+          workout: 2
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -208,12 +250,61 @@ export default function AddExerciseToWork() {
       })
       .then((data) => {
         console.log(data)
-        history.replace('/');
+        setOrder(order+1)
+        setDescription('')
+        setSelectedOption('')
+        setSeries(1)
+        setRepeats(1)
+        setTime(1)
       })
       .catch((err) => {
         alert(err.message);
       });
-  };
+  }
+
+  if(alignment==="time"){
+    fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
+      method: 'POST',
+        body: JSON.stringify({
+          order: order,
+          repeats: repeats,
+          time: time,
+          exercise: index,
+          workout: 2
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " +token
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = 'Wrong username or password!';
+            throw new Error(errorMessage);
+          });
+        }
+      })
+      .then((data) => {
+        console.log(data)
+        setOrder(order+1)
+        setDescription('')
+        setSelectedOption('')
+        setSeries(1)
+        setRepeats(1)
+        setTime(1)
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+  }
+
+
+};
+
+  
 
   return (
     <Fragment>
@@ -235,51 +326,75 @@ export default function AddExerciseToWork() {
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} fullWidth>
           <div>
-      <FormControl sx={{ m: 1, width: 300, mt: 3 }}>
+      <FormControl fullWidth>
+        <InputLabel id="search-select-label">Options</InputLabel>
         <Select
-          value={personName}
-          onChange={handleChange}
-          input={<OutlinedInput />}
-          renderValue={(selected) => {
-            return selected;
-          }}
-          MenuProps={MenuProps}
-          inputProps={{ 'aria-label': 'Without label' }}
+          // Disables auto focus on MenuItems and allows TextField to be in focus
+          MenuProps={{ autoFocus: false }}
+          labelId="search-select-label"
+          id="search-select"
+          value={selectedOption}
+          label="Options"
+          onChange={(e) => setSelectedOption(e.target.value)}
+          // This prevents rendering empty string in Select's value
+          // if search text would exclude currently selected option.
+          renderValue={() => selectedOption}
         >
-          {names.map((name) => (
-            <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
-            >
-              {name}
+          {/* TextField is put into ListSubheader so that it doesn't
+              act as a selectable item in the menu
+              i.e. we can click the TextField without triggering any selection.*/}
+          <ListSubheader>
+            <TextField
+              size="small"
+              // Autofocus on textfield
+              autoFocus
+              placeholder="Type to search..."
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+              onChange={(e) => {e.target.value!=='' && setSearchText(e.target.value)}}
+              onKeyDown={(e) => {
+                if (e.key !== "Escape") {
+                  // Prevents autoselecting item while typing (default Select behaviour)
+                  e.stopPropagation();
+                }
+              }}
+            />
+          </ListSubheader>
+          {array.map((option, i) => (
+            <MenuItem key={i} value={option}>
+              {option}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
     </div>
-    <Grid container spacing={2} alignItems="center">
+    <p>{selectedOption.length>1 && description}</p>
     <Grid item marginTop={2} alignItems="center">
     <ToggleButtonGroup
       color="primary"
       value={alignment}
       exclusive
+      fullWidth
       onChange={handleChange1}
-      aria-label="Platform"
       size='large'
     >
-      <ToggleButton size='medium' value="repeats">On Repeats</ToggleButton>
+      <ToggleButton size='medium' value="series">On Series</ToggleButton>
       <ToggleButton size='medium' value="time">On Time</ToggleButton>
     </ToggleButtonGroup>
     </Grid>
-    </Grid>
-              {alignment==='repeats' && <Typography id="input-slider" gutterBottom marginTop={2}>
+      <Typography id="input-slider" gutterBottom marginTop={2}>
         Repeats
-      </Typography>}
-      {alignment==='repeats' && <Grid container spacing={2} alignItems="center">
+      </Typography>
+      <Grid container spacing={2} alignItems="center">
       <Grid item xs>
           <Slider
-            value={typeof value === 'number' ? value : 0}
+            value={typeof repeats === 'number' ? repeats : 0}
             onChange={handleSliderChange}
             aria-labelledby="input-slider"
             min={1}
@@ -288,43 +403,43 @@ export default function AddExerciseToWork() {
         </Grid>
         <Grid item>
           <Input
-            value={value}
+            value={repeats}
             size="small"
             onChange={handleInputChange}
             onBlur={handleBlur}
             inputProps={{
               step: 1,
-              min: 0,
+              min: 1,
               max: 10,
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}
           />
         </Grid>
-      </Grid>}
-      {alignment==='repeats' && <Typography id="input-slider" gutterBottom marginTop={2}>
+      </Grid>
+      {alignment==='series' && <Typography id="input-slider" gutterBottom marginTop={2}>
         Series
       </Typography>}
-      {alignment==='repeats' && <Grid container spacing={2} alignItems="center">
+      {alignment==='series' && <Grid container spacing={2} alignItems="center">
       <Grid item xs>
           <Slider
-            value={typeof calories === 'number' ? calories : 0}
+            value={typeof series === 'number' ? series : 0}
             onChange={handleCaloriesSliderChange}
             aria-labelledby="input-slider"
             min={1}
-            max={500}
+            max={10}
           />
         </Grid>
         <Grid item marginBottom={3}>
           <Input
-            value={calories}
+            value={series}
             size="small"
             onChange={handleCaloriesInputChange}
             onBlur={handleCaloriesBlur}
             inputProps={{
-              step: 10,
-              min: 0,
-              max: 500,
+              step: 1,
+              min: 1,
+              max: 20,
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}
@@ -369,7 +484,7 @@ export default function AddExerciseToWork() {
               Add next Exercise
             </Button>
             <Button
-              type="submit"
+              onClick={end}
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
