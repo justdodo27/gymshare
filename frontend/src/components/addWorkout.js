@@ -23,6 +23,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { useDispatch } from 'react-redux';
+import { workoutActions } from '../store/workout';
 
 function Copyright(props) {
   return (
@@ -67,6 +69,7 @@ export default function AddWorkout() {
   let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
   let author = useSelector(state => state.auth.userId);
+  const dispatch = useDispatch();
 
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
@@ -133,7 +136,8 @@ export default function AddWorkout() {
       })
       .then((data) => {
         console.log(data)
-        history.replace('/');
+        dispatch(workoutActions.getWorkout(data.id))
+        history.replace('/addExerciseToWorkOut');
       })
       .catch((err) => {
         alert(err.message);
@@ -148,6 +152,7 @@ export default function AddWorkout() {
         <Box
           sx={{
             marginTop: 8,
+            marginBottom: 8,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -159,6 +164,7 @@ export default function AddWorkout() {
             Add New Workout
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} fullWidth>
+          <FormControl fullWidth>
             <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
@@ -171,7 +177,7 @@ export default function AddWorkout() {
               name='title'
               autoComplete='off'
             />
-            <Grid item xs={12}>
+            <Grid item xs={12} marginTop={2} marginBottom={3}>
                 <TextField
                 inputProps={{ style: { color: "white" } }}
                 InputLabelProps={{ style: { color: '#fff' }}}
@@ -186,9 +192,9 @@ export default function AddWorkout() {
                 />
               </Grid>
               
-      
-        <div>
-      <FormControl sx={{ m: 1, minWidth: 250 }}>
+            
+          <FormControl>
+          <Grid item xs={12}>
         <InputLabel id="demo-simple-select-autowidth-label">Visibility</InputLabel>
         <Select
           labelId="demo-simple-select-autowidth-label"
@@ -201,8 +207,8 @@ export default function AddWorkout() {
           <MenuItem value="Public">Public</MenuItem>
           <MenuItem value="Hidden">Hidden</MenuItem>
         </Select>
-      </FormControl>
-    </div>
+    </Grid>
+    </FormControl>
 
     <Typography id="input-slider" gutterBottom marginTop={2}>
         Cycles
@@ -233,6 +239,7 @@ export default function AddWorkout() {
           />
         </Grid>
       </Grid>
+      </FormControl>
             <Button
               type="submit"
               fullWidth
