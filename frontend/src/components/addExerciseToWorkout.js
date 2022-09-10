@@ -73,12 +73,13 @@ export default function AddExerciseToWork() {
   const [repeats, setRepeats] = React.useState(5);
   const [series, setSeries] = React.useState(5);
   const [time, setTime] = React.useState(30);
-  const [type, setType] = React.useState('');
   const [alignment, setAlignment] = React.useState('series');
   const [array, setArray] = React.useState([''])
   const [indexes, setIndexes] = React.useState([''])
   const [description, setDescription] = React.useState([''])
   const [order, setOrder] = React.useState(0)
+  let workoutId = useSelector(state => state.workout.workoutId);
+  console.log(workoutId)
 
 
   const containsText = (text, searchText) =>
@@ -153,16 +154,11 @@ export default function AddExerciseToWork() {
     setAlignment(newAlignment);
   };
 
-  let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
   console.log(token)
 
   const handleSliderChange = (event, newValue) => {
     setRepeats(newValue);
-  };
-
-  const handleTypeChange = (event) => {
-    setType(event.target.value);
   };
 
   const handleCaloriesSliderChange = (event, newValue) => {
@@ -210,20 +206,91 @@ export default function AddExerciseToWork() {
   };
 
   const end = (event) => {
+    if(alignment==="series" && selectedOption!==''){
+      fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
+        method: 'POST',
+          body: JSON.stringify({
+            order: order,
+            repeats: repeats,
+            series: series,
+            exercise: index,
+            workout: workoutId
+        }), 
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: "Bearer " +token
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((data) => {
+              let errorMessage = 'Wrong username or password!';
+              throw new Error(errorMessage);
+            });
+          }
+        })
+        .then((data) => {
+          console.log(data)
+          setOrder(order+1)
+          setDescription('')
+          setSelectedOption('')
+          setSeries(1)
+          setRepeats(1)
+          setTime(1)
+        })
+        .catch((err) => {
+          alert(err.message);
+        });
+    }
+
+    if(alignment==="time" && selectedOption!==''){
+      fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
+        method: 'POST',
+          body: JSON.stringify({
+            order: order,
+            repeats: repeats,
+            time: time,
+            exercise: index,
+            workout: workoutId
+        }), 
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: "Bearer " +token
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((data) => {
+              let errorMessage = 'Wrong username or password!';
+              throw new Error(errorMessage);
+            });
+          }
+        })
+        .then((data) => {
+          console.log(data)
+          setOrder(order+1)
+          setDescription('')
+          setSelectedOption('')
+          setSeries(1)
+          setRepeats(1)
+          setTime(1)
+        })
+        .catch((err) => {
+          alert(err.message);
+        });
+    }
+
     history.replace('/');
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const title = data.get('title')
-    console.log(title)
-    const description = data.get('description')
-    console.log(description)
-    console.log(type)
 
-    console.log(selectedOption)
-    if(alignment==="series"){
+    if(alignment==="series" && selectedOption!==''){
     fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
       method: 'POST',
         body: JSON.stringify({
@@ -231,8 +298,8 @@ export default function AddExerciseToWork() {
           repeats: repeats,
           series: series,
           exercise: index,
-          workout: 2
-      }),
+          workout: workoutId
+      }), 
       headers: {
         'Content-Type': 'application/json',
         Authorization: "Bearer " +token
@@ -262,7 +329,7 @@ export default function AddExerciseToWork() {
       });
   }
 
-  if(alignment==="time"){
+  if(alignment==="time" && selectedOption!==''){
     fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
       method: 'POST',
         body: JSON.stringify({
@@ -270,7 +337,7 @@ export default function AddExerciseToWork() {
           repeats: repeats,
           time: time,
           exercise: index,
-          workout: 2
+          workout: workoutId
       }),
       headers: {
         'Content-Type': 'application/json',
