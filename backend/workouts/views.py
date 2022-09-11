@@ -13,7 +13,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     queryset = models.Exercise.objects.all()
     serializer_class = serializers.ExerciseSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'description',]
+    search_fields = ['title',]
     filterset_fields = ['exercise_type',]
     ordering_fields = ['title', 'calories_burn_rate', 'difficulty',]
 
