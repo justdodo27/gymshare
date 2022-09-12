@@ -1,0 +1,3 @@
+workouts/migrations/*
+accounts/migrations/*
+stats/migrations/*
