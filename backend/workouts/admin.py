@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Exercise, Workout, ExcerciseInWorkout
+from .models import Exercise, FavoriteWorkout, Workout, ExcerciseInWorkout
 
 
 @admin.register(Exercise)
@@ -11,6 +11,11 @@ class ExerciseAdmin(admin.ModelAdmin):
 @admin.register(Workout)
 class WorkoutAdmin(admin.ModelAdmin):
     list_display = ('id', 'author', 'title', 'avg_time', 'visibility')
+
+
+@admin.register(FavoriteWorkout)
+class FavoriteWorkoutAdmin(admin.ModelAdmin):
+    list_display = ('id', 'workout', 'user')
 
 
 @admin.register(ExcerciseInWorkout)

@@ -54,6 +54,15 @@ class Workout(models.Model):
         ordering = ['id']
 
 
+class FavoriteWorkout(models.Model):
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'workout']
+
+
 class ExcerciseInWorkout(models.Model):
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
