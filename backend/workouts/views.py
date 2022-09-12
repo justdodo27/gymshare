@@ -62,6 +62,23 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             self.serializer_class = serializers.WorkoutSerializerWithAuthor
         return super().get_serializer_class()
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['user'] = self.request.user
+        return context
+
+
+class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows favorite workouts to be viewed or edited.
+    """
+    queryset = models.FavoriteWorkout.objects.all()
+    serializer_class = serializers.FavoriteWorkoutSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(user = self.request.user)
+
 
 class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
     """

@@ -19,6 +19,9 @@ services:
       - ./backend:/backend
       - static_volume:/backend/staticfiles
       - media_volume:/backend/mediafiles
+      - /backend/workouts/migrations
+      - /backend/stats/migrations
+      - /backend/accounts/migrations
     ports:
       - "8000:8000"
     environment:
