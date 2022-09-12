@@ -51,9 +51,13 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
         return ExerciseInWorkoutSerializer(qs, many=True).data
 
     def get_is_favorite(self, workout):
-        qs = models.FavoriteWorkout.objects.filter(workout=workout, user=self.context.get('user')).first()
-        if qs:
-            return True
+        context_user = self.context.get('user')
+        if context_user.is_anonymous: return False
+
+        qs = models.FavoriteWorkout.objects.filter(workout=workout, user=context_user).first()
+
+        if qs: return True
+        
         return False
 
     class Meta:
