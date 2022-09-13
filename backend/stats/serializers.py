@@ -101,9 +101,9 @@ class ExerciseDataSerializer(serializers.Serializer):
         user_weight = Profile.objects.get(user=user).weight
         if not user_weight: raise Exception('User Profile don\'t have weight data')
         if exerciseAttrs.get('time', None):
-            return exercise.calories_burn_rate * user_weight * exerciseAttrs['time']/60
+            return exercise.calories_burn_rate * user_weight * exerciseAttrs['time'] / 60
         elif exerciseAttrs.get('repeats', None):
-            return exercise.calories_burn_rate * user_weight * exerciseAttrs['repeats']
+            return exercise.calories_burn_rate * user_weight * exerciseAttrs['repeats'] * 5 / 60
         else:
             raise Exception('Wrong Exercise Attributes')
 

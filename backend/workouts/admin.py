@@ -10,7 +10,7 @@ class ExerciseAdmin(admin.ModelAdmin):
 
 @admin.register(Workout)
 class WorkoutAdmin(admin.ModelAdmin):
-    list_display = ('id', 'author', 'title', 'avg_time', 'visibility')
+    list_display = ('id', 'author', 'title', 'visibility')
 
 
 @admin.register(FavoriteWorkout)
