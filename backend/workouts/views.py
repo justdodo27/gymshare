@@ -94,3 +94,19 @@ class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
             self.permission_classes = [permissions.AllowAny]
 
         return super().get_permissions()
+
+
+class RatingViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows ratings to be viewed or edited.
+    """
+    queryset = models.Rating.objects.all()
+    serializer_class = serializers.RatingSerializer
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            self.permission_classes = [permissions.IsAuthenticated]
+        else:
+            self.permission_classes = [permissions.AllowAny]
+
+        return super().get_permissions()

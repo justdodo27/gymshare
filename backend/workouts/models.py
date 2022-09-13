@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Exercise(models.Model):
@@ -41,10 +41,7 @@ class Workout(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=80)
     description = models.TextField(max_length=300, null=True, blank=True)
-    sum_of_cb = models.FloatField(null=True, blank=True)
-    difficulty = models.FloatField(null=True, blank=True)
     visibility = models.CharField(max_length=20, choices=VISIBILITIES, default=PUBLIC)
-    avg_time = models.FloatField()
     cycles = models.PositiveIntegerField()
 
     def __str__(self) -> str:
@@ -76,3 +73,15 @@ class ExcerciseInWorkout(models.Model):
 
     class Meta:
         ordering = ['id']
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
+    rate = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+
+    def __str__(self) -> str:
+        return f'{self.workout} rating'
+
+    class Meta:
+        ordering = ['rate']
