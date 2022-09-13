@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models import Avg
 from rest_framework import serializers
 
 from . import models
@@ -44,6 +45,7 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
     exercises = serializers.SerializerMethodField()
     author = SimpleAuthorSerializer()
     is_favorite = serializers.SerializerMethodField()
+    avg_rating = serializers.SerializerMethodField()
 
     def get_exercises(self, workout):
         qs = models.ExcerciseInWorkout.objects.filter(workout=workout)
@@ -58,6 +60,11 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
         if qs: return True
         
         return False
+
+    def get_avg_rating(self, workout):
+        return models.Rating.objects.filter(
+            workout=workout
+        ).aggregate(Avg('rate')).get('rate__avg', 0)
 
     class Meta:
         model = models.Workout
