@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Exercise(models.Model):
@@ -76,3 +76,15 @@ class ExcerciseInWorkout(models.Model):
 
     class Meta:
         ordering = ['id']
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
+    rate = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+
+    def __str__(self) -> str:
+        return f'{self.workout} rating'
+
+    class Meta:
+        ordering = ['rate']
