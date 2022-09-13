@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Exercise, Workout, ExcerciseInWorkout, Rating
+from .models import Exercise, Workout, ExcerciseInWorkout, FavoriteWorkout, Rating
 
 
 @admin.register(Exercise)
