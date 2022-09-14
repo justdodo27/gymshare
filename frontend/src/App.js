@@ -12,6 +12,7 @@ import ConfirmPasswordPage from './pages/ConfirmPasswordPage';
 import AddExercisePage from './adminPages.js/addExercisePage';
 import AddExerciseToWorkoutPage from './pages/AddExerciseToWorkoutPAge';
 import AddWorkoutPage from './pages/addWorkoutPage';
+import SearchWorkoutPage from './pages/SearchWorkoutPage';
 
 
 
@@ -65,6 +66,10 @@ function App() {
     </Route>
     <Route path='/addExerciseToWorkOut'>
       {isAuth && <AddExerciseToWorkoutPage/>}
+      {!isAuth && <Redirect to='/' />}
+    </Route>
+    <Route path='/searchWorkout'>
+      {isAuth && <SearchWorkoutPage/>}
       {!isAuth && <Redirect to='/' />}
     </Route>
     <Route path='/addWorkout'>

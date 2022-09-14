@@ -6,14 +6,15 @@ import Header from "../components/header.js"
 import { blueGrey, indigo } from '@mui/material/colors';
 
 
-const sections = [
+export const sections = [
   { title: 'AddWorkout', url: '/addWorkout' },
+  { title: 'SearchWorkout', url: '/searchWorkout' },
   { title: 'Profile', url: '/profile' },
   { title: 'Logout', url: '/logout' },
 ];
 
 
-const theme = createTheme({
+export const theme = createTheme({
     palette: {
       mode: "dark",
       background: {

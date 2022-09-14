@@ -14,16 +14,6 @@ function Header(props) {
 
   return (
     <React.Fragment>
-            <Typography
-          component="h1"
-          variant="h2"
-          color="inherit"
-          align="center"
-          noWrap
-          sx={{ flex: 1 }}
-        >
-          {title}
-        </Typography>
       <Grid container spacing={2} sx={{ borderBottom: 1, borderColor: 'divider', margin:'auto' }}>
         <Grid item xs = {4}>
         <Toolbar >
