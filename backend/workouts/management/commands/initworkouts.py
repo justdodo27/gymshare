@@ -17,11 +17,8 @@ class Command(BaseCommand):
                 workout_kwargs = {
                     'title': workout[1],
                     'description': workout[2],
-                    "sum_of_cb": workout[3],
-                    "difficulty": workout[4],
-                    'visibility': workout[5],
-                    'avg_time': workout[6],
-                    'cycles': workout[7]
+                    'visibility': workout[3],
+                    'cycles': workout[4]
                 }
                 author = User.objects.get(id=workout[0])
                 print(f"Creating workout {workout_kwargs}")

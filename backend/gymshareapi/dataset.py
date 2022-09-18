@@ -47,10 +47,7 @@ WORKOUTS = [
         1,
         'Turbo Admin Workout',
         'Workout only for admin\'s',
-        0,
-        0,
         Workout.PUBLIC,
-        3600,
         2
     )
 ]
