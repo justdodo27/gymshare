@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from workouts.models import Exercise
 
 class StatisticCalories(models.Model):
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField()
     calories = models.FloatField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
