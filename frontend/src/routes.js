@@ -6,6 +6,7 @@ import LogoOnlyLayout from './layouts/LogoOnlyLayout';
 import Blog from './pages/Blog';
 import User from './pages/User';
 import Login from './pages/Login';
+import Forgot from './pages/ForgotPassword';
 import NotFound from './pages/Page404';
 import Register from './pages/Register';
 import Products from './pages/Products';
@@ -17,11 +18,11 @@ import Profile from './pages/Profile';
 export default function Router() {
   return useRoutes([
     {
-      path: '/',
+      path: '/gymshare',
       element: <DashboardLayout />,
       children: [
         { path: 'app', element: <Profile /> },
-        { path: 'user', element: <User /> },
+        { path: 'workouts', element: <User /> },
         { path: 'products', element: <Products /> },
         { path: 'blog', element: <Blog /> },
         { path: 'statistics', element: <DashboardApp /> },
@@ -38,10 +39,14 @@ export default function Router() {
       element: <Register />,
     },
     {
+      path: 'forgot',
+      element: <Forgot />,
+    },
+    {
       path: '/',
       element: <LogoOnlyLayout />,
       children: [
-        { path: '/', element: <Navigate to="/app" /> },
+        { path: '/', element: <Navigate to="/gymshare/app" /> },
         { path: '404', element: <NotFound /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
@@ -52,7 +57,7 @@ export default function Router() {
     },
     {
       path: '/',
-      element: <Navigate to="/app" replace />,
+      element: <Navigate to="/gymshare/app" replace />,
     },
   ]);
 }

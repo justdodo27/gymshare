@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -14,11 +12,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Fragment } from 'react';
 import { blueGrey, indigo} from '@mui/material/colors';
-import icon from '../../../pictures/icon.jpg'
-import { useNavigate } from 'react-router-dom';
-import { useDispatch} from 'react-redux';
-import { authActions } from '../../../store/auth';
-import jwt_decode from "jwt-decode";
+import icon from "../../../pictures/icon.jpg"
 
 function Copyright(props) {
   return (
@@ -31,6 +25,11 @@ function Copyright(props) {
       {'.'}
     </Typography>
   );
+}
+
+function validatePassword (password) {
+  const regexp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/;
+  return regexp.test(password);
 }
 
 const theme = createTheme({
@@ -49,23 +48,20 @@ const theme = createTheme({
 }
 );
 
-export default function Login() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-
+export default function ResetPassword() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const password = data.get('password')
-    const username = data.get('username')
-    console.log(password, username);
+    const email = data.get('email')
+    
 
-    fetch("http://localhost:1337/api/token/", {
+    
+
+    
+    fetch("http://localhost:1337/api/password-reset/", {
       method: 'POST',
-      body: JSON.stringify({
-        password: password,
-        username: username
+        body: JSON.stringify({
+          email: email
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -83,11 +79,6 @@ export default function Login() {
       })
       .then((data) => {
         console.log(data)
-        const decodedData = jwt_decode(data.access)
-        const decodedId = decodedData.user_id
-        console.log(data.access)
-        dispatch(authActions.login([data.access, decodedId, username]))
-        navigate('/gymshare/app', { replace: true });
       })
       .catch((err) => {
         alert(err.message);
@@ -112,7 +103,10 @@ export default function Login() {
           </Avatar>
           </Link>
           <Typography component="h1" variant="h5">
-            Sign in
+            Reset Password
+          </Typography>
+          <Typography component="h1" variant="body1">
+            Please enter your email address. You will receive a link to create a new password via email.
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -121,27 +115,11 @@ export default function Login() {
               margin="normal"
               required
               fullWidth
-              id="username"
-              label="Username"
-              name="username"
-              autoComplete="username"
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
               autoFocus
-            />
-            <TextField
-            inputProps={{ style: { color: "white" } }}
-            InputLabelProps={{ style: { color: '#fff' }} }
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
             />
             <Button
               type="submit"
@@ -149,17 +127,12 @@ export default function Login() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+               Send link
             </Button>
             <Grid container>
-              <Grid item xs>
-                <Link component={RouterLink} to='/forgot' variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
               <Grid item>
-                <Link component={RouterLink} to='/register' variant="body2">
-                  {"Don't have an account? Sign Up"}
+                <Link component={RouterLink} to='/login' variant="body2">
+                  {"Back to login"}
                 </Link>
               </Grid>
             </Grid>

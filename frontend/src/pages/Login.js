@@ -36,23 +36,11 @@ export default function Login() {
 
         <Container maxWidth="sm">
           <ContentStyle>
-            <Typography variant="h4" gutterBottom>
-              Sign in to Minimal
-            </Typography>
-
-            <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography>
-
-            <AuthSocial />
+            
 
             <LoginForm />
 
-            
-              <Typography variant="body2" align="center" sx={{ mt: 3 }}>
-                Don’t have an account?{' '}
-                <Link variant="subtitle2" component={RouterLink} to="/register">
-                  Get started
-                </Link>
-              </Typography>
+  
           </ContentStyle>
         </Container>
     </Page>

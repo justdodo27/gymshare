@@ -8,7 +8,7 @@ const getIcon = (name) => <Iconify icon={name} width={22} height={22} />;
 const navConfig = [
   {
     title: 'dashboard',
-    path: '/app',
+    path: '/gymshare/app',
     icon: getIcon('eva:home-fill'),
   },
   {
@@ -23,17 +23,17 @@ const navConfig = [
   },
   {
     title: 'profile',
-    path: '/user',
+    path: '/gymshare/user',
     icon: getIcon('eva:people-fill'),
   },
   {
     title: 'workouts',
-    path: '/products',
+    path: '/gymshare/workouts',
     icon: getIcon('eva:shopping-bag-fill'),
   },
   {
     title: 'statistics',
-    path: '/statistics',
+    path: '/gymshare/statistics',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
 ];
