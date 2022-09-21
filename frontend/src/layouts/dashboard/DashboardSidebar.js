@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
+import * as React from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
+import { Box, Link, Button, Drawer, Typography, Avatar, Stack, Menu, MenuItem } from '@mui/material';
+
 // mock
 import account from '../../_mock/account';
 // hooks
@@ -46,6 +48,15 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
 
   const isDesktop = useResponsive('up', 'lg');
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   useEffect(() => {
     if (isOpenSidebar) {
       onCloseSidebar();
@@ -65,8 +76,15 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
       </Box>
 
       <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none" component={RouterLink} to="#">
           <AccountStyle>
+          <Button
+        style={{minWidth: '100%'}}
+        id="basic-button"
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+        >
             <Avatar src={account.photoURL} alt="photoURL" />
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
@@ -76,8 +94,21 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
                 {account.role}
               </Typography>
             </Box>
+            </Button>
           </AccountStyle>
-        </Link>
+          <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        <MenuItem onClick={handleClose} component={RouterLink} to="/Profile">Profile</MenuItem>
+        <MenuItem onClick={handleClose} component={RouterLink} to="/changePassword">Change Password</MenuItem>
+        <MenuItem onClick={handleClose} component={RouterLink} to="/logout">Logout</MenuItem>
+      </Menu>
       </Box>
 
       <NavSection navConfig={navConfig} />
