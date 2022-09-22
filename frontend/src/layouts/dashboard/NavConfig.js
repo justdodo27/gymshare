@@ -12,6 +12,11 @@ const navConfig = [
     icon: getIcon('eva:home-fill'),
   },
   {
+    title: 'profile',
+    path: '/gymshare/profile',
+    icon: getIcon('eva:person-fill'),
+  },
+  {
     title: 'login',
     path: '/login',
     icon: getIcon('eva:lock-fill'),
@@ -20,11 +25,6 @@ const navConfig = [
     title: 'register',
     path: '/register',
     icon: getIcon('eva:person-add-fill'),
-  },
-  {
-    title: 'profile',
-    path: '/gymshare/user',
-    icon: getIcon('eva:people-fill'),
   },
   {
     title: 'workouts',

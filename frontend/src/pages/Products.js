@@ -29,7 +29,7 @@ export default function EcommerceShop() {
           <Typography variant="h4" gutterBottom>
             Workouts
           </Typography>
-          <Button variant="contained" component={RouterLink} to="/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
             New Workout
           </Button>
         </Stack>

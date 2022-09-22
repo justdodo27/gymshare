@@ -1,18 +1,8 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
+import { Avatar, TextField, Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { Link } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Fragment } from 'react';
 import icon from "../pictures/icon.jpg"
-import { useHistory} from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import { useState } from 'react';
 import { useSelector} from 'react-redux';
 import Slider from '@mui/material/Slider';
@@ -24,27 +14,16 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useDispatch } from 'react-redux';
 import { workoutActions } from '../store/workout';
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link component={RouterLink} to='/' color="inherit">
-        Gymshare
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { useTheme } from '@mui/material/styles';
 
 const Input = styled(MuiInput)`
   width: 42px;
 `;
 
 export default function AddWorkout() {
+  const theme = useTheme();
 
-  const history = useHistory();
+  const history = useNavigate();
   const [passwordError, setPasswordError] = useState(false)
   const [value, setValue] = React.useState(1);
   const [visibility, setVisibility] = React.useState('Public');
@@ -128,7 +107,6 @@ export default function AddWorkout() {
 
   return (
       <Container component="main" maxWidth="xs">
-        <CssBaseline />
         <Box
           sx={{
             marginTop: 8,
@@ -230,14 +208,13 @@ export default function AddWorkout() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link component={RouterLink} to='/' variant="body2">
-                  {"Back to main Page"}
-                </Link>
+                <Button component={RouterLink} to='/' variant="body2">
+                  {"Back to home site"}
+                </Button>
               </Grid>
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
   );
 }

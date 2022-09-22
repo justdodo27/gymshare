@@ -12,6 +12,10 @@ import Register from './pages/Register';
 import Products from './pages/Products';
 import DashboardApp from './pages/DashboardApp';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
+import AddWorkout from './pages/AddWorkout';
+import ChangePassword from './pages/ChangePassword';
+import AddExerciseToWork from './pages/AddExerciseToWork';
 
 // ----------------------------------------------------------------------
 
@@ -21,13 +25,15 @@ export default function Router() {
       path: '/gymshare',
       element: <DashboardLayout />,
       children: [
-        { path: 'app', element: <Profile /> },
+        { path: 'profile', element: <Profile />, },
+        { path: 'editProfile', element: <EditProfile /> },
         { path: 'workouts', element: <User /> },
-        { path: 'products', element: <Products /> },
+        { path: 'app', element: <Products /> },
         { path: 'blog', element: <Blog /> },
         { path: 'statistics', element: <DashboardApp /> },
-        { path: 'profile', element: <Profile /> },
-        { path: 'addWorkout', element: <addWorkout /> },
+        { path: 'addWorkout', element: <AddWorkout /> },
+        { path: 'changePassword', element: <ChangePassword />, },
+        { path: 'addExerciseToWork', element: <AddExerciseToWork />, },
       ],
     },
     {

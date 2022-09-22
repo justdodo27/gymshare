@@ -105,8 +105,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={handleClose} component={RouterLink} to="/gymshare/Profile">Profile</MenuItem>
-        <MenuItem onClick={handleClose} component={RouterLink} to="/gymshare/changePassword">Change Password</MenuItem>
+        <MenuItem onClick={handleClose} component={RouterLink} to="/gymshare/ChangePassword">Change Password</MenuItem>
         <MenuItem onClick={handleClose} component={RouterLink} to="/logout">Logout</MenuItem>
       </Menu>
       </Box>

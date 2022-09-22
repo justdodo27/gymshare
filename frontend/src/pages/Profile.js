@@ -9,12 +9,13 @@ import {
 } from '../sections/@dashboard/app';
 import { useTheme } from '@mui/material/styles';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
 import { useState, useEffect } from "react";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+
+import { ProductSort, ProductList, ProductFilterSidebar } from '../sections/@dashboard/products';
+// mock
+import PRODUCTS from '../_mock/products';
 
 export default function Profile() {
   const theme = useTheme();
@@ -115,7 +116,7 @@ export default function Profile() {
               justifyContent="center"
               alignItems="center"
           >
-      <Button variant="contained" component={RouterLink} to="/EditProfile" style={{ minWidth: '40vh'}}>
+      <Button variant="contained" component={RouterLink} to="/gymshare/EditProfile" style={{ minWidth: '40vh'}}>
             Edit Profile
           </Button>
           </Box>
@@ -131,7 +132,7 @@ export default function Profile() {
             color: "primary.main",
           }}
           >
-      <Button variant="contained" component={RouterLink} to="/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
+      <Button variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
             New Workout
           </Button>
           </Box>
@@ -157,7 +158,8 @@ export default function Profile() {
       <ToggleButton size='medium' value="liked">Liked Workouts</ToggleButton>
     </ToggleButtonGroup>
     {alignment==='your' && <Grid container spacing={0}>
-
+      
+    <ProductList products={PRODUCTS} />
     {/* {workouts.map((workout) => (<Grid item sx={2}>
     <Card sx={{ minWidth: 575 }}>
     <CardActionArea>
