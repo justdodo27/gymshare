@@ -35,7 +35,7 @@ const Input = styled(MuiInput)`
 
 export default function AddExerciseToWork() {
 
-  const history = useNavigate();
+  const navigate = useNavigate();
   const [repeats, setRepeats] = React.useState(5);
   const [series, setSeries] = React.useState(5);
   const [time, setTime] = React.useState(30);
@@ -250,7 +250,7 @@ export default function AddExerciseToWork() {
         });
     }
 
-    history.replace('/');
+    navigate('/gymshare/app', { replace: true });
   };
 
   const handleSubmit = (event) => {

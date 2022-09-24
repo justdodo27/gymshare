@@ -114,7 +114,7 @@ export default function SignUp() {
         })
         .then((data) => {
           console.log(data)
-          navigate('/dashboard', { replace: true });
+          navigate('/gymshare/app', { replace: true });
         })
         .catch((err) => {
           alert(err.message);

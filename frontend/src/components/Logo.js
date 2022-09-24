@@ -21,5 +21,5 @@ export default function Logo({ disabledLink = false, sx }) {
     return <>{logo}</>;
   }
 
-  return <RouterLink to="/app">{logo}</RouterLink>;
+  return <RouterLink to="/gymshare/app">{logo}</RouterLink>;
 }

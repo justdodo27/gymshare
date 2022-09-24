@@ -23,7 +23,7 @@ const Input = styled(MuiInput)`
 export default function AddWorkout() {
   const theme = useTheme();
 
-  const history = useNavigate();
+  const navigate= useNavigate();
   const [passwordError, setPasswordError] = useState(false)
   const [value, setValue] = React.useState(1);
   const [visibility, setVisibility] = React.useState('Public');
@@ -98,7 +98,7 @@ export default function AddWorkout() {
       .then((data) => {
         console.log(data)
         dispatch(workoutActions.getWorkout(data.id))
-        history.replace('/addExerciseToWorkOut');
+        navigate('/gymshare/addExerciseToWork', { replace: true });
       })
       .catch((err) => {
         alert(err.message);

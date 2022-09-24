@@ -26,16 +26,22 @@ import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
 // mock
-import USERLIST from '../_mock/user';
+import { faker } from '@faker-js/faker';
+import { sample } from 'lodash';
+import { useCallback } from 'react';
+import { useEffect } from 'react';
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'title', label: 'Title', alignRight: false },
+  { id: 'author', label: 'Author', alignRight: false },
+  { id: 'difficulty', label: 'Difficulty', alignRight: false },
+  { id: 'avg_time', label: 'Avg Time', alignRight: false },
+  { id: 'rating', label: 'Rating', alignRight: false },
   { id: '' },
 ];
 
@@ -71,7 +77,10 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function User() {
+
   const [page, setPage] = useState(0);
+
+  const [array, setArray] = useState([]);
 
   const [order, setOrder] = useState('asc');
 
@@ -83,6 +92,41 @@ export default function User() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const fetchMoviesHandler = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:1337/workouts/plans/");
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+      const data = await response.json();
+      const temp = data.results
+  
+      
+
+      const users = [...Array(temp.length)].map((_, index) => ({
+        id: faker.datatype.uuid(),
+        avatarUrl: `/static/mock-images/avatars/avatar_${index + 1}.jpg`,
+        name: temp[index].title,
+        company: temp[index].author.username,
+        isVerified: temp[index].avg_time,
+        status: sample(['active', 'banned']),
+        role: temp[index].difficulty,
+      }));
+
+      setArray(users)
+
+      
+
+    } catch (error) {
+      return<p>Error</p>;
+    }
+    ;
+  }, []);
+
+  useEffect(() => {
+    fetchMoviesHandler();
+  }, [fetchMoviesHandler]);
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -91,7 +135,7 @@ export default function User() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = array.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -126,9 +170,9 @@ export default function User() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - array.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(array, getComparator(order, orderBy), filterName);
 
   const isUserNotFound = filteredUsers.length === 0;
 
@@ -137,10 +181,10 @@ export default function User() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            Workouts
           </Typography>
-          <Button variant="contained" component={RouterLink} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New User
+          <Button variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
+            New Workout
           </Button>
         </Stack>
 
@@ -154,7 +198,7 @@ export default function User() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={array.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -186,7 +230,7 @@ export default function User() {
                         </TableCell>
                         <TableCell align="left">{company}</TableCell>
                         <TableCell align="left">{role}</TableCell>
-                        <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
+                        <TableCell align="left">{isVerified}</TableCell>
                         <TableCell align="left">
                           <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
                             {sentenceCase(status)}
@@ -222,7 +266,7 @@ export default function User() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={array.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
