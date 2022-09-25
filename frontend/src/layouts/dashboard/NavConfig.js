@@ -1,9 +1,11 @@
 // component
 import Iconify from '../../components/Iconify';
+import { useSelector } from 'react-redux';
 
 // ----------------------------------------------------------------------
 
 const getIcon = (name) => <Iconify icon={name} width={22} height={22} />;
+
 
 const navConfig = [
   {

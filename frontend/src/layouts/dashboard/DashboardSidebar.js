@@ -15,7 +15,8 @@ import Logo from '../../components/Logo';
 import Scrollbar from '../../components/Scrollbar';
 import NavSection from '../../components/NavSection';
 //
-import navConfig from './NavConfig';
+import Iconify from '../../components/Iconify';
+import { useSelector } from 'react-redux';
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +45,51 @@ DashboardSidebar.propTypes = {
 };
 
 export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
+
+const getIcon = (name) => <Iconify icon={name} width={22} height={22} />;
+
+let isAuth = useSelector(state => state.auth.isAuthenticated);
+
+
+const navConfig = isAuth ? [
+  {
+    title: 'dashboard',
+    path: '/gymshare/app',
+    icon: getIcon('eva:home-fill'),
+  },
+  {
+    title: 'workouts',
+    path: '/gymshare/workouts',
+    icon: getIcon('eva:shopping-bag-fill'),
+  },
+  {
+    title: 'statistics',
+    path: '/gymshare/statistics',
+    icon: getIcon('eva:pie-chart-2-fill'),
+  },
+  {
+    title: 'profile',
+    path: '/gymshare/profile',
+    icon: getIcon('eva:person-fill'),
+  },
+] : [
+  {
+    title: 'dashboard',
+    path: '/gymshare/app',
+    icon: getIcon('eva:home-fill'),
+  },
+  {
+    title: 'login',
+    path: '/login',
+    icon: getIcon('eva:lock-fill'),
+  },
+  {
+    title: 'register',
+    path: '/register',
+    icon: getIcon('eva:person-add-fill'),
+  },
+];
+
   const { pathname } = useLocation();
 
   const isDesktop = useResponsive('up', 'lg');
@@ -75,7 +121,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
         <Logo />
       </Box>
 
-      <Box sx={{ mb: 5, mx: 2.5 }}>
+      {isAuth && <Box sx={{ mb: 5, mx: 2.5 }}>
           <AccountStyle>
           <Button
         style={{minWidth: '100%'}}
@@ -108,7 +154,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
         <MenuItem onClick={handleClose} component={RouterLink} to="/gymshare/ChangePassword">Change Password</MenuItem>
         <MenuItem onClick={handleClose} component={RouterLink} to="/logout">Logout</MenuItem>
       </Menu>
-      </Box>
+      </Box>}
 
       <NavSection navConfig={navConfig} />
 

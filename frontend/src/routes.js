@@ -16,37 +16,40 @@ import EditProfile from './pages/EditProfile';
 import AddWorkout from './pages/AddWorkout';
 import ChangePassword from './pages/ChangePassword';
 import AddExerciseToWork from './pages/AddExerciseToWork';
+import { useSelector } from 'react-redux';
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
+
+  let isAuth = useSelector(state => state.auth.isAuthenticated);
+
   return useRoutes([
     {
       path: '/gymshare',
       element: <DashboardLayout />,
       children: [
-        { path: 'profile', element: <Profile />, },
-        { path: 'editProfile', element: <EditProfile /> },
-        { path: 'workouts', element: <User /> },
+        { path: 'profile', element: isAuth ? (<Profile /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'editProfile', element: isAuth ? (<EditProfile/> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'workouts', element: isAuth ? (<User /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'app', element: <Products /> },
-        { path: 'blog', element: <Blog /> },
-        { path: 'statistics', element: <DashboardApp /> },
-        { path: 'addWorkout', element: <AddWorkout /> },
-        { path: 'changePassword', element: <ChangePassword />, },
-        { path: 'addExerciseToWork', element: <AddExerciseToWork />, },
+        { path: 'statistics', element: isAuth ? (<DashboardApp /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'addWorkout', element: isAuth ? (<AddWorkout /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'changePassword', element: isAuth ? (<ChangePassword /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'addExerciseToWork', element: isAuth ? (<AddExerciseToWork /> ) : (<Navigate to="/gymshare/app" />  )},
       ],
     },
     {
       path: 'login',
-      element: <Login />,
+      element: !isAuth ? (<Login /> ) : (<Navigate to="/gymshare/app" />  ),
     },
     {
       path: 'register',
-      element: <Register />,
+      element: !isAuth ? (<Register /> ) : (<Navigate to="/gymshare/app" />  ),
     },
     {
       path: 'forgot',
-      element: <Forgot />,
+      element: !isAuth ? (<Forgot /> ) : (<Navigate to="/gymshare/app" />  ),
     },
     {
       path: '/',
