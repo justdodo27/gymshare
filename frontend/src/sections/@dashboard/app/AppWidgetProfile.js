@@ -1,5 +1,4 @@
 // @mui
-import PropTypes from 'prop-types';
 import { alpha, styled } from '@mui/material/styles';
 import { Card, Typography } from '@mui/material';
 // utils
@@ -22,15 +21,7 @@ const IconWrapperStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-AppWidgetProfile.propTypes = {
-  color: PropTypes.string,
-  icon: PropTypes.string,
-  title: PropTypes.string.isRequired,
-  total: PropTypes.number.isRequired,
-  sx: PropTypes.object,
-};
-
-export default function AppWidgetProfile({ email, name, last, height, weight, color = 'primary', sx, ...other }) {
+export default function AppWidgetProfile({ name, last, height, weight, color = 'primary', sx, ...other }) {
   return (
     <Card
       sx={{
@@ -46,7 +37,6 @@ export default function AppWidgetProfile({ email, name, last, height, weight, co
         <Typography variant="h2" sx={{ opacity: 0.72 }}>
         {name} {last}
       </Typography>
-      <Typography variant="h5">{email}</Typography>
       <Typography variant="subtitle1">Height: {height}cm</Typography>
       <Typography variant="subtitle1">Weight: {weight}kg</Typography>
     </Card>

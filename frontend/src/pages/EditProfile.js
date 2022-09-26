@@ -18,7 +18,7 @@ export default function EditProfile() {
     const theme = useTheme();
 
   const userId = useSelector(state => state.auth.userId);
-  const history = useNavigate();
+  const navigate = useNavigate();
   let token = useSelector(state => state.auth.token);
 
 
@@ -34,6 +34,7 @@ export default function EditProfile() {
   
 
   console.log(token)
+  console.log(userId)
 
   const fetchData = () => {
   fetch("http://localhost:1337/accounts/profiles/" +userId, {
@@ -58,6 +59,9 @@ export default function EditProfile() {
     fetchData()
   }, [])
 
+  console.log(firstName)
+  console.log(lastName)
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -65,9 +69,6 @@ export default function EditProfile() {
     let weight = data.get('weight')
     let first_Name = data.get('first_name')
     let last_Name = data.get('last_name')
-
-    console.log(first_Name)
-    console.log(last_Name)
   
 
     if (validateNumber(weight)) {
@@ -113,7 +114,7 @@ export default function EditProfile() {
         })
         .then((data) => {
           console.log(data)
-          history.replace('/profile');
+          navigate('/gymshare/profile', {replace: true})
         })
         .catch((err) => {
           alert(err.message);

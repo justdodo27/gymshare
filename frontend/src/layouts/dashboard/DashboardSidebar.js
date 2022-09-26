@@ -49,7 +49,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
 const getIcon = (name) => <Iconify icon={name} width={22} height={22} />;
 
 let isAuth = useSelector(state => state.auth.isAuthenticated);
-
+const username = useSelector(state => state.auth.username);
 
 const navConfig = isAuth ? [
   {
@@ -134,10 +134,7 @@ const navConfig = isAuth ? [
             <Avatar src={account.photoURL} alt="photoURL" />
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
+                {username}
               </Typography>
             </Box>
             </Button>
@@ -152,7 +149,7 @@ const navConfig = isAuth ? [
         }}
       >
         <MenuItem onClick={handleClose} component={RouterLink} to="/gymshare/ChangePassword">Change Password</MenuItem>
-        <MenuItem onClick={handleClose} component={RouterLink} to="/logout">Logout</MenuItem>
+        <MenuItem onClick={handleClose} component={RouterLink} to="/gymshare/Logout">Logout</MenuItem>
       </Menu>
       </Box>}
 

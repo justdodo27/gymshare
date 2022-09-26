@@ -3,6 +3,7 @@ import { Navigate, useRoutes } from 'react-router-dom';
 import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
 //
+import { useSelector } from 'react-redux';
 import Blog from './pages/Blog';
 import User from './pages/User';
 import Login from './pages/Login';
@@ -16,7 +17,8 @@ import EditProfile from './pages/EditProfile';
 import AddWorkout from './pages/AddWorkout';
 import ChangePassword from './pages/ChangePassword';
 import AddExerciseToWork from './pages/AddExerciseToWork';
-import { useSelector } from 'react-redux';
+import Logout from './pages/Logout';
+
 
 // ----------------------------------------------------------------------
 
@@ -37,6 +39,7 @@ export default function Router() {
         { path: 'addWorkout', element: isAuth ? (<AddWorkout /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'changePassword', element: isAuth ? (<ChangePassword /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'addExerciseToWork', element: isAuth ? (<AddExerciseToWork /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'logout', element: isAuth ? (<Logout /> ) : (<Navigate to="/gymshare/app" />  )},
       ],
     },
     {

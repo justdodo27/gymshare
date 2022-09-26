@@ -8,6 +8,7 @@ import { fCurrency } from '../../../utils/formatNumber';
 // components
 import Label from '../../../components/Label';
 import { ColorPreview } from '../../../components/color-utils';
+import icon from "../../../pictures/icon.jpg"
 
 // ----------------------------------------------------------------------
 
@@ -26,15 +27,29 @@ ShopProductCard.propTypes = {
 };
 
 export default function ShopProductCard({ product }) {
-  const { name, cover, price, colors, status, priceSale } = product;
+  console.log(product)
+  const { 
+    author, 
+    avg_rating, 
+    avg_time, 
+    cycles,
+    description,
+    difficulty,
+    exercises,
+    id,
+    is_favorite,
+    sum_of_cb,
+    title,
+    visibility 
+    } = product;
 
   return (
     <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
-        {status && (
+        {visibility && (
           <Label
             variant="filled"
-            color={(status === 'sale' && 'error') || 'info'}
+            color={(visibility === 'Hidden' && 'error') || 'info'}
             sx={{
               zIndex: 9,
               top: 16,
@@ -43,34 +58,30 @@ export default function ShopProductCard({ product }) {
               textTransform: 'uppercase',
             }}
           >
-            {status}
+            {visibility}
           </Label>
         )}
-        <ProductImgStyle alt={name} src={cover} />
+        <ProductImgStyle alt={title} src={icon} />
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>
         <Link to="#" color="inherit" underline="hover" component={RouterLink}>
           <Typography variant="subtitle2" noWrap>
-            {name}
+            {title}
           </Typography>
         </Link>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={colors} />
           <Typography variant="subtitle1">
             <Typography
               component="span"
               variant="body1"
               sx={{
                 color: 'text.disabled',
-                textDecoration: 'line-through',
               }}
             >
-              {priceSale && fCurrency(priceSale)}
+              {author.username}
             </Typography>
-            &nbsp;
-            {fCurrency(price)}
           </Typography>
         </Stack>
       </Stack>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import { Container, Button, Stack, Typography } from '@mui/material';
@@ -7,12 +7,15 @@ import Iconify from '../components/Iconify';
 import Page from '../components/Page';
 import { ProductSort, ProductList, ProductFilterSidebar } from '../sections/@dashboard/products';
 // mock
-import PRODUCTS from '../_mock/products';
+import { useSelector} from 'react-redux';
 
 // ----------------------------------------------------------------------
 
 export default function EcommerceShop() {
+  let isAuth = useSelector(state => state.auth.isAuthenticated);
+
   const [openFilter, setOpenFilter] = useState(false);
+  const [workouts, setWorkouts] = useState([]);
 
   const handleOpenFilter = () => {
     setOpenFilter(true);
@@ -22,6 +25,35 @@ export default function EcommerceShop() {
     setOpenFilter(false);
   };
 
+  const fetchWorkout = (countPage) => {
+
+    fetch("http://localhost:1337/workouts/plans/?visibility=Public&page="+countPage, {
+    })
+
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        const myWorkouts = []
+        console.log("Chuj")
+        console.log(data.results.length)
+        for (let i = 0; i < data.results.length; i++){
+            if (data.results[i].visibility === 'Public'){
+              myWorkouts.push(data.results[i])
+            }
+        }
+        setWorkouts(myWorkouts);
+      })
+  }
+
+  useEffect(() => {
+    try {
+      fetchWorkout(1)
+    } catch (error) {
+      
+    }
+  }, [])
+
   return (
     <Page title="Dashboard: Products">
       <Container>
@@ -29,9 +61,9 @@ export default function EcommerceShop() {
           <Typography variant="h4" gutterBottom>
             Workouts
           </Typography>
-          <Button variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
+          {isAuth && <Button variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
             New Workout
-          </Button>
+          </Button>}
         </Stack>
 
         <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
@@ -45,7 +77,7 @@ export default function EcommerceShop() {
           </Stack>
         </Stack>
 
-        <ProductList products={PRODUCTS} />
+        <ProductList products={workouts} />
       </Container>
     </Page>
   );

@@ -16,7 +16,7 @@ function validatePassword (password) {
 export default function ChangePassword() {
     const theme = useTheme();
 
-  const history = useNavigate();
+  const navigate = useNavigate();
   const [passwordError, setPasswordError] = useState(false)
   let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
@@ -59,7 +59,7 @@ export default function ChangePassword() {
       })
       .then((data) => {
         console.log(data)
-        history.replace('/');
+        navigate('/gymshare/Logout', {replace: true})
       })
       .catch((err) => {
         alert(err.message);
