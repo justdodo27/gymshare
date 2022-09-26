@@ -18,6 +18,7 @@ import AddWorkout from './pages/AddWorkout';
 import ChangePassword from './pages/ChangePassword';
 import AddExerciseToWork from './pages/AddExerciseToWork';
 import Logout from './pages/Logout';
+import WorkoutDetail from './pages/WorkoutDetail';
 
 
 // ----------------------------------------------------------------------
@@ -40,6 +41,7 @@ export default function Router() {
         { path: 'changePassword', element: isAuth ? (<ChangePassword /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'addExerciseToWork', element: isAuth ? (<AddExerciseToWork /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'logout', element: isAuth ? (<Logout /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'workoutDetail', element: <WorkoutDetail /> },
       ],
     },
     {

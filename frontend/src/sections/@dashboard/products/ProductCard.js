@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Box, Card, Link, Typography, Stack } from '@mui/material';
+import { Box, Card, CardActionArea, Link, Typography, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 // utils
 import { fCurrency } from '../../../utils/formatNumber';
@@ -9,6 +9,9 @@ import { fCurrency } from '../../../utils/formatNumber';
 import Label from '../../../components/Label';
 import { ColorPreview } from '../../../components/color-utils';
 import icon from "../../../pictures/icon.jpg"
+import { useDispatch } from 'react-redux';
+import { workoutActions } from '../../../store/workout';
+import { useNavigate} from 'react-router-dom';
 
 // ----------------------------------------------------------------------
 
@@ -20,14 +23,19 @@ const ProductImgStyle = styled('img')({
   position: 'absolute',
 });
 
+
+
 // ----------------------------------------------------------------------
 
 ShopProductCard.propTypes = {
   product: PropTypes.object,
 };
 
+
 export default function ShopProductCard({ product }) {
-  console.log(product)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { 
     author, 
     avg_rating, 
@@ -43,8 +51,16 @@ export default function ShopProductCard({ product }) {
     visibility 
     } = product;
 
+    const handleClick = (workoutId) => {
+      dispatch(workoutActions.getWorkout(workoutId))
+      navigate('/gymshare/workoutDetail', { replace: true });
+    };
+
   return (
     <Card>
+      <CardActionArea onClick={() => {
+          handleClick(id)
+        }}>
       <Box sx={{ pt: '100%', position: 'relative' }}>
         {visibility && (
           <Label
@@ -65,11 +81,9 @@ export default function ShopProductCard({ product }) {
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Link to="#" color="inherit" underline="hover" component={RouterLink}>
           <Typography variant="subtitle2" noWrap>
             {title}
           </Typography>
-        </Link>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="subtitle1">
@@ -80,11 +94,12 @@ export default function ShopProductCard({ product }) {
                 color: 'text.disabled',
               }}
             >
-              {author.username}
+              @{author.username}
             </Typography>
           </Typography>
         </Stack>
       </Stack>
+      </CardActionArea>
     </Card>
   );
 }

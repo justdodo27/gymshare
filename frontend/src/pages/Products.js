@@ -35,7 +35,6 @@ export default function EcommerceShop() {
       })
       .then(data => {
         const myWorkouts = []
-        console.log("Chuj")
         console.log(data.results.length)
         for (let i = 0; i < data.results.length; i++){
             if (data.results[i].visibility === 'Public'){
@@ -55,7 +54,7 @@ export default function EcommerceShop() {
   }, [])
 
   return (
-    <Page title="Dashboard: Products">
+    <Page title="Workouts">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
