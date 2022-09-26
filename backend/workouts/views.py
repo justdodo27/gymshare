@@ -95,6 +95,13 @@ class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
 
         return super().get_permissions()
 
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            self.serializer_class = serializers.ExerciseInWorkoutCreateSerializer
+        else:
+            self.serializer_class = serializers.ExerciseInWorkoutSerializer
+        return super().get_serializer_class()
+
 
 class RatingViewSet(viewsets.ModelViewSet):
     """

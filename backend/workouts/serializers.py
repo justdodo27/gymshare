@@ -13,6 +13,12 @@ class ExerciseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ExerciseInWorkoutCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ExcerciseInWorkout
+        fields = '__all__'
+
+
 class ExerciseInWorkoutSerializer(serializers.ModelSerializer):
     exercise = ExerciseSerializer()
 
