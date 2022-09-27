@@ -12,6 +12,8 @@ import Label from '../components/Label';
 // mock
 import { useSelector} from 'react-redux';
 import icon from "../pictures/play.png"
+import { useDispatch } from 'react-redux';
+import { workoutActions } from '../store/workout';
 
 // ----------------------------------------------------------------------
 
@@ -21,6 +23,7 @@ const Transition = forwardRef(function Transition(props, ref) {
   });
 
 export default function WorkoutDetail() {
+  const dispatch = useDispatch();
     const ProductImgStyle = styled('img')({
         top: 0,
         width: '100%',
@@ -86,22 +89,21 @@ export default function WorkoutDetail() {
     visibility 
     } = workout;
 
-
+    dispatch(workoutActions.getWorkout(''))
 
   return (
     <Page title="Workout Details">
       <Container>
         <Card sx={{ maxWidth: "90%", minWidth: "90%"}}>
-      <CardActionArea>
-      <Box sx={{ pt: '50%', position: 'relative' }}>
+      <Box sx={{ pt: '1%', position: 'relative' }}>
         {visibility && (
           <Label
             variant="filled"
             color={(visibility === 'Hidden' && 'error') || 'info'}
             sx={{
               zIndex: 9,
-              top: 16,
-              right: 16,
+              top: '100%',
+              right: '5%',
               position: 'absolute',
               textTransform: 'uppercase',
             }}
@@ -109,9 +111,8 @@ export default function WorkoutDetail() {
             {visibility}
           </Label>
         )}
-        <ProductImgStyle alt={title} src={icon} />
+        
       </Box>
-        </CardActionArea>
         <CardContent sx={{minHeigth:500}}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
         <Stack direction="column" alignItems="left" justifyContent="space-between" mb={1}>
@@ -179,13 +180,21 @@ export default function WorkoutDetail() {
     </Card>
       </Container>
       <Dialog
+        fullWidth
+        maxWidth="sm"
         open={open}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        
       >
-        <DialogTitle>{exe[0]}</DialogTitle>
+        <DialogTitle>        
+        <Box sx={{ pt: '90%', position: 'relative' }}>
+        <ProductImgStyle alt={title} src={icon} />
+      </Box>
+          {exe[0]}
+        </DialogTitle>
         <DialogContent>
         <Typography variant="body2" color="text.secondary">
             Calories Burn Rate: {exe[2]}
@@ -201,8 +210,6 @@ export default function WorkoutDetail() {
             {exe[1]}
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-        </DialogActions>
       </Dialog>
     </Page>
   );

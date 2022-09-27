@@ -30,6 +30,9 @@ import { faker } from '@faker-js/faker';
 import { sample } from 'lodash';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
+import { useNavigate} from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { workoutActions } from '../store/workout';
 
 // ----------------------------------------------------------------------
 
@@ -78,6 +81,9 @@ function applySortFilter(array, comparator, query) {
 
 export default function User() {
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(0);
 
   const [array, setArray] = useState([]);
@@ -93,6 +99,7 @@ export default function User() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const fetchMoviesHandler = useCallback(async () => {
+    
     try {
       const response = await fetch("http://localhost:1337/workouts/plans/");
       if (!response.ok) {
@@ -104,7 +111,7 @@ export default function User() {
       
 
       const users = [...Array(temp.length)].map((_, index) => ({
-        id: faker.datatype.uuid(),
+        id: temp[index].id,
         avatarUrl: `/static/mock-images/avatars/avatar_${index + 1}.jpg`,
         name: temp[index].title,
         company: temp[index].author.username,
@@ -142,19 +149,24 @@ export default function User() {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
+  // const handleClick = (event, name) => {
+  //   const selectedIndex = selected.indexOf(name);
+  //   let newSelected = [];
+  //   if (selectedIndex === -1) {
+  //     newSelected = newSelected.concat(selected, name);
+  //   } else if (selectedIndex === 0) {
+  //     newSelected = newSelected.concat(selected.slice(1));
+  //   } else if (selectedIndex === selected.length - 1) {
+  //     newSelected = newSelected.concat(selected.slice(0, -1));
+  //   } else if (selectedIndex > 0) {
+  //     newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
+  //   }
+  //   setSelected(newSelected);
+  // };
+
+  const handleClick = (workoutId) => {
+    dispatch(workoutActions.getWorkout(workoutId))
+    navigate('/gymshare/workoutDetail', { replace: true });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -216,9 +228,10 @@ export default function User() {
                         role="checkbox"
                         selected={isItemSelected}
                         aria-checked={isItemSelected}
+                        onClick={() => handleClick(id)}
                       >
                         <TableCell padding="checkbox">
-                          <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} />
+                          {/* <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} /> */}
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
