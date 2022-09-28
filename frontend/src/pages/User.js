@@ -33,6 +33,10 @@ import { useEffect } from 'react';
 import { useNavigate} from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { workoutActions } from '../store/workout';
+import Rating from '@mui/material/Rating';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { styled } from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
 
@@ -47,6 +51,15 @@ const TABLE_HEAD = [
   { id: 'rating', label: 'Rating', alignRight: false },
   { id: '' },
 ];
+
+const StyledRating = styled(Rating)({
+  '& .MuiRating-iconFilled': {
+    color: '#ff6d75',
+  },
+  '& .MuiRating-iconHover': {
+    color: '#ff3d47',
+  },
+});
 
 // ----------------------------------------------------------------------
 
@@ -115,11 +128,12 @@ export default function User() {
         avatarUrl: `/static/mock-images/avatars/avatar_${index + 1}.jpg`,
         name: temp[index].title,
         company: temp[index].author.username,
-        isVerified: temp[index].avg_time,
-        status: sample(['active', 'banned']),
+        isVerified: temp[index].avg_time<60 ? temp[index].avg_time.toSting()+ " seconds" : temp[index].avg_time<3600 ?  (temp[index].avg_time/60).toFixed(2).toString()+ " minutes" : (temp[index].avg_time/3600).toFixed(2).toString()+ " hours",
+        status: temp[index].avg_rating,
         role: temp[index].difficulty,
       }));
 
+      console.log(users)
       setArray(users)
 
       
@@ -242,16 +256,22 @@ export default function User() {
                           </Stack>
                         </TableCell>
                         <TableCell align="left">{company}</TableCell>
-                        <TableCell align="left">{role}</TableCell>
+                        <TableCell align="left">
+                        <StyledRating
+       
+        value={role}
+        readOnly
+        precision={0.5}
+        icon={<FavoriteIcon fontSize="inherit" />}
+        emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+      />
+                        </TableCell>
                         <TableCell align="left">{isVerified}</TableCell>
                         <TableCell align="left">
-                          <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
-                            {sentenceCase(status)}
-                          </Label>
+                          <Rating name="read-only" value={status} precision={0.5} readOnly />
                         </TableCell>
 
                         <TableCell align="right">
-                          <UserMoreMenu />
                         </TableCell>
                       </TableRow>
                     );
