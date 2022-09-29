@@ -1,5 +1,6 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 
@@ -79,6 +80,12 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user = self.request.user)
 
+    def destroy(self, request, *args, **kwargs):
+        user_id = self.request.user.id
+        workout_id = request.data.get('workout', None)
+        instance = models.FavoriteWorkout.objects.filter(user__id=user_id, workout__id=workout_id)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
     """
