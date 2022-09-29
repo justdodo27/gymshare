@@ -60,7 +60,7 @@ export default function Profile() {
 
   const fetchWorkout = () => {
 
-    fetch("http://localhost:1337/workouts/plans/?search="+username, {
+    fetch("http://localhost:1337/workouts/plans/", {
       headers: {
         Authorization: "Bearer " +token
       },
@@ -71,38 +71,25 @@ export default function Profile() {
       })
       .then(data => {
         const myWorkouts = []
+        const favWorkouts = []
         console.log(data.results.length)
         for (let i = 0; i < data.results.length; i++){
           if(data.results[i].author.id == userId){
             myWorkouts.push(data.results[i])
           }
+          if(data.results[i].is_favorite == true){
+            favWorkouts.push(data.results[i])
+          }
         }
         setWorkouts(myWorkouts);
+        setFavWorkouts(favWorkouts);
       })
   }
 
-  const fetchFavWorkout = () => {
-
-    fetch("http://localhost:1337/workouts/favorites", {
-    method: 'GET',  
-    headers: {
-        Authorization: "Bearer " +token
-      },
-    })
-
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-        console.log(data)
-        setFavWorkouts(data);
-      })
-  }
 
   useEffect(() => {
     fetchData()
     fetchWorkout()
-    fetchFavWorkout()
   }, [])
   
   return (
@@ -180,6 +167,9 @@ export default function Profile() {
     </ToggleButtonGroup>
     {alignment==='your' && <Grid container spacing={0}>
     <ProductList products={myWorkouts} />
+    </Grid>}
+    {alignment==='liked' && <Grid container spacing={0}>
+    <ProductList products={favWorkouts} />
     </Grid>}
 
     </Box>

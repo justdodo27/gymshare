@@ -56,12 +56,13 @@ export default function WorkoutDetail() {
         position: 'absolute',
       });
 
-    let workoutId = useSelector(state => state.workout.workoutId);
+    const workoutId = useSelector(state => state.workout.workoutId);
     const [workout, setWorkouts] = useState([]);
     const [open, setOpen] = useState(false);
     const [exe, setExe] = useState([]);
     const [addAlert, setAddAlert] = useState(false);
     const [styleAlert, setStyleAlert] = useState(false);
+    const [saved, setSaved] = useState(false);
     
 
     const handleClickOpen = (title, description, cbr, difficulty, type) => {
@@ -87,6 +88,10 @@ export default function WorkoutDetail() {
     const fetchWorkout = () => {
 
     fetch("http://localhost:1337/workouts/plans/" + workoutId, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " +token
+      },
     })
 
       .then(response => {
@@ -94,6 +99,7 @@ export default function WorkoutDetail() {
       })
       .then(data => {
         setWorkouts(data);
+        setSaved(data.is_favorite);
       })
   }
 
@@ -102,7 +108,6 @@ export default function WorkoutDetail() {
       fetchWorkout()
     } catch (error) {}
   }, [])
-
   const { 
     author, 
     avg_rating, 
@@ -116,17 +121,44 @@ export default function WorkoutDetail() {
     sum_of_cb,
     title,
     visibility 
-    } = workout;
-
-    const [saved, setSaved] = useState(is_favorite);
+    } = workout
 
     const handleClickSave = () => {
       if(saved)
       {
+      
         setSaved(false);
         handleClickAlert(false);
+
       }
       else{
+        fetch('http://localhost:1337/workouts/favorites/', {
+      method: 'POST',
+        body: JSON.stringify({
+          workout: workoutId,
+          user: userId
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " +token
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = 'Wrong username or password!';
+            throw new Error(errorMessage);
+          });
+        }
+      })
+      .then((data) => {
+        console.log(data)
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
         setSaved(true);
         handleClickAlert(true);
       }
@@ -153,7 +185,7 @@ export default function WorkoutDetail() {
       setAddAlert(false);
     };
 
-    dispatch(workoutActions.getWorkout(''))
+    
 
   return (
     <Page title="Workout Details">
