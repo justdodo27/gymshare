@@ -31,6 +31,7 @@ export default function Profile() {
   const [lastName, setLastName] = useState(null)
   const [alignment, setAlignment] = React.useState('your');
   const [myWorkouts, setWorkouts] = React.useState([]);
+  const [favWorkouts, setFavWorkouts] = React.useState([]);
 
   const handleChange1 = (event, newAlignment) => {
     setAlignment(newAlignment);
@@ -59,7 +60,7 @@ export default function Profile() {
 
   const fetchWorkout = () => {
 
-    fetch("http://localhost:1337/workouts/plans/?search="+username, {
+    fetch("http://localhost:1337/workouts/plans/", {
       headers: {
         Authorization: "Bearer " +token
       },
@@ -70,15 +71,21 @@ export default function Profile() {
       })
       .then(data => {
         const myWorkouts = []
+        const favWorkouts = []
         console.log(data.results.length)
         for (let i = 0; i < data.results.length; i++){
           if(data.results[i].author.id == userId){
             myWorkouts.push(data.results[i])
           }
+          if(data.results[i].is_favorite == true){
+            favWorkouts.push(data.results[i])
+          }
         }
         setWorkouts(myWorkouts);
+        setFavWorkouts(favWorkouts);
       })
   }
+
 
   useEffect(() => {
     fetchData()
@@ -93,21 +100,7 @@ export default function Profile() {
         </Typography>
 
         <Grid container spacing={3} >
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
-          </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
-          </Grid>
           <Grid item xs={12} sm={6} md={12}>
             <AppWidgetProfile name={firstName} last={lastName} height={height} weight={weight} color="info" />
           </Grid>
@@ -160,6 +153,9 @@ export default function Profile() {
     </ToggleButtonGroup>
     {alignment==='your' && <Grid container spacing={0}>
     <ProductList products={myWorkouts} />
+    </Grid>}
+    {alignment==='liked' && <Grid container spacing={0}>
+    <ProductList products={favWorkouts} />
     </Grid>}
 
     </Box>

@@ -259,7 +259,7 @@ export default function User() {
                         <TableCell align="left">
                         <StyledRating
        
-        value={role}
+        value={role/2}
         readOnly
         precision={0.5}
         icon={<FavoriteIcon fontSize="inherit" />}

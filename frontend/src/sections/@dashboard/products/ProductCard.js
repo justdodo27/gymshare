@@ -12,6 +12,9 @@ import icon from "../../../pictures/icon.jpg"
 import { useDispatch } from 'react-redux';
 import { workoutActions } from '../../../store/workout';
 import { useNavigate} from 'react-router-dom';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import Rating from '@mui/material/Rating';
 
 // ----------------------------------------------------------------------
 
@@ -23,7 +26,14 @@ const ProductImgStyle = styled('img')({
   position: 'absolute',
 });
 
-
+const StyledRating = styled(Rating)({
+  '& .MuiRating-iconFilled': {
+    color: '#ff6d75',
+  },
+  '& .MuiRating-iconHover': {
+    color: '#ff3d47',
+  },
+});
 
 // ----------------------------------------------------------------------
 
@@ -80,7 +90,7 @@ export default function ShopProductCard({ product }) {
         <ProductImgStyle alt={title} src={icon} />
       </Box>
 
-      <Stack spacing={2} sx={{ p: 3 }}>
+      <Stack spacing={1} sx={{ p: 2 }}>
           <Typography variant="subtitle2" noWrap>
             {title}
           </Typography>
@@ -97,7 +107,28 @@ export default function ShopProductCard({ product }) {
               @{author.username}
             </Typography>
           </Typography>
+          
         </Stack>
+        <Typography variant="subtitle1">
+            <Typography
+              component="span"
+              variant="body3"
+              sx={{
+                color: 'text.disabled',
+              }}
+            >
+              difficulty
+            </Typography>
+          </Typography>
+        <StyledRating
+       
+        value={parseFloat(difficulty)/2}
+        readOnly
+        precision={0.5}
+        icon={<FavoriteIcon fontSize="inherit" />}
+        emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+      />
+    
       </Stack>
       </CardActionArea>
     </Card>
