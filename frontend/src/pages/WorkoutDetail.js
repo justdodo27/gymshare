@@ -13,17 +13,41 @@ import Label from '../components/Label';
 import { useSelector} from 'react-redux';
 import icon from "../pictures/play.png"
 import { useDispatch } from 'react-redux';
+import { useNavigate} from 'react-router-dom';
 import { workoutActions } from '../store/workout';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import Rating from '@mui/material/Rating';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 // ----------------------------------------------------------------------
-
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={5} ref={ref} variant="filled" {...props} />;
+});
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
   });
 
+const StyledRating = styled(Rating)({
+    '& .MuiRating-iconFilled': {
+      color: '#ff6d75',
+    },
+    '& .MuiRating-iconHover': {
+      color: '#ff3d47',
+    },
+  });
+
 export default function WorkoutDetail() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  let token = useSelector(state => state.auth.token);
+  const userId = useSelector(state => state.auth.userId);
+
+  
     const ProductImgStyle = styled('img')({
         top: 0,
         width: '100%',
@@ -36,6 +60,9 @@ export default function WorkoutDetail() {
     const [workout, setWorkouts] = useState([]);
     const [open, setOpen] = useState(false);
     const [exe, setExe] = useState([]);
+    const [addAlert, setAddAlert] = useState(false);
+    const [styleAlert, setStyleAlert] = useState(false);
+    
 
     const handleClickOpen = (title, description, cbr, difficulty, type) => {
         let array = []
@@ -47,6 +74,10 @@ export default function WorkoutDetail() {
         setExe(array);
         setOpen(true);
     };
+
+  const handleClickDelete = () => {
+
+  };
   
     const handleClose = () => {
         setExe([]);
@@ -69,9 +100,7 @@ export default function WorkoutDetail() {
   useEffect(() => {
     try {
       fetchWorkout()
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   }, [])
 
   const { 
@@ -88,6 +117,41 @@ export default function WorkoutDetail() {
     title,
     visibility 
     } = workout;
+
+    const [saved, setSaved] = useState(is_favorite);
+
+    const handleClickSave = () => {
+      if(saved)
+      {
+        setSaved(false);
+        handleClickAlert(false);
+      }
+      else{
+        setSaved(true);
+        handleClickAlert(true);
+      }
+    };
+
+    const handleClickAlert = (variant) => {
+      if(variant){
+        setStyleAlert(true);
+        setAddAlert(true);
+        
+      }
+      else{
+        setStyleAlert(false);
+        setAddAlert(true);
+      }
+      
+    };
+  
+    const handleCloseAlert = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+  
+      setAddAlert(false);
+    };
 
     dispatch(workoutActions.getWorkout(''))
 
@@ -130,12 +194,50 @@ export default function WorkoutDetail() {
           </Typography>
         </Stack>
 
-        <Stack direction="column" alignItems="left" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
-            Rating: {avg_rating}
+        <Stack direction="column" alignItems="center" justifyContent="space-between" mb={5}>
+          {author && userId && <Box>
+            <IconButton 
+              aria-label="favoriteicon" 
+              size="large" 
+              color={(saved === true && 'warning') || 'secondary'} 
+              onClick={() => handleClickSave()}>
+        <FavoriteIcon fontSize="inherit" />
+      </IconButton>
+          {author.id === userId && <IconButton aria-label="delete" size="large" color="secondary" onClick={() => handleClickDelete()}>
+        <DeleteIcon  fontSize="inherit" />
+      </IconButton>}
+
+      </Box>}
+      <Rating name="read-only" value={parseFloat(avg_rating)} precision={0.5} readOnly />
+        <Typography variant="subtitle1">
+            <Typography
+              component="span"
+              variant="body3"
+              sx={{
+                color: 'text.disabled',
+              }}
+            >
+              Rating
+            </Typography>
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Difficulty: {difficulty}
+          <StyledRating
+       
+       value={parseFloat(difficulty)/2}
+       readOnly
+       precision={0.5}
+       icon={<FavoriteIcon fontSize="inherit" />}
+       emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+     />
+      <Typography variant="subtitle1">
+            <Typography
+              component="span"
+              variant="body3"
+              sx={{
+                color: 'text.disabled',
+              }}
+            >
+              Difficulty
+            </Typography>
           </Typography>
         </Stack>
         </Stack>
@@ -197,20 +299,43 @@ export default function WorkoutDetail() {
         </DialogTitle>
         <DialogContent>
         <Typography variant="body2" color="text.secondary">
+            {exe[4]} 
+          </Typography>
+        <Typography variant="body2" color="text.secondary">
             Calories Burn Rate: {exe[2]}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Difficulty: {exe[3]}
+          <Typography variant="subtitle1">
+            <Typography
+              component="span"
+              variant="body3"
+              sx={{
+                color: 'text.disabled',
+              }}
+            >
+              Difficulty
+            </Typography>
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Exercise Type: {exe[4]} 
-          </Typography>
-
+        <StyledRating
+       
+        value={parseFloat(exe[3])/2}
+        readOnly
+        precision={0.5}
+        icon={<FavoriteIcon fontSize="inherit" />}
+        emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+      />
           <DialogContentText margin="1vh" id="alert-dialog-slide-description">
             {exe[1]}
           </DialogContentText>
         </DialogContent>
       </Dialog>
+      
+      <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'info'} sx={{ width: '100%' }}>
+          {styleAlert && <Typography>Workout Saved</Typography>}
+          {!styleAlert && <Typography>Workout Unsaved</Typography>}
+        </Alert>
+      </Snackbar>
+
     </Page>
   );
 }

@@ -31,6 +31,7 @@ export default function Profile() {
   const [lastName, setLastName] = useState(null)
   const [alignment, setAlignment] = React.useState('your');
   const [myWorkouts, setWorkouts] = React.useState([]);
+  const [favWorkouts, setFavWorkouts] = React.useState([]);
 
   const handleChange1 = (event, newAlignment) => {
     setAlignment(newAlignment);
@@ -80,9 +81,28 @@ export default function Profile() {
       })
   }
 
+  const fetchFavWorkout = () => {
+
+    fetch("http://localhost:1337/workouts/favorites", {
+    method: 'GET',  
+    headers: {
+        Authorization: "Bearer " +token
+      },
+    })
+
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        console.log(data)
+        setFavWorkouts(data);
+      })
+  }
+
   useEffect(() => {
     fetchData()
     fetchWorkout()
+    fetchFavWorkout()
   }, [])
   
   return (
