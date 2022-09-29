@@ -22,6 +22,7 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 // ----------------------------------------------------------------------
 const Alert = forwardRef(function Alert(props, ref) {
@@ -77,7 +78,15 @@ export default function WorkoutDetail() {
     };
 
   const handleClickDelete = () => {
-
+    fetch('http://localhost:1337/workouts/plans/'+workoutId, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: "Bearer " +token,
+          },
+        })
+        .then(() => {navigate('/', { replace: true });})
+        
   };
   
     const handleClose = () => {
@@ -126,13 +135,23 @@ export default function WorkoutDetail() {
     const handleClickSave = () => {
       if(saved)
       {
-      
+        fetch('http://localhost:1337/workouts/favorites/0/', {
+          method: 'DELETE',
+            body: JSON.stringify({
+              workout: workoutId
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: "Bearer " +token,
+          },
+        })
+        .then(() => this.setState({ status: 'Delete successful' }));
         setSaved(false);
         handleClickAlert(false);
 
       }
       else{
-        fetch('http://localhost:1337/workouts/favorites/', {
+      fetch('http://localhost:1337/workouts/favorites/', {
       method: 'POST',
         body: JSON.stringify({
           workout: workoutId,
@@ -192,6 +211,7 @@ export default function WorkoutDetail() {
       <Container>
         <Card sx={{ maxWidth: "90%", minWidth: "90%"}}>
       <Box sx={{ pt: '1%', position: 'relative' }}>
+      
         {visibility && (
           <Label
             variant="filled"
@@ -209,6 +229,9 @@ export default function WorkoutDetail() {
         )}
         
       </Box>
+      <IconButton aria-label="backarrow" size="large" color="secondary" onClick={() => navigate('/')}>
+        <ArrowBackIcon  fontSize="inherit" />
+      </IconButton>
         <CardContent sx={{minHeigth:500}}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
         <Stack direction="column" alignItems="left" justifyContent="space-between" mb={1}>
@@ -363,8 +386,8 @@ export default function WorkoutDetail() {
       
       <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
         <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'info'} sx={{ width: '100%' }}>
-          {styleAlert && <Typography>Workout Saved</Typography>}
-          {!styleAlert && <Typography>Workout Unsaved</Typography>}
+          {styleAlert && <Typography>Workout added to Favorites</Typography>}
+          {!styleAlert && <Typography>Workout deleted from Favorites</Typography>}
         </Alert>
       </Snackbar>
 

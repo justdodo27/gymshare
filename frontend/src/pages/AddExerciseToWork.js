@@ -27,6 +27,19 @@ import {
 import { useMemo } from 'react';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+function createData(name, calories, fat) {
+  return { name, calories, fat };
+}
+
+let rows = [];
 
 
 const Input = styled(MuiInput)`
@@ -39,13 +52,16 @@ export default function AddExerciseToWork() {
   const [repeats, setRepeats] = React.useState(5);
   const [series, setSeries] = React.useState(5);
   const [time, setTime] = React.useState(30);
-  const [alignment, setAlignment] = React.useState('series');
+  const [alignment, setAlignment] = React.useState('repeats');
   const [array, setArray] = React.useState([''])
   const [indexes, setIndexes] = React.useState([''])
   const [description, setDescription] = React.useState([''])
   const [order, setOrder] = React.useState(0)
+  const [table, setTable] = React.useState([])
   let workoutId = useSelector(state => state.workout.workoutId);
   console.log(workoutId)
+
+  rows = table
 
 
   const containsText = (text, searchText) =>
@@ -124,11 +140,11 @@ export default function AddExerciseToWork() {
   console.log(token)
 
   const handleSliderChange = (event, newValue) => {
-    setRepeats(newValue);
+    setSeries(newValue);
   };
 
   const handleCaloriesSliderChange = (event, newValue) => {
-    setSeries(newValue);
+    setRepeats(newValue);
   };
 
   const handleTimeSliderChange = (event, newValue) => {
@@ -136,11 +152,11 @@ export default function AddExerciseToWork() {
   };
 
   const handleInputChange = (event) => {
-    setRepeats(event.target.value === '' ? '' : Number(event.target.value));
+    setSeries(event.target.value === '' ? '' : Number(event.target.value));
   };
 
   const handleCaloriesInputChange = (event) => {
-    setSeries(event.target.value === '' ? '' : Number(event.target.value));
+    setRepeats(event.target.value === '' ? '' : Number(event.target.value));
   };
 
   const handleTimeInputChange = (event) => {
@@ -148,10 +164,10 @@ export default function AddExerciseToWork() {
   };
 
   const handleBlur = () => {
-    if (repeats < 0) {
-      setRepeats(1);
-    } else if (repeats > 10) {
-      setRepeats(10);
+    if (series < 0) {
+      setSeries(1);
+    } else if (series > 10) {
+      setSeries(10);
     }
   };
 
@@ -164,15 +180,15 @@ export default function AddExerciseToWork() {
   };
 
   const handleCaloriesBlur = () => {
-    if (series< 0) {
+    if (repeats< 0) {
       setRepeats(1);
-    } else if (series> 20) {
+    } else if (repeats> 20) {
       setRepeats(20);
     }
   };
 
   const end = (event) => {
-    if(alignment==="series" && selectedOption!==''){
+    if(alignment==="repeats" && selectedOption!==''){
       fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
         method: 'POST',
           body: JSON.stringify({
@@ -216,7 +232,7 @@ export default function AddExerciseToWork() {
         method: 'POST',
           body: JSON.stringify({
             order: order,
-            repeats: repeats,
+            series: series,
             time: time,
             exercise: index,
             workout: workoutId
@@ -256,7 +272,8 @@ export default function AddExerciseToWork() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if(alignment==="series" && selectedOption!==''){
+    if(alignment==="repeats" && selectedOption!==''){
+    rows.push(createData(order+'. '+selectedOption, repeats, series))
     fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
       method: 'POST',
         body: JSON.stringify({
@@ -296,11 +313,12 @@ export default function AddExerciseToWork() {
   }
 
   if(alignment==="time" && selectedOption!==''){
+    rows.push(createData(order+'. '+selectedOption, time+' s', series))
     fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
       method: 'POST',
         body: JSON.stringify({
           order: order,
-          repeats: repeats,
+          series: series,
           time: time,
           exercise: index,
           workout: workoutId
@@ -352,9 +370,9 @@ export default function AddExerciseToWork() {
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
           </Avatar>
           <Typography component="h1" variant="h5">
-            Add New Exercise
+            Add Exercise
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} fullWidth>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, minWidth: '100%' }}>
           <div>
       <FormControl fullWidth>
         <InputLabel id="search-select-label">Options</InputLabel>
@@ -413,17 +431,17 @@ export default function AddExerciseToWork() {
       onChange={handleChange1}
       size='large'
     >
-      <ToggleButton size='medium' value="series">On Series</ToggleButton>
+      <ToggleButton size='medium' value="repeats">Repeats</ToggleButton>
       <ToggleButton size='medium' value="time">On Time</ToggleButton>
     </ToggleButtonGroup>
     </Grid>
       <Typography id="input-slider" gutterBottom marginTop={2}>
-        Repeats
+        Series
       </Typography>
       <Grid container spacing={2} alignItems="center">
       <Grid item xs>
           <Slider
-            value={typeof repeats === 'number' ? repeats : 0}
+            value={typeof series === 'number' ? series : 0}
             onChange={handleSliderChange}
             aria-labelledby="input-slider"
             min={1}
@@ -432,7 +450,7 @@ export default function AddExerciseToWork() {
         </Grid>
         <Grid item>
           <Input
-            value={repeats}
+            value={series}
             size="small"
             onChange={handleInputChange}
             onBlur={handleBlur}
@@ -446,13 +464,13 @@ export default function AddExerciseToWork() {
           />
         </Grid>
       </Grid>
-      {alignment==='series' && <Typography id="input-slider" gutterBottom marginTop={2}>
-        Series
+      {alignment==='repeats' && <Typography id="input-slider" gutterBottom marginTop={2}>
+        Repeats
       </Typography>}
-      {alignment==='series' && <Grid container spacing={2} alignItems="center">
+      {alignment==='repeats' && <Grid container spacing={2} alignItems="center">
       <Grid item xs>
           <Slider
-            value={typeof series === 'number' ? series : 0}
+            value={typeof repeats === 'number' ? repeats : 0}
             onChange={handleCaloriesSliderChange}
             aria-labelledby="input-slider"
             min={1}
@@ -461,7 +479,7 @@ export default function AddExerciseToWork() {
         </Grid>
         <Grid item marginBottom={3}>
           <Input
-            value={series}
+            value={repeats}
             size="small"
             onChange={handleCaloriesInputChange}
             onBlur={handleCaloriesBlur}
@@ -510,7 +528,7 @@ export default function AddExerciseToWork() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Add next Exercise
+              Add Exercise
             </Button>
             <Button
               onClick={end}
@@ -518,17 +536,35 @@ export default function AddExerciseToWork() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Create your workout
+              Done
             </Button>
-            <Grid container>
-              <Grid item>
-                <Button component={RouterLink} to='/' variant="body2">
-                  {"Back to main Page"}
-                </Button>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
+      <TableContainer component={Paper}>
+      <Table sx={{ minWidth: "100%" }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Exercise</TableCell>
+            <TableCell align="right">Repeats/Time</TableCell>
+            <TableCell align="right">Series</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.name}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.name}
+              </TableCell>
+              <TableCell align="right">{row.calories}</TableCell>
+              <TableCell align="right">{row.fat}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
       </Container>
   );
 }
