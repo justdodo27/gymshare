@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useRef } from "react";
 import Page from '../components/Page';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
@@ -20,7 +21,7 @@ import PRODUCTS from '../_mock/products';
 
 export default function Profile() {
   const theme = useTheme();
-
+  const listInnerRef = useRef();
    const userId = useSelector(state => state.auth.userId);
    const username = useSelector(state => state.auth.username);
    let token = useSelector(state => state.auth.token)
@@ -29,9 +30,10 @@ export default function Profile() {
   const [weight, setWeight] = useState(null)
   const [firstName, setFirstName] = useState(null)
   const [lastName, setLastName] = useState(null)
-  const [alignment, setAlignment] = React.useState('your');
-  const [myWorkouts, setWorkouts] = React.useState([]);
-  const [favWorkouts, setFavWorkouts] = React.useState([]);
+  const [alignment, setAlignment] = useState('your');
+  const [myWorkouts, setWorkouts] = useState([]);
+  const [favWorkouts, setFavWorkouts] = useState([]);
+  const [next, setNext] = useState();
 
   const handleChange1 = (event, newAlignment) => {
     setAlignment(newAlignment);
@@ -70,19 +72,20 @@ export default function Profile() {
         return response.json()
       })
       .then(data => {
-        const myWorkouts = []
-        const favWorkouts = []
+        const workouts = []
+        const fav = []
         console.log(data.results.length)
         for (let i = 0; i < data.results.length; i++){
           if(data.results[i].author.id == userId){
-            myWorkouts.push(data.results[i])
+            workouts.push(data.results[i])
           }
           if(data.results[i].is_favorite == true){
-            favWorkouts.push(data.results[i])
+            fav.push(data.results[i])
           }
         }
-        setWorkouts(myWorkouts);
-        setFavWorkouts(favWorkouts);
+        setNext(data.next)
+        setWorkouts(workouts);
+        setFavWorkouts(fav);
       })
   }
 
@@ -91,6 +94,47 @@ export default function Profile() {
     fetchData()
     fetchWorkout()
   }, [])
+
+
+const fetchNextWorkout = () => {
+  if(next){
+  fetch(next, {
+    headers: {
+      Authorization: "Bearer " +token
+    },
+    })
+
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        const workouts = myWorkouts
+        const fav = favWorkouts
+        for (let i = 0; i < data.results.length; i++){
+          if(data.results[i].author.id == userId){
+            workouts.push(data.results[i])
+          }
+            if(data.results[i].is_favorite == true){
+              fav.push(data.results[i])
+            }
+        }
+        setNext(data.next)
+        setWorkouts(workouts);
+        setFavWorkouts(fav);
+      })
+    }
+  }
+  
+  const onScroll = () => {
+    if (listInnerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
+      if (scrollTop + clientHeight === scrollHeight) {
+        console.log("reached bottom");
+        fetchNextWorkout(next)
+      }
+    }
+  };
+
   
   return (
     <Page title="Profile">
@@ -151,14 +195,19 @@ export default function Profile() {
       <ToggleButton size='medium' value="your">Your Workouts</ToggleButton>
       <ToggleButton size='medium' value="liked">Liked Workouts</ToggleButton>
     </ToggleButtonGroup>
-    {alignment==='your' && <Grid container spacing={0}>
-    <ProductList products={myWorkouts} />
-    </Grid>}
-    {alignment==='liked' && <Grid container spacing={0}>
-    <ProductList products={favWorkouts} />
-    </Grid>}
-
     </Box>
+    {alignment==='your' && <div
+            onScroll={onScroll}
+            ref={listInnerRef}
+            style={{ height: "400px", overflowY: "auto" }}>
+    <ProductList products={myWorkouts} />
+    </div>}
+    {alignment==='liked' && <div
+            onScroll={onScroll}
+            ref={listInnerRef}
+            style={{ height: "400px", overflowY: "auto" }}>
+    <ProductList products={favWorkouts} />
+    </div>}
       </Container>
       </Page>
   );

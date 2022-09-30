@@ -95,11 +95,14 @@ export default function WorkoutDetail() {
     };
 
     const fetchWorkout = () => {
-
+      let head = ''
+      if(token){
+        head = "Bearer " +token
+      }
     fetch("http://localhost:1337/workouts/plans/" + workoutId, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: "Bearer " +token
+        Authorization: head
       },
     })
 
