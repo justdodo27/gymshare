@@ -15,7 +15,6 @@ class Command(BaseCommand):
         if StatisticCalories.objects.count() == 0:
             for statistic_calories in STATISTIC_CALORIES:
                 stat_cal_kwargs = {
-                    'id': statistic_calories.get('id'),
                     'date': statistic_calories.get('date'),
                     'calories': statistic_calories.get('calories'),
                 }
@@ -29,7 +28,6 @@ class Command(BaseCommand):
         if StatisticExercise.objects.count() == 0:
             for statistic_exercise in STATISTIC_EXERCISE:
                 stat_ex_kwargs = {
-                    'id': statistic_exercise.get('id'),
                     'date': statistic_exercise.get('date'),
                     'repeats': statistic_exercise.get('repeats'),
                     'time': statistic_exercise.get('time'),
