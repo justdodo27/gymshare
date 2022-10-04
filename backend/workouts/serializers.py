@@ -13,6 +13,12 @@ class ExerciseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ExerciseInWorkoutCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ExcerciseInWorkout
+        fields = '__all__'
+
+
 class ExerciseInWorkoutSerializer(serializers.ModelSerializer):
     exercise = ExerciseSerializer()
 
@@ -80,16 +86,17 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
             calc_time=Coalesce('time', F('repeats') * 5, 0, output_field=FloatField())
         )
 
-        avg_time = exercises.aggregate(Sum('calc_time')).get('calc_time__sum', 0)
+        if avg_time := exercises.aggregate(Sum('calc_time')).get('calc_time__sum', 0):
+            return round(avg_time, 2)
+        return 0
 
-        return round(avg_time, 2)
 
     def get_difficulty(self, workout):
-        difficulty = models.ExcerciseInWorkout.objects.filter(
+        if difficulty := models.ExcerciseInWorkout.objects.filter(
             workout=workout
-        ).aggregate(Avg('exercise__difficulty')).get('exercise__difficulty__avg', 1)
-
-        return round(difficulty, 2)
+        ).aggregate(Avg('exercise__difficulty')).get('exercise__difficulty__avg', 1):
+            return round(difficulty, 2)
+        return 0
 
     def get_sum_of_cb(self, workout):
         context_user = self.context.get('user')
@@ -101,10 +108,10 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
             ) * get_user_weight(context_user) * F('exercise__calories_burn_rate')
         )
 
-        sum_of_cb = exercises.aggregate(
-            Sum('calc_calories')).get('calc_calories__sum', 0)
-
-        return round(sum_of_cb, 2)
+        if sum_of_cb := exercises.aggregate(
+            Sum('calc_calories')).get('calc_calories__sum', 0):
+            return round(sum_of_cb, 2)
+        return 0
 
     class Meta:
         model = models.Workout
