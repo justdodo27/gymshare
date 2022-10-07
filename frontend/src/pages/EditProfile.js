@@ -31,6 +31,8 @@ export default function EditProfile() {
 
   let weightErrorCheck = false
   let heightErrorCheck = false
+  let firstNameErrorCheck = false
+  let lastNameErrorCheck = false
   
 
   console.log(token)
@@ -86,11 +88,21 @@ export default function EditProfile() {
       setHeightError(true)
       heightErrorCheck = false
     }
+    if(first_Name){
+      firstNameErrorCheck = true
+    }else {
+      firstNameErrorCheck = false
+    }
+    if(last_Name){
+      lastNameErrorCheck = true
+    }else {
+      lastNameErrorCheck = false
+    }
     
 
-    if (heightErrorCheck === true && weightErrorCheck === true) {
+    if (heightErrorCheck && weightErrorCheck && firstNameErrorCheck && lastNameErrorCheck) {
       fetch("http://localhost:1337/accounts/profiles/" + userId +"/", {
-        method: 'PUT',
+        method: 'PATCH',
         body: JSON.stringify({
           first_name: first_Name,
           last_name: last_Name,
@@ -107,7 +119,7 @@ export default function EditProfile() {
             return res.json();
           } else {
             return res.json().then((data) => {
-              let errorMessage = 'Something gone wrong!';
+              let errorMessage = 'Enter correct data!';
               throw new Error(errorMessage);
             });
           }
@@ -119,7 +131,7 @@ export default function EditProfile() {
         .catch((err) => {
           alert(err.message);
         });
-    };
+    }
   };
 
 

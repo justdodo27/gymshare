@@ -1,31 +1,15 @@
 // @mui
-import { alpha, styled } from '@mui/material/styles';
-import { Card, Typography } from '@mui/material';
-// utils
-import { fShortenNumber } from '../../../utils/formatNumber';
-// components
 import Iconify from '../../../components/Iconify';
+import { Card, Typography, Divider, Stack, Button, Avatar, Grid } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import account from '../../../_mock/account';
 
-// ----------------------------------------------------------------------
-
-const IconWrapperStyle = styled('div')(({ theme }) => ({
-  margin: 'auto',
-  display: 'flex',
-  borderRadius: '50%',
-  alignItems: 'center',
-  width: theme.spacing(8),
-  height: theme.spacing(8),
-  justifyContent: 'center',
-  marginBottom: theme.spacing(3),
-}));
-
-// ----------------------------------------------------------------------
 
 export default function AppWidgetProfile({ name, last, height, weight, color = 'primary', sx, ...other }) {
   return (
     <Card
       sx={{
-        py: 5,
+        height: '100%',
         boxShadow: 0,
         textAlign: 'center',
         color: (theme) => theme.palette[color].darker,
@@ -34,11 +18,36 @@ export default function AppWidgetProfile({ name, last, height, weight, color = '
       }}
       {...other}
     >
-        <Typography variant="h2" sx={{ opacity: 0.72 }}>
+      <Grid container spacing={1} >
+        <Grid item xs={2} sm={2} md={2}>
+      <Avatar  sx={{ margin: 4, width: '100%', height: 'auto' }} src={account.photoURL} alt="photoURL" />
+        </Grid>
+        <Grid item xs={10} sm={10} md={10}>
+        <Typography padding={2} margin={2} variant="h3" sx={{ opacity: 0.72 }}>
         {name} {last}
       </Typography>
       <Typography variant="subtitle1">Height: {height}cm</Typography>
       <Typography variant="subtitle1">Weight: {weight}kg</Typography>
+      <Stack 
+      padding={2} margin={2} 
+      marginLeft={25}
+      marginRight={25}
+      divider={<Divider orientation="vertical" flexItem />} 
+      direction="row" spacing={2} 
+      justifyContent="center"
+      alignItems="center">
+          <Button fullWidth color='info' variant="contained" component={RouterLink} to="/gymshare/EditProfile" >
+            Edit Profile
+          </Button>
+          <Button fullWidth color='info' variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
+            New Workout
+          </Button>
+          <Button fullWidth color='info' variant="contained" component={RouterLink} to="/gymshare/ChangePassword" >
+            Change Password
+          </Button>
+        </Stack>
+        </Grid>
+        </Grid>
     </Card>
   );
 }

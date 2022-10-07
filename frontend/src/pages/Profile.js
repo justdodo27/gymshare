@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useRef } from "react";
 import Page from '../components/Page';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
@@ -21,7 +20,6 @@ import PRODUCTS from '../_mock/products';
 
 export default function Profile() {
   const theme = useTheme();
-  const listInnerRef = useRef();
    const userId = useSelector(state => state.auth.userId);
    const username = useSelector(state => state.auth.username);
    let token = useSelector(state => state.auth.token)
@@ -124,60 +122,25 @@ const fetchNextWorkout = () => {
       })
     }
   }
-  
-  const onScroll = () => {
-    if (listInnerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
-      if (scrollTop + clientHeight === scrollHeight) {
-        console.log("reached bottom");
-        fetchNextWorkout(next)
-      }
-    }
-  };
 
   
   return (
     <Page title="Profile">
       <Container component="main" maxWidth="lg">
       <Typography variant="h4" sx={{ mb: 5 }}>
-          Gymshare - train more effectively
+          Gymshare - view Your Profile
         </Typography>
 
-        <Grid container spacing={3} >
+        <Grid container spacing={1} >
 
-          <Grid item xs={12} sm={6} md={12}>
-            <AppWidgetProfile name={firstName} last={lastName} height={height} weight={weight} color="info" />
+          <Grid item xs={12} sm={12} md={12}>
+            <AppWidgetProfile name={firstName} last={lastName} height={height} weight={weight} color="secondary" />
           </Grid>
-          <Grid item xs={12} sm={6} md={12}>
-          <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-          >
-      <Button variant="contained" component={RouterLink} to="/gymshare/EditProfile" style={{ minWidth: '40vh'}}>
-            Edit Profile
-          </Button>
-          </Box>
           </Grid>
-          
-          </Grid>
-        <Box sx={{
-            marginTop: 8,
-            marginBottom: 10,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            color: "primary.main",
-          }}
-          >
-      <Button variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New Workout
-          </Button>
-          </Box>
         <Box
           sx={{
-            marginTop: 8,
-            marginBottom: 10,
+            marginTop: 4,
+            marginBottom: 5,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -196,18 +159,22 @@ const fetchNextWorkout = () => {
       <ToggleButton size='medium' value="liked">Liked Workouts</ToggleButton>
     </ToggleButtonGroup>
     </Box>
-    {alignment==='your' && <div
-            onScroll={onScroll}
-            ref={listInnerRef}
-            style={{ height: "400px", overflowY: "auto" }}>
+    {alignment==='your' && <Box>
     <ProductList products={myWorkouts} />
-    </div>}
-    {alignment==='liked' && <div
-            onScroll={onScroll}
-            ref={listInnerRef}
-            style={{ height: "400px", overflowY: "auto" }}>
+     <Box m={3} pt={5}>
+        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+            See more
+          </Button>
+          </Box>
+          </Box>}
+    {alignment==='liked' && <Box>
     <ProductList products={favWorkouts} />
-    </div>}
+     <Box m={3} pt={5}>
+        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+            See more
+          </Button>
+          </Box>
+          </Box>}
       </Container>
       </Page>
   );
