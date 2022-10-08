@@ -2,15 +2,30 @@ from django.contrib.auth.models import User
 from django.db.models import Avg, FloatField, F, Sum
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
+from accounts.models import Profile
+from accounts.serializers import ProfileSerializer
 
 from . import models
 from .utils import get_user_weight
 
 
 class ExerciseSerializer(serializers.ModelSerializer):
+    thumbnail = serializers.SerializerMethodField()
+    video = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Exercise
         fields = '__all__'
+
+    def get_thumbnail(self, exercise):
+        request = self.context.get('request')
+        thumbnail_url = exercise.thumbnail.url
+        return request.build_absolute_uri(thumbnail_url)
+
+    def get_video(self, exercise):
+        request = self.context.get('request')
+        video_url = exercise.video.url
+        return request.build_absolute_uri(video_url)
 
 
 class ExerciseInWorkoutCreateSerializer(serializers.ModelSerializer):
@@ -32,23 +47,23 @@ class WorkoutSerializer(serializers.ModelSerializer):
 
     def get_exercises(self, workout):
         qs = models.ExcerciseInWorkout.objects.filter(workout=workout)
-        return ExerciseInWorkoutSerializer(qs, many=True).data
+        return ExerciseInWorkoutSerializer(qs, many=True, context=self.context).data
 
     class Meta:
         model = models.Workout
         fields = '__all__'
 
 
-class FavoriteWorkoutSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.FavoriteWorkout
-        fields = '__all__'
-
-
 class SimpleAuthorSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username',)
+        fields = ('id', 'username', 'profile_picture')
+
+    def get_profile_picture(self, user):
+        qs = Profile.objects.get(user=user)
+        return ProfileSerializer(qs, context=self.context).data.get('profile_picture')
 
 
 class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
@@ -62,7 +77,7 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
 
     def get_exercises(self, workout):
         qs = models.ExcerciseInWorkout.objects.filter(workout=workout)
-        return ExerciseInWorkoutSerializer(qs, many=True).data
+        return ExerciseInWorkoutSerializer(qs, many=True, context=self.context).data
 
     def get_is_favorite(self, workout):
         context_user = self.context.get('user')
@@ -115,6 +130,20 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
 
     class Meta:
         model = models.Workout
+        fields = '__all__'
+
+
+class FavoriteWorkoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.FavoriteWorkout
+        fields = '__all__'
+
+
+class FavoriteWorkoutDetailedSerializer(serializers.ModelSerializer):
+    workout = WorkoutSerializerWithAuthor()
+
+    class Meta:
+        model = models.FavoriteWorkout
         fields = '__all__'
 
 
