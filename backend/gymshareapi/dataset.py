@@ -18,7 +18,7 @@ EXERCISES = [
         3,
         0.0063,
         '/backend/mediafiles/thumbnails/pushups.png',
-        None,
+        '/backend/mediafiles/videos/push-ups.mp4',
         Exercise.WITH_OWN_BODY_WEIGHT
     ),
     (
@@ -27,7 +27,7 @@ EXERCISES = [
         10,
         0.033,
         '/backend/mediafiles/thumbnails/deadlift.png',
-        None,
+        '/backend/mediafiles/videos/deadlift.mp4',
         Exercise.WITH_A_WEIGHT
     ),
     (
@@ -36,7 +36,7 @@ EXERCISES = [
         1,
         0.13,
         '/backend/mediafiles/thumbnails/running-treadmill.png',
-        None,
+        '/backend/mediafiles/videos/running.mp4',
         Exercise.WITH_TIME
     ),
 ]
