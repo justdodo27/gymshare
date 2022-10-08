@@ -16,6 +16,7 @@ import {
   AppWidgetSummary,
   AppCurrentSubject,
   AppConversionRates,
+  AppStatistics
 } from '../sections/@dashboard/app';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
@@ -27,7 +28,7 @@ import { useState } from 'react';
 export default function DashboardApp() {
   const theme = useTheme();
   let token = useSelector(state => state.auth.token);
-  const [caloriesToday, setCaloriesToday] = useState('')
+  const [caloriesToday, setCaloriesToday] = useState(0)
   const [pastDays, setPastDays] = useState([])
   const [caloriesDays, setCaloriesDays] = useState([])
   const [avgCalories, setAvgCalories] = useState("")
@@ -145,11 +146,11 @@ export default function DashboardApp() {
 
         <Grid container spacing={9}>
           <Grid item xs={12} sm={6} md={6}>
-            <AppWidgetSummary title="Calories burned today" total={caloriesToday} icon={'ant-design:pie-chart-filled'} />
+            <AppStatistics title="Calories burned today" total={caloriesToday} icon={'ant-design:pie-chart-filled'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={6}>
-            <AppWidgetSummary title="Average of calories burned in the last month" total={avgCalories} color="info" icon={'ant-design:fund-filled'} />
+            <AppStatistics title="Average of calories burned in the last month" total={avgCalories} color="info" icon={'ant-design:fund-filled'} />
           </Grid>
 
           <Grid item xs={12} md={9} lg={12}>
