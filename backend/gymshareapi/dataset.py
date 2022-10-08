@@ -48,7 +48,8 @@ WORKOUTS = [
         'Turbo Admin Workout',
         'Workout only for admin\'s',
         Workout.PUBLIC,
-        2
+        2,
+        '/backend/mediafiles/thumbnails/admin_workout.png',
     )
 ]
 
