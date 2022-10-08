@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db.models import Avg, FloatField, F, Sum
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
+from accounts.models import Profile
+from accounts.serializers import ProfileSerializer
 
 from . import models
 from .utils import get_user_weight
@@ -53,9 +55,15 @@ class WorkoutSerializer(serializers.ModelSerializer):
 
 
 class SimpleAuthorSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username',)
+        fields = ('id', 'username', 'profile_picture')
+
+    def get_profile_picture(self, user):
+        qs = Profile.objects.get(user=user)
+        return ProfileSerializer(qs, context=self.context).data.get('profile_picture')
 
 
 class WorkoutSerializerWithAuthor(serializers.ModelSerializer):

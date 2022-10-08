@@ -2,7 +2,7 @@ from workouts.models import Exercise, Workout
 
 # Admins accounts
 ADMINS = (
-    ('admin', 'admin@admin.com', 'Strong2137'),
+    ('admin', 'admin@admin.com', 'Strong2137', '/backend/mediafiles/profiles/admin_profile.png',),
 )
 
 # Users accounts
