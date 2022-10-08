@@ -38,7 +38,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     filterset_fields = ['visibility',]
     ordering_fields = ['title', 'sum_of_cb', 'difficulty', 'avg_time']
     pagination_class = PageNumberPagination
-    pagination_class.page_size = 2
+    pagination_class.page_size = 15
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -76,9 +76,23 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
     queryset = models.FavoriteWorkout.objects.all()
     serializer_class = serializers.FavoriteWorkoutSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 15
 
     def get_queryset(self):
         return self.queryset.filter(user = self.request.user)
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            self.serializer_class = serializers.FavoriteWorkoutSerializer
+        else:
+            self.serializer_class = serializers.FavoriteWorkoutDetailedSerializer
+        return super().get_serializer_class()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['user'] = self.request.user
+        return context
 
     def destroy(self, request, *args, **kwargs):
         user_id = self.request.user.id

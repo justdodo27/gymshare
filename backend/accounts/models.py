@@ -28,6 +28,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     height = models.PositiveIntegerField(null=True, blank=True)
     weight = models.FloatField(validators=[MinValueValidator(0)], null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profiles/', null=True, blank=True)
 
     def __str__(self) -> str:
         return f'{self.user}\'s profile'

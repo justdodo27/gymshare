@@ -43,6 +43,7 @@ class Workout(models.Model):
     description = models.TextField(max_length=300, null=True, blank=True)
     visibility = models.CharField(max_length=20, choices=VISIBILITIES, default=PUBLIC)
     cycles = models.PositiveIntegerField()
+    thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
 
     def __str__(self) -> str:
         return f'{self.title} by {self.author}'
