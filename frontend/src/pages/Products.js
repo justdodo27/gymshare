@@ -10,10 +10,24 @@ import Page from '../components/Page';
 import { ProductSort, ProductList } from '../sections/@dashboard/products';
 // mock
 import { useSelector} from 'react-redux';
-
+import { authActions } from '../store/auth'
+import { useNavigate } from 'react-router-dom';
+import { useDispatch} from 'react-redux';
 // ----------------------------------------------------------------------
 
 export default function EcommerceShop() {
+
+  const dispatch = useDispatch()
+  let exp = useSelector(state => state.auth.exp);
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (exp<parseInt(Date.now()/1000)) {
+      dispatch(authActions.logout())
+      navigate('/', {replace: true});
+    }
+  }, [dispatch, exp, navigate]);
+
   let isAuth = useSelector(state => state.auth.isAuthenticated);
 
   const [workouts, setWorkouts] = useState([]);

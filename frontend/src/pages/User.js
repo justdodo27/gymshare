@@ -37,6 +37,8 @@ import Rating from '@mui/material/Rating';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { styled } from '@mui/material/styles';
+import { useSelector} from 'react-redux';
+import { authActions } from '../store/auth'
 
 // ----------------------------------------------------------------------
 
@@ -94,8 +96,17 @@ function applySortFilter(array, comparator, query) {
 
 export default function User() {
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const dispatch = useDispatch()
+  let exp = useSelector(state => state.auth.exp);
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (exp<parseInt(Date.now()/1000)) {
+      dispatch(authActions.logout())
+      navigate('/', {replace: true});
+    }
+  }, [dispatch, exp, navigate]);
+
 
   const [page, setPage] = useState(0);
 

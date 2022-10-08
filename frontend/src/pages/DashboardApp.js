@@ -22,10 +22,26 @@ import { useCallback } from 'react';
 import { useEffect } from 'react';
 import { useSelector} from 'react-redux';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch} from 'react-redux';
+import { authActions } from '../store/auth';
+import { AutoLogout } from 'src/hooks/autoLogout';
+
 
 // ----------------------------------------------------------------------
 
 export default function DashboardApp() {
+  const dispatch = useDispatch()
+  let exp = useSelector(state => state.auth.exp);
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (exp<parseInt(Date.now()/1000)) {
+      dispatch(authActions.logout())
+      navigate('/', {replace: true});
+    }
+  }, [dispatch, exp, navigate]);
+
   const theme = useTheme();
   let token = useSelector(state => state.auth.token);
   const [caloriesToday, setCaloriesToday] = useState(0)
@@ -118,7 +134,10 @@ export default function DashboardApp() {
 
       for (const element of days) {
         if(element["day"].toString()===today){
-          setCaloriesToday(element["calories"].toString()+" kcal")
+          if (element["calories"] < 1){
+            setCaloriesToday(0.00+" kcal")
+          }
+          setCaloriesToday(element["calories"].toFixed(2).toString()+" kcal")
         }
     }
       

@@ -17,8 +17,23 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { ProductSort, ProductList, ProductFilterSidebar } from '../sections/@dashboard/products';
 // mock
 import PRODUCTS from '../_mock/products';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch} from 'react-redux';
+import { authActions } from '../store/auth'
 
 export default function Profile() {
+
+  const dispatch = useDispatch()
+  let exp = useSelector(state => state.auth.exp);
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (exp<parseInt(Date.now()/1000)) {
+      dispatch(authActions.logout())
+      navigate('/', {replace: true});
+    }
+  }, [dispatch, exp, navigate]);
+
   const theme = useTheme();
    const userId = useSelector(state => state.auth.userId);
    const username = useSelector(state => state.auth.username);

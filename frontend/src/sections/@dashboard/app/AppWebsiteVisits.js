@@ -5,6 +5,7 @@ import ReactApexChart from 'react-apexcharts';
 import { Card, CardHeader, Box } from '@mui/material';
 // components
 import { BaseOptionChart } from '../../../components/chart';
+import Button from 'src/theme/overrides/Button';
 
 // ----------------------------------------------------------------------
 
