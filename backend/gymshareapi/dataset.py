@@ -2,7 +2,7 @@ from workouts.models import Exercise, Workout
 
 # Admins accounts
 ADMINS = (
-    ('admin', 'admin@admin.com', 'Strong2137'),
+    ('admin', 'admin@admin.com', 'Strong2137', '/backend/mediafiles/profiles/admin_profile.png',),
 )
 
 # Users accounts
@@ -18,7 +18,7 @@ EXERCISES = [
         3,
         0.0063,
         '/backend/mediafiles/thumbnails/pushups.png',
-        None,
+        '/backend/mediafiles/videos/push-ups.mp4',
         Exercise.WITH_OWN_BODY_WEIGHT
     ),
     (
@@ -27,7 +27,7 @@ EXERCISES = [
         10,
         0.033,
         '/backend/mediafiles/thumbnails/deadlift.png',
-        None,
+        '/backend/mediafiles/videos/deadlift.mp4',
         Exercise.WITH_A_WEIGHT
     ),
     (
@@ -36,7 +36,7 @@ EXERCISES = [
         1,
         0.13,
         '/backend/mediafiles/thumbnails/running-treadmill.png',
-        None,
+        '/backend/mediafiles/videos/running.mp4',
         Exercise.WITH_TIME
     ),
 ]
@@ -48,7 +48,8 @@ WORKOUTS = [
         'Turbo Admin Workout',
         'Workout only for admin\'s',
         Workout.PUBLIC,
-        2
+        2,
+        '/backend/mediafiles/thumbnails/admin_workout.png',
     )
 ]
 
@@ -82,7 +83,6 @@ EXERCISE_IN_WORKOUTS = [
 # Statistics
 STATISTIC_CALORIES = [
     {
-        "id": 1,
         "date": "2022-08-29",
         "calories": 90.8625,
         "user": 1
@@ -91,7 +91,6 @@ STATISTIC_CALORIES = [
 
 STATISTIC_EXERCISE = [
     {   
-        "id": 1,
         "date": "2022-08-29T19:25:49.739738Z",
         "repeats": 30,
         "time": None,
@@ -100,7 +99,6 @@ STATISTIC_EXERCISE = [
         "user": 1
     },
     {
-        "id": 2,
         "date": "2022-08-29T19:26:12.781326Z",
         "repeats": 30,
         "time": None,
@@ -109,7 +107,6 @@ STATISTIC_EXERCISE = [
         "user": 1
     },
     {
-        "id": 3,
         "date": "2022-08-29T19:26:12.789855Z",
         "repeats": None,
         "time": "15.000",
@@ -118,7 +115,6 @@ STATISTIC_EXERCISE = [
         "user": 1
     },
     {
-        "id": 4,
         "date": "2022-08-29T19:26:12.797326Z",
         "repeats": 30,
         "time": None,

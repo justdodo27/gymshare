@@ -21,8 +21,12 @@ class Command(BaseCommand):
                     'cycles': workout[4]
                 }
                 author = User.objects.get(id=workout[0])
+                thumbnail = workout[5]
                 print(f"Creating workout {workout_kwargs}")
                 workout_obj = Workout.objects.create(**workout_kwargs, author=author)
+                if thumbnail:
+                    with open(thumbnail, 'rb') as img_file:
+                        workout_obj.thumbnail.save(thumbnail.split('/')[-1], File(img_file), save=True)
                 workout_obj.save()
         else:
             print('Workout already created')
