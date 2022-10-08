@@ -83,7 +83,7 @@ EXERCISE_IN_WORKOUTS = [
 # Statistics
 STATISTIC_CALORIES = [
     {
-        "date": "2022-08-29",
+        # "date": "2022-08-29",
         "calories": 90.8625,
         "user": 1
     },
@@ -91,7 +91,7 @@ STATISTIC_CALORIES = [
 
 STATISTIC_EXERCISE = [
     {   
-        "date": "2022-08-29T19:25:49.739738Z",
+        # "date": "2022-08-29T19:25:49.739738Z",
         "repeats": 30,
         "time": None,
         "weight": None,
@@ -99,7 +99,7 @@ STATISTIC_EXERCISE = [
         "user": 1
     },
     {
-        "date": "2022-08-29T19:26:12.781326Z",
+        # "date": "2022-08-29T19:26:12.781326Z",
         "repeats": 30,
         "time": None,
         "weight": None,
@@ -107,7 +107,7 @@ STATISTIC_EXERCISE = [
         "user": 1
     },
     {
-        "date": "2022-08-29T19:26:12.789855Z",
+        # "date": "2022-08-29T19:26:12.789855Z",
         "repeats": None,
         "time": "15.000",
         "weight": None,
@@ -115,7 +115,7 @@ STATISTIC_EXERCISE = [
         "user": 1
     },
     {
-        "date": "2022-08-29T19:26:12.797326Z",
+        # "date": "2022-08-29T19:26:12.797326Z",
         "repeats": 30,
         "time": None,
         "weight": "100.000",
