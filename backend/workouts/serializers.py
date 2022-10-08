@@ -39,12 +39,6 @@ class WorkoutSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FavoriteWorkoutSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.FavoriteWorkout
-        fields = '__all__'
-
-
 class SimpleAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -115,6 +109,20 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
 
     class Meta:
         model = models.Workout
+        fields = '__all__'
+
+
+class FavoriteWorkoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.FavoriteWorkout
+        fields = '__all__'
+
+
+class FavoriteWorkoutDetailedSerializer(serializers.ModelSerializer):
+    workout = WorkoutSerializerWithAuthor()
+
+    class Meta:
+        model = models.FavoriteWorkout
         fields = '__all__'
 
 
