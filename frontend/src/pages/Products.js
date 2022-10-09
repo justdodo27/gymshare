@@ -1,41 +1,104 @@
 import { useState, useEffect } from 'react';
+import { styled, alpha } from '@mui/material/styles';
+import InputBase from '@mui/material/InputBase';
 import React, { useRef } from "react";
-
+import SearchIcon from '@mui/icons-material/Search';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Container, Button, Stack, Typography, Box } from '@mui/material';
+import { Container, Button, Stack, Typography, Box, Menu, MenuItem } from '@mui/material';
 import Iconify from '../components/Iconify';
 // components
 import Page from '../components/Page';
-import { ProductSort, ProductList } from '../sections/@dashboard/products';
+import { ProductList } from '../sections/@dashboard/products';
 // mock
 import { useSelector} from 'react-redux';
 import { authActions } from '../store/auth'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch} from 'react-redux';
 // ----------------------------------------------------------------------
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
+}));
 
 export default function EcommerceShop() {
 
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
   const navigate = useNavigate()
+  let isAuth = useSelector(state => state.auth.isAuthenticated);
+  const [open, setOpen] = useState(null);
+  const [term, setTerm] = useState('');
+  const [sort, setSort] = useState({ value: 'newest', label: 'Newest' });
+
+  const SORT_BY_OPTIONS = [
+    { value: 'newest', label: 'Newest' },
+    { value: 'rate', label: 'Rate' },
+    { value: 'title', label: 'Title' },
+  ];
 
   useEffect(() => {
-    if (exp<parseInt(Date.now()/1000)) {
+    if (isAuth && exp<parseInt(Date.now()/1000)) {
       dispatch(authActions.logout())
       navigate('/', {replace: true});
     }
   }, [dispatch, exp, navigate]);
 
-  let isAuth = useSelector(state => state.auth.isAuthenticated);
+  
 
   const [workouts, setWorkouts] = useState([]);
   const [next, setNext] = useState();
 
-  const fetchWorkout = () => {
+  const fetchWorkout = (s, term='') => {
+    let option = ''
+    if (s === "rate"){
+      option = 'avg_rating'
+    }
+    else if (s === 'title'){
+      option = 'title'
+    }
+    else{
+      option = '-id'
+    }
 
-    fetch("http://localhost:1337/workouts/plans/?visibility=Public&page=1", {
+    fetch("http://localhost:1337/workouts/plans/?visibility=Public&page=1&ordering="+option+"&search="+term, {
     })
 
       .then(response => {
@@ -56,7 +119,7 @@ export default function EcommerceShop() {
 
   useEffect(() => {
     try {
-        fetchWorkout()
+        fetchWorkout('newest')
     } catch (error) {
       
     }
@@ -85,6 +148,15 @@ const fetchNextWorkout = () => {
     }
   }
 
+
+  const handleOpen = (event) => {
+    setOpen(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setOpen(null);
+  };
+
   return (
     <Page title="Workouts">
       <Container>
@@ -97,10 +169,50 @@ const fetchNextWorkout = () => {
           </Button>}
         </Stack>
 
-        <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
-          <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-            <ProductSort />
-          </Stack>
+        <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
+        <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ 'aria-label': 'search' }}
+              onInput={(e) => {
+                setTerm(e.target.value);fetchWorkout(sort.value, e.target.value);
+              }}
+            />
+          </Search>
+        <Button
+        color="inherit"
+        disableRipple
+        onClick={handleOpen}
+        endIcon={<Iconify icon={open ? 'eva:chevron-up-fill' : 'eva:chevron-down-fill'} />}
+      >
+        Sort By:&nbsp;
+        <Typography component="span" variant="subtitle2" sx={{ color: 'text.secondary' }}>
+          {sort.label}
+        </Typography>
+      </Button>
+      <Menu
+        keepMounted
+        anchorEl={open}
+        open={Boolean(open)}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        {SORT_BY_OPTIONS.map((option) => (
+          <MenuItem
+            key={option.value}
+            selected={option.value === sort.value}
+            onClick={() => {handleClose();setSort({ value: option.value, label: option.label });fetchWorkout(option.value)}}
+            sx={{ typography: 'body2' }}
+          >
+            {option.label}
+          </MenuItem>
+        ))}
+      </Menu>
+
         </Stack>
         {workouts && <ProductList products={workouts} />}
         <Box m={3} pt={5}>
