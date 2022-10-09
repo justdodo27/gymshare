@@ -19,11 +19,13 @@ class ExerciseSerializer(serializers.ModelSerializer):
 
     def get_thumbnail(self, exercise):
         request = self.context.get('request')
+        if not exercise.thumbnail: return ""
         thumbnail_url = exercise.thumbnail.url
         return request.build_absolute_uri(thumbnail_url)
 
     def get_video(self, exercise):
         request = self.context.get('request')
+        if not exercise.video: return ""
         video_url = exercise.video.url
         return request.build_absolute_uri(video_url)
 
