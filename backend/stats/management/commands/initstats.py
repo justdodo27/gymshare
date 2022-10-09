@@ -22,7 +22,7 @@ class Command(BaseCommand):
                 month = month.replace(month=10)
                 month_last_date = monthrange(month.year, month.month)[1]
                 for day in range(month_last_date):
-                    month = dt.datetime.now().replace(day=day+1)
+                    month = month.replace(day=day+1)
 
                     stat_cal_kwargs = {
                         'date': month.strftime('%Y-%m-%d'),
@@ -36,7 +36,7 @@ class Command(BaseCommand):
                 month = month.replace(month=9)
                 month_last_date = monthrange(month.year, month.month)[1]
                 for day in range(month_last_date):
-                    month = dt.datetime.now().replace(day=day+1)
+                    month = month.replace(day=day+1)
 
                     stat_cal_kwargs = {
                         'date': month.strftime('%Y-%m-%d'),
@@ -60,7 +60,7 @@ class Command(BaseCommand):
             month = month.replace(month=10)
             month_last_date = monthrange(month.year, month.month)[1]
             for day in range(month_last_date):
-                month = dt.datetime.now().replace(day=day+1)
+                month = month.replace(day=day+1)
                 for statistic_exercise in STATISTIC_EXERCISE:
                     stat_ex_kwargs = {
                         'date': json.dumps(month, default=date_handler).strip('"'),
@@ -77,7 +77,7 @@ class Command(BaseCommand):
             month = month.replace(month=9)
             month_last_date = monthrange(month.year, month.month)[1]
             for day in range(month_last_date):
-                month = dt.datetime.now().replace(day=day+1)
+                month = month.replace(day=day+1)
                 for statistic_exercise in STATISTIC_EXERCISE:
                     stat_ex_kwargs = {
                         'date': json.dumps(month, default=date_handler).strip('"'),
