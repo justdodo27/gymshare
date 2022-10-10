@@ -25,12 +25,27 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch} from 'react-redux';
 import { authActions } from '../store/auth';
-import { AutoLogout } from 'src/hooks/autoLogout';
+import { Button } from '@mui/material';
+import { month } from 'src/sections/@dashboard/app/AppWebsiteVisits';
+import { ConnectingAirportsOutlined } from '@mui/icons-material';
 
 
 // ----------------------------------------------------------------------
 
 export default function DashboardApp() {
+
+  function getMonth(date) {
+    var month = date.getMonth() + 1;
+    return month < 10 ? '0' + month : '' + month; // ('' + month) for string result
+  }  
+
+  function getDay(date) {
+    var month = date.getDate();
+    return month < 10 ? '0' + month : '' + month; // ('' + month) for string result
+  }
+
+  let month= useSelector(state => state.month.month);
+
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
   const navigate = useNavigate()
@@ -48,6 +63,9 @@ export default function DashboardApp() {
   const [pastDays, setPastDays] = useState([])
   const [caloriesDays, setCaloriesDays] = useState([])
   const [avgCalories, setAvgCalories] = useState("")
+
+  let year = new Date().getFullYear() 
+
 
   const fetchMoviesHandler = useCallback(async () => {
     
@@ -97,13 +115,25 @@ export default function DashboardApp() {
       let caloriesDays = [];
       let sum = 0
 
-      for (let i = 29; i >= 0; i--) {
+      function getDaysInMonth(year, month) {
+        let date = new Date(year, month-1, 1);
+        let days = [];
+        while (date.getMonth() === month-1) {
+          let day = getDay(date)+'-'+ (getMonth(date));
+          days.push(day.toString())
+          date.setDate(date.getDate() + 1);
+        }
+        return days;
+      }
+
+
+
+      for (let i = getDaysInMonth(year, month).length-1; i >= 0; i--) {
         let now = new Date();
         let flag = false
-        let backdate = new Date(now.setDate(now.getDate() - i));
-        let day = backdate.getFullYear()+'-'+(getMonth(backdate))+'-'+getDay(backdate);
+        let day = getDaysInMonth(year, month);
         for (let j = 0; j < days.length; j++) {
-          if (day.toString()===days[j].day.toString()) {
+          if (day[i].toString()===days[j].day.split('-')[2].toString()+'-'+days[j].day.split('-')[1].toString()) {
             caloriesDays.push(days[j].calories.toFixed(2))
             flag=true
             break
@@ -125,9 +155,10 @@ export default function DashboardApp() {
       let average = (sum/30).toFixed(2)
       setAvgCalories(average+ " kcal")
 
+
     
 
-      setPastDays(pastDays)
+      setPastDays(getDaysInMonth(year, month))
       
       
 
@@ -146,14 +177,27 @@ export default function DashboardApp() {
       return<p>Error</p>;
     }
     ;
-  }, []);
+  }, [month]);
 
   useEffect(() => {
     fetchMoviesHandler();
   }, [fetchMoviesHandler]);
 
+  function toMonthName(monthNumber) {
+    const date = new Date();
+    date.setMonth(monthNumber - 1);
   
-  console.log(pastDays)
+    return date.toLocaleString('en-US', {
+      month: 'long',
+    });
+  }
+
+  let selectedMonth = toMonthName(month).toString()
+  console.log(selectedMonth)
+  let title = "Average of calories burned in " + selectedMonth
+  console.log(title)
+
+  
 
 
   return (
@@ -169,13 +213,14 @@ export default function DashboardApp() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={6}>
-            <AppStatistics title="Average of calories burned in the last month" total={avgCalories} color="info" icon={'ant-design:fund-filled'} />
+            <AppStatistics title={title} total={avgCalories} color="info" icon={'ant-design:fund-filled'} />
           </Grid>
+
 
           <Grid item xs={12} md={9} lg={12}>
             <AppWebsiteVisits
               title="Burned calories"
-              subheader="Past month"
+              subheader="Per day"
               chartLabels={pastDays}
               chartData={[
                 {
