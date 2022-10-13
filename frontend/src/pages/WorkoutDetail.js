@@ -23,8 +23,40 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 // ----------------------------------------------------------------------
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+    fontSize: 18,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 18,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
+    
+  },
+  "&:hover": {
+    cursor: "pointer",
+    backgroundColor: theme.palette.primary.light,
+  },
+}));
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={5} ref={ref} variant="filled" {...props} />;
 });
@@ -221,7 +253,7 @@ export default function WorkoutDetail() {
             color={(visibility === 'Hidden' && 'error') || 'info'}
             sx={{
               zIndex: 9,
-              top: '100%',
+              top: '200%',
               right: '5%',
               position: 'absolute',
               textTransform: 'uppercase',
@@ -306,37 +338,37 @@ export default function WorkoutDetail() {
         <Typography align="center" variant="body2" color="subtitle3">
             Workout cycles: {cycles}
           </Typography>
-        {exercises && <List
-      sx={{ width: '100%', bgcolor: 'background.paper' }}
-      aria-label="exercises"
-    >
-    <Grid container spacing={1}>
-      {exercises.map((exercise) => (
-        <Grid key={exercise.id} item sm={1} md={12}>
-        <ListItem disablePadding>
-        <ListItemButton onClick={() => {
-          handleClickOpen(
-            exercise.exercise.title, exercise.exercise.description, exercise.exercise.calories_burn_rate, 
-            exercise.exercise.difficulty, exercise.exercise.exercise_type
-      )}}
-        >
-            <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ width: '90%'}}>
-                {exercise.time && <Typography gutterBottom variant="h5">
-                {exercise.order}. {exercise.exercise.title} ({exercise.time} s)
-                </Typography>}
-                {exercise.repeats && <Typography gutterBottom variant="h5">
-                {exercise.order}. {exercise.exercise.title} (x{exercise.repeats})
-                </Typography>}
-                <Typography gutterBottom variant="h5">
-                {exercise.series} series
-                </Typography>
-            </Stack>
-        </ListItemButton>
-      </ListItem>  
-        </Grid>
-      ))}
-    </Grid>
-    </List>}
+
+          {exercises && <TableContainer component={Paper}>
+      <Table  sx={{ minWidth: 700 }} aria-label="customized table">
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>Order</StyledTableCell>
+            <StyledTableCell align="left">Title</StyledTableCell>
+            <StyledTableCell align="left">Repeats/Time</StyledTableCell>
+            <StyledTableCell align="left">Series</StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+        {exercises.map((exercise) => (
+            <StyledTableRow key={exercise.order} onClick={() => {
+              handleClickOpen(
+                exercise.exercise.title, exercise.exercise.description, exercise.exercise.calories_burn_rate, 
+                exercise.exercise.difficulty, exercise.exercise.exercise_type
+          )}}>
+              <StyledTableCell component="th" scope="row">
+                {exercise.order}
+              </StyledTableCell>
+              <StyledTableCell align="left">{exercise.exercise.title}</StyledTableCell>
+              {exercise.time && <StyledTableCell align="left">{exercise.time} s</StyledTableCell>}
+              {exercise.repeats && <StyledTableCell align="left">x{exercise.repeats}</StyledTableCell>}
+              <StyledTableCell align="left">{exercise.series}</StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>}
+
     </Card>
       </Container>
       <Dialog
