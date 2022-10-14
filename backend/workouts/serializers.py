@@ -60,6 +60,16 @@ class WorkoutSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class WorkoutCreateSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        context_user = self.context.get('user')
+        return models.Workout.objects.create(author=context_user, **validated_data)
+
+    class Meta:
+        model = models.Workout
+        fields = ('title', 'description', 'visibility', 'cycles', 'thumbnail')
+
+
 class SimpleAuthorSerializer(serializers.ModelSerializer):
     profile_picture = serializers.SerializerMethodField()
 

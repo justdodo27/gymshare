@@ -41,6 +41,11 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     pagination_class.page_size = 15
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['user'] = self.request.user
+        return context
+
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             self.permission_classes = [permissions.IsAuthenticated]
@@ -59,15 +64,10 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            self.serializer_class = serializers.WorkoutSerializer
+            self.serializer_class = serializers.WorkoutCreateSerializer
         else:
             self.serializer_class = serializers.WorkoutSerializerWithAuthor
         return super().get_serializer_class()
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['user'] = self.request.user
-        return context
 
 
 class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
