@@ -13,7 +13,7 @@ USERS = (
 # Exercises
 EXERCISES = [
     (
-        'Push Ups', 
+        'Push Ups',
         'The push-up (sometimes called a press-up in British English) is a common calisthenics exercise beginning from the prone position. By raising and lowering the body using the arms, push-ups exercise the pectoral muscles, triceps, and anterior deltoids, with ancillary benefits to the rest of the deltoids, serratus anterior, coracobrachialis and the midsection as a whole.',
         3,
         0.0063,
@@ -90,7 +90,7 @@ STATISTIC_CALORIES = [
 ]
 
 STATISTIC_EXERCISE = [
-    {   
+    {
         # "date": "2022-08-29T19:25:49.739738Z",
         "repeats": 30,
         "time": None,
@@ -121,5 +121,5 @@ STATISTIC_EXERCISE = [
         "weight": "100.000",
         "exercise": 2,
         "user": 1
-    } 
+    }
 ]
