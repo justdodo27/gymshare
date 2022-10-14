@@ -53,7 +53,7 @@ ROOT_URLCONF = 'gymshareapi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '/templates/'),],
+        'DIRS': [os.path.join(BASE_DIR, '/templates/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -152,7 +152,7 @@ REST_FRAMEWORK  = {
 }
 
 # CSRF Trusted origins
-CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:1337",]
+CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:1337"]
 
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': 'http://localhost:8000/',
@@ -170,7 +170,6 @@ SWAGGER_SETTINGS = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 # JWT settings
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
 }

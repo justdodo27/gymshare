@@ -19,13 +19,17 @@ class ExerciseSerializer(serializers.ModelSerializer):
 
     def get_thumbnail(self, exercise):
         request = self.context.get('request')
-        if not exercise.thumbnail: return ""
+        if not exercise.thumbnail:
+            return ""
+
         thumbnail_url = exercise.thumbnail.url
         return request.build_absolute_uri(thumbnail_url)
 
     def get_video(self, exercise):
         request = self.context.get('request')
-        if not exercise.video: return ""
+        if not exercise.video:
+            return ""
+
         video_url = exercise.video.url
         return request.build_absolute_uri(video_url)
 
@@ -83,13 +87,11 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
 
     def get_is_favorite(self, workout):
         context_user = self.context.get('user')
-        if context_user.is_anonymous: return False
+        if context_user.is_anonymous:
+            return False
 
-        qs = models.FavoriteWorkout.objects.filter(workout=workout, user=context_user).first()
-
-        if qs: return True
-
-        return False
+        return models.FavoriteWorkout.objects.filter(
+            workout=workout, user=context_user).exists()
 
     def get_avg_rating(self, workout):
         return models.Rating.objects.filter(

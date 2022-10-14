@@ -1,10 +1,11 @@
 from rest_framework.response import Response
-from rest_framework import authentication, permissions
+from rest_framework import permissions
 from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView, ListAPIView
 from rest_framework.exceptions import NotAuthenticated
 
 from .models import StatisticExercise, StatisticCalories
 from .serializers import ExerciseDataSerializer, StatisticCaloriesSerializer, StatisticExerciseSerializer
+
 
 class SyncStats(CreateAPIView):
     """
@@ -20,6 +21,7 @@ class SyncStats(CreateAPIView):
             return Response({'info': 'ok'})
         return Response(serializer.errors)
 
+
 class StatisticExerciseList(ListAPIView):
     queryset = StatisticExercise.objects.all()
     serializer_class = StatisticExerciseSerializer
@@ -28,6 +30,7 @@ class StatisticExerciseList(ListAPIView):
         if self.request.user.is_anonymous:
             raise NotAuthenticated("No Token Provided")
         return self.queryset.filter(user=self.request.user)
+
 
 class StatisticExerciseDetail(RetrieveDestroyAPIView):
     queryset = StatisticExercise.objects.all()
@@ -38,6 +41,7 @@ class StatisticExerciseDetail(RetrieveDestroyAPIView):
             raise NotAuthenticated("No Token Provided")
         return self.queryset.filter(user=self.request.user)
 
+
 class StatisticCaloriesList(ListAPIView):
     queryset = StatisticCalories.objects.all()
     serializer_class = StatisticCaloriesSerializer
@@ -46,6 +50,7 @@ class StatisticCaloriesList(ListAPIView):
         if self.request.user.is_anonymous:
             raise NotAuthenticated("No Token Provided")
         return self.queryset.filter(user=self.request.user)
+
 
 class StatisticCaloriesDetail(RetrieveDestroyAPIView):
     queryset = StatisticCalories.objects.all()

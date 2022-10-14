@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from workouts.models import Exercise
 
+
 class StatisticCalories(models.Model):
     date = models.DateField()
     calories = models.FloatField()
