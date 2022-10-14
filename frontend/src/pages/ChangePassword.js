@@ -18,6 +18,8 @@ export default function ChangePassword() {
 
   const navigate = useNavigate();
   const [passwordError, setPasswordError] = useState(false)
+  const [oldPasswordError, setOldPasswordError] = useState(false)
+  const [repPasswordError, setRepPasswordError] = useState(false)
   let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
 
@@ -28,9 +30,15 @@ export default function ChangePassword() {
     const newPassword = data.get('newpassword')
     const repeatPassword = data.get('repeatpassword')
 
-    if (validatePassword(newPassword)) {
+    if (validatePassword(newPassword) && newPassword !== password) {
       setPasswordError(false)
-      passwordErrorCheck = true
+      if(newPassword === repeatPassword){
+        setRepPasswordError(false)
+        passwordErrorCheck = true
+      }
+      else{
+        setRepPasswordError(true)
+      }
     } else {
       setPasswordError(true)
     }
@@ -52,6 +60,7 @@ export default function ChangePassword() {
           return res.json();
         } else {
           return res.json().then((data) => {
+            setOldPasswordError(true)
             let errorMessage = 'Wrong username or password!';
             throw new Error(errorMessage);
           });
@@ -62,7 +71,7 @@ export default function ChangePassword() {
         navigate('/gymshare/Logout', {replace: true})
       })
       .catch((err) => {
-        alert(err.message);
+
       });
     }
   };
@@ -83,7 +92,7 @@ export default function ChangePassword() {
             Change Password
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
+            {!oldPasswordError && <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
               margin="normal"
@@ -94,7 +103,21 @@ export default function ChangePassword() {
               type="password"
               id="password"
               autoComplete="current-password"
-            />
+            />}
+            {oldPasswordError && <TextField
+            inputProps={{ style: { color: "white" } }}
+            InputLabelProps={{ style: { color: '#fff' }} }
+              margin="normal"
+              required
+              error
+              fullWidth
+              name="password"
+              label="current password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              helperText="Wrong password"
+            />}
             {!passwordError && <Grid item xs={12}>
                 <TextField
                 inputProps={{ style: { color: "white" } }}
@@ -119,10 +142,10 @@ export default function ChangePassword() {
                   type="password"
                   id="newpassword"
                   autoComplete="new-password"
-                  helperText="Password should be at least 8 characters"
+                  helperText="Try another stronger password"
                 />
               </Grid>}
-            <TextField
+            {!repPasswordError && <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
               margin="normal"
@@ -133,7 +156,21 @@ export default function ChangePassword() {
               type="password"
               id="repeatpassword"
               autoComplete="repeat-new-password"
-            />
+            />}
+            {repPasswordError && <TextField
+            inputProps={{ style: { color: "white" } }}
+            InputLabelProps={{ style: { color: '#fff' }} }
+              margin="normal"
+              required
+              error
+              fullWidth
+              name="repeatpassword"
+              label="repeat password"
+              type="password"
+              id="repeatpassword"
+              autoComplete="repeat-new-password"
+              helperText="Passwords are not the same"
+            />}
             <Button
               type="submit"
               fullWidth

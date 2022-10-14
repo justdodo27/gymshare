@@ -5,7 +5,14 @@ import { Link as RouterLink } from 'react-router-dom';
 import account from '../../../_mock/account';
 
 
-export default function AppWidgetProfile({ name, last, height, weight, color = 'primary', sx, ...other }) {
+export default function AppWidgetProfile({ name, last, height, weight, photo, color = 'primary', sx, ...other }) {
+  let src = ''
+  if(photo){
+    src = photo
+  }else{
+    src = account.photoURL
+  }
+  console.log(src)
   return (
     <Card
       sx={{
@@ -20,7 +27,7 @@ export default function AppWidgetProfile({ name, last, height, weight, color = '
     >
       <Grid container spacing={1} >
         <Grid item xs={2} sm={2} md={2}>
-      <Avatar  sx={{ margin: 4, width: '100%', height: 'auto' }} src={account.photoURL} alt="photoURL" />
+      <Avatar  sx={{ margin: 4, width: '100%', height: 'auto' }} src={src} alt="photoURL" />
         </Grid>
         <Grid item xs={10} sm={10} md={10}>
         <Typography padding={2} margin={2} variant="h3" sx={{ opacity: 0.72 }}>

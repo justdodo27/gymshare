@@ -4,7 +4,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
 import Iconify from '../components/Iconify';
 import {
-  AppWidgetSummary,
   AppWidgetProfile,
 } from '../sections/@dashboard/app';
 import { useTheme } from '@mui/material/styles';
@@ -14,9 +13,7 @@ import { useSelector} from 'react-redux';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-import { ProductSort, ProductList, ProductFilterSidebar } from '../sections/@dashboard/products';
-// mock
-import PRODUCTS from '../_mock/products';
+import { ProductList } from '../sections/@dashboard/products';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch} from 'react-redux';
 import { authActions } from '../store/auth'
@@ -43,6 +40,7 @@ export default function Profile() {
   const [weight, setWeight] = useState(null)
   const [firstName, setFirstName] = useState(null)
   const [lastName, setLastName] = useState(null)
+  const [photo, setPhoto] = useState(null)
   const [alignment, setAlignment] = useState('your');
   const [myWorkouts, setWorkouts] = useState([]);
   const [favWorkouts, setFavWorkouts] = useState([]);
@@ -69,7 +67,7 @@ export default function Profile() {
         setWeight(data.weight)
         setFirstName(data.user.first_name)
         setLastName(data.user.last_name)
-        
+        setPhoto(data.user.profile_picture)
       })
   }
 
@@ -137,8 +135,6 @@ const fetchNextWorkout = () => {
       })
     }
   }
-
-  
   return (
     <Page title="Profile">
       <Container component="main" maxWidth="lg">
@@ -149,7 +145,7 @@ const fetchNextWorkout = () => {
         <Grid container spacing={1} >
 
           <Grid item xs={12} sm={12} md={12}>
-            <AppWidgetProfile name={firstName} last={lastName} height={height} weight={weight} color="secondary" />
+            <AppWidgetProfile name={firstName} last={lastName} height={height} weight={weight} photo={photo} color="secondary" />
           </Grid>
           </Grid>
         <Box

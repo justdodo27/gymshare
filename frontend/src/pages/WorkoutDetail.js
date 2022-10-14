@@ -1,8 +1,7 @@
 import { useState, useEffect, forwardRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Container, Button, Box, Stack, Typography, Card, CardContent, CardActionArea, 
-        List, ListItem, ListItemButton, Grid,
+import { Container, Button, Box, Stack, Typography, Card, CardContent, CardMedia, 
         DialogTitle, DialogContentText, DialogContent, DialogActions, Dialog } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Slide from '@mui/material/Slide';
@@ -12,6 +11,7 @@ import Label from '../components/Label';
 // mock
 import { useSelector} from 'react-redux';
 import icon from "../pictures/play.png"
+import nophoto from "../pictures/nophoto.jpg"
 import { useDispatch } from 'react-redux';
 import { useNavigate} from 'react-router-dom';
 import { workoutActions } from '../store/workout';
@@ -87,6 +87,20 @@ export default function WorkoutDetail() {
         height: '100%',
         objectFit: 'cover',
         position: 'absolute',
+        opacity: 0.7
+      });
+      const PlayImgStyle = styled('img')({
+        top: '15%',
+        left: '15%',
+        width: '70%',
+        height: '70%',
+        objectFit: 'cover',
+        position: 'absolute',
+        opacity: 0.4,
+        "&:hover": {
+          cursor: "pointer",
+          opacity: 0.6,
+        },
       });
 
     const workoutId = useSelector(state => state.workout.workoutId);
@@ -98,13 +112,19 @@ export default function WorkoutDetail() {
     const [saved, setSaved] = useState(false);
     
 
-    const handleClickOpen = (title, description, cbr, difficulty, type) => {
+    const handleClickOpen = (title, description, cbr, difficulty, type, thumbnail, video) => {
         let array = []
         array.push(title)
         array.push(description)
         array.push(cbr)
         array.push(difficulty)
         array.push(type)
+        if(thumbnail){
+          array.push(thumbnail)
+        }else{
+          array.push(icon)
+        }
+        array.push(video)
         setExe(array);
         setOpen(true);
     };
@@ -164,8 +184,15 @@ export default function WorkoutDetail() {
     is_favorite,
     sum_of_cb,
     title,
-    visibility 
+    visibility ,
+    thumbnail
     } = workout
+    let workoutThumbnail = ''
+    if(thumbnail){
+      workoutThumbnail = thumbnail
+    }else{
+      workoutThumbnail = nophoto
+    }
 
     const handleClickSave = () => {
       if(saved)
@@ -245,16 +272,15 @@ export default function WorkoutDetail() {
     <Page title="Workout Details">
       <Container>
         <Card sx={{ maxWidth: "90%", minWidth: "90%"}}>
-      <Box sx={{ pt: '1%', position: 'relative' }}>
-      
+        <Box sx={{ pt: '2', position: 'relative' }}>
         {visibility && (
           <Label
             variant="filled"
             color={(visibility === 'Hidden' && 'error') || 'info'}
             sx={{
               zIndex: 9,
-              top: '200%',
-              right: '5%',
+              top: 10,
+              right: 10,
               position: 'absolute',
               textTransform: 'uppercase',
             }}
@@ -262,15 +288,31 @@ export default function WorkoutDetail() {
             {visibility}
           </Label>
         )}
-        
-      </Box>
-      <IconButton aria-label="backarrow" size="large" color="secondary" onClick={() => navigate('/')}>
+        <IconButton variant="filled" aria-label="backarrow" size="large" color="secondary"             
+        sx={{
+              zIndex: 9,
+              top: 0,
+              left: 0,
+              position: 'absolute',
+              textTransform: 'uppercase',
+            }}onClick={() => navigate('/')}>
         <ArrowBackIcon  fontSize="inherit" />
       </IconButton>
+      
+        <CardMedia
+        component="img"
+        height="600vh"
+        weight="100%"
+        objectFit='cover'
+        position='absolute'
+        image={workoutThumbnail}
+        alt="workout thumbnail"
+      />
+        </Box>
         <CardContent sx={{minHeigth:500}}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-        <Stack direction="column" alignItems="left" justifyContent="space-between" mb={1}>
-        <Typography gutterBottom variant="h3" component="div">
+        <Stack margin='1%' direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+        <Stack direction="column" alignItems="left" justifyContent="space-between" mb={5}>
+        <Typography variant="h3" component="div">
           {title}
           </Typography>
           {author && <Typography variant="subtitle1" gutterBottom>
@@ -281,6 +323,9 @@ export default function WorkoutDetail() {
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Time: {avg_time}
+          </Typography>
+          <Typography padding='2%'variant="body2" color="text.secondary">
+            {description}
           </Typography>
         </Stack>
 
@@ -331,9 +376,6 @@ export default function WorkoutDetail() {
           </Typography>
         </Stack>
         </Stack>
-          <Typography variant="body2" color="text.secondary">
-            {description}
-          </Typography>
         </CardContent>
         <Typography align="center" variant="body2" color="subtitle3">
             Workout cycles: {cycles}
@@ -354,7 +396,7 @@ export default function WorkoutDetail() {
             <StyledTableRow key={exercise.order} onClick={() => {
               handleClickOpen(
                 exercise.exercise.title, exercise.exercise.description, exercise.exercise.calories_burn_rate, 
-                exercise.exercise.difficulty, exercise.exercise.exercise_type
+                exercise.exercise.difficulty, exercise.exercise.exercise_type, exercise.exercise.thumbnail, exercise.exercise.video,
           )}}>
               <StyledTableCell component="th" scope="row">
                 {exercise.order}
@@ -373,7 +415,7 @@ export default function WorkoutDetail() {
       </Container>
       <Dialog
         fullWidth
-        maxWidth="sm"
+        minWidth="100%"
         open={open}
         TransitionComponent={Transition}
         keepMounted
@@ -382,8 +424,9 @@ export default function WorkoutDetail() {
         
       >
         <DialogTitle>        
-        <Box sx={{ pt: '90%', position: 'relative' }}>
-        <ProductImgStyle alt={title} src={icon} />
+        <Box sx={{ pt: '100%', position: 'relative' }}>
+        <ProductImgStyle alt={title} src={exe[5]} />
+        <PlayImgStyle alt={title} src={icon} />
       </Box>
           {exe[0]}
         </DialogTitle>

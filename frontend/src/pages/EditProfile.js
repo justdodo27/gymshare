@@ -24,6 +24,8 @@ export default function EditProfile() {
 
   const [heightError, setHeightError] = useState(false)
   const [weightError, setWeightError] = useState(false)
+  const [firstNameError, setFirstNameError] = useState(false)
+  const [lastNameError, setLastNameError] = useState(false)
   const [heightGet, setHeight] = useState("")
   const [weightGet, setWeight] = useState("")
   const [firstName, setFirstName] = useState("")
@@ -33,10 +35,6 @@ export default function EditProfile() {
   let heightErrorCheck = false
   let firstNameErrorCheck = false
   let lastNameErrorCheck = false
-  
-
-  console.log(token)
-  console.log(userId)
 
   const fetchData = () => {
   fetch("http://localhost:1337/accounts/profiles/" +userId, {
@@ -61,9 +59,6 @@ export default function EditProfile() {
     fetchData()
   }, [])
 
-  console.log(firstName)
-  console.log(lastName)
-
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -73,7 +68,7 @@ export default function EditProfile() {
     let last_Name = data.get('last_name')
   
 
-    if (validateNumber(weight)) {
+    if (validateNumber(weight) && weight.length !== 0) {
       setWeightError(false)
       weightErrorCheck = true
     } else {
@@ -81,25 +76,29 @@ export default function EditProfile() {
       weightErrorCheck = false
     }
 
-    if (validateNumber(height)) {
+    if (validateNumber(height) && height.length !== 0) {
       setHeightError(false)
       heightErrorCheck = true
     } else {
       setHeightError(true)
       heightErrorCheck = false
     }
-    if(first_Name){
+    if(first_Name.length !== 0){
+      setFirstNameError(false)
       firstNameErrorCheck = true
     }else {
+      setFirstNameError(true)
       firstNameErrorCheck = false
     }
-    if(last_Name){
+    if(last_Name.length !== 0){
+      setLastNameError(false)
       lastNameErrorCheck = true
     }else {
+      setLastNameError(true)
       lastNameErrorCheck = false
     }
     
-
+    console.log(heightErrorCheck, weightErrorCheck, firstNameErrorCheck, lastNameErrorCheck)
     if (heightErrorCheck && weightErrorCheck && firstNameErrorCheck && lastNameErrorCheck) {
       fetch("http://localhost:1337/accounts/profiles/" + userId +"/", {
         method: 'PATCH',
@@ -152,7 +151,7 @@ export default function EditProfile() {
             Edit Profile
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
+            {!firstNameError && <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
               margin="normal"
@@ -164,8 +163,23 @@ export default function EditProfile() {
               value={firstName}
               onChange={event => setFirstName(event.target.value)}
               autoFocus
-            />
-            <TextField
+            />}
+            {firstNameError && <TextField
+            inputProps={{ style: { color: "white" } }}
+            InputLabelProps={{ style: { color: '#fff' }} }
+              margin="normal"
+              fullWidth
+              error
+              name="first_name"
+              label="First name"
+              type="first_name"
+              id="first_name"
+              value={firstName}
+              helperText="Please enter valid height"
+              onChange={event => setFirstName(event.target.value)}
+              autoFocus
+            />}
+            {!lastNameError && <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
               margin="normal"
@@ -177,7 +191,22 @@ export default function EditProfile() {
               value={lastName}
               onChange={event => setLastName(event.target.value)}
               
-            />
+            />}
+            {lastNameError && <TextField
+            inputProps={{ style: { color: "white" } }}
+            InputLabelProps={{ style: { color: '#fff' }} }
+              margin="normal"
+              fullWidth
+              error
+              name="last_name"
+              label="Last name"
+              type="last_name"
+              id="last_name"
+              helperText="Please enter valid height"
+              value={lastName}
+              onChange={event => setLastName(event.target.value)}
+              autoFocus
+            />}
             {!heightError && <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
@@ -203,8 +232,8 @@ export default function EditProfile() {
               type="height"
               id="height"
               helperText="Please enter valid height"
-              
-              defaultValue={heightGet}
+              autoFocus
+              value={heightGet}
               onChange={event => setHeight(event.target.value)}
             />
             }
@@ -234,7 +263,7 @@ export default function EditProfile() {
               id="weight"
               helperText="Please enter valid weight"
               autoFocus
-              defaultValue={weightGet}
+              value={weightGet}
               onChange={event => setWeight(event.target.value)}
             />
             }

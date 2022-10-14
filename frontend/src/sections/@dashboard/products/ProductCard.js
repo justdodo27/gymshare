@@ -3,12 +3,9 @@ import { Link as RouterLink } from 'react-router-dom';
 // material
 import { Box, Card, CardActionArea, Link, Typography, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-// utils
-import { fCurrency } from '../../../utils/formatNumber';
 // components
 import Label from '../../../components/Label';
-import { ColorPreview } from '../../../components/color-utils';
-import icon from "../../../pictures/icon.jpg"
+import icon from "../../../pictures/nophoto.jpg"
 import { useDispatch } from 'react-redux';
 import { workoutActions } from '../../../store/workout';
 import { useNavigate} from 'react-router-dom';
@@ -58,8 +55,16 @@ export default function ShopProductCard({ product }) {
     is_favorite,
     sum_of_cb,
     title,
-    visibility 
+    visibility,
+    thumbnail
     } = product;
+    let source =''
+    if(thumbnail){
+      source=thumbnail
+    }
+    else{
+      source=icon
+    }
 
     const handleClick = (workoutId) => {
       dispatch(workoutActions.getWorkout(workoutId))
@@ -87,7 +92,7 @@ export default function ShopProductCard({ product }) {
             {visibility}
           </Label>
         )}
-        <ProductImgStyle alt={title} src={icon} />
+        <ProductImgStyle alt={title} src={source} />
       </Box>
 
       <Stack spacing={1} sx={{ p: 2 }}>
