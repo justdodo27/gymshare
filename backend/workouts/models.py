@@ -86,3 +86,4 @@ class Rating(models.Model):
 
     class Meta:
         ordering = ['rate']
+        unique_together = ('user', 'workout',)
