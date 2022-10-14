@@ -48,6 +48,36 @@ class ExerciseInWorkoutSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ExerciseInWorkoutUploadSerializer(serializers.Serializer):
+    workout = serializers.IntegerField()
+    exercises = ExerciseInWorkoutCreateSerializer(many=True)
+
+    def validate(self, attrs):
+        workout_id = attrs.get('workout', None)
+        exercises = attrs.get('exercises', [])
+
+        if not models.Workout.objects.filter(id=workout_id).exists():
+            raise serializers.ValidationError('The workout does not exists.')
+
+        for exercise in exercises:
+            if exercise['workout'].id != workout_id:
+                raise serializers.ValidationError('Not all exercises belongs to specified workout.')
+
+        return attrs
+
+    def create(self, validated_data):
+        exercises = models.ExcerciseInWorkout.objects.filter(workout__id=validated_data['workout'])
+        exercises.delete()
+
+        for exercise_data in validated_data['exercises']:
+            exercise = models.ExcerciseInWorkout.objects.create(**exercise_data)
+
+        return exercise
+
+    def save(self, **kwargs):
+        return self.validated_data
+
+
 class WorkoutSerializer(serializers.ModelSerializer):
     exercises = serializers.SerializerMethodField()
 

@@ -47,7 +47,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         return context
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
             self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.AllowAny]
@@ -63,11 +63,22 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(queryset_for_public | queryset_for_hidden)
 
     def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            self.serializer_class = serializers.WorkoutCreateSerializer
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return serializers.WorkoutCreateSerializer
+        return serializers.WorkoutSerializerWithAuthor
+
+    @action(detail=False, methods=['post'], url_path='upload-exercises')
+    def upload_exercises(self, request):
+        """
+        Deletes old exercises and creates new ones from the given data.
+        Parameters "workout" - ID of the workout. "exercises" - List of ExercisesInWorkout in json format to save.
+        """
+        serializer = serializers.ExerciseInWorkoutUploadSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
         else:
-            self.serializer_class = serializers.WorkoutSerializerWithAuthor
-        return super().get_serializer_class()
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
@@ -114,8 +125,13 @@ class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
     queryset = models.ExcerciseInWorkout.objects.all()
     serializer_class = serializers.ExerciseInWorkoutSerializer
 
+    def get_queryset(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return models.ExcerciseInWorkout.objects.filter(workout__author=self.request.user)
+        return models.ExcerciseInWorkout.objects.all()
+
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
             self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.AllowAny]
@@ -124,10 +140,8 @@ class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
-            self.serializer_class = serializers.ExerciseInWorkoutCreateSerializer
-        else:
-            self.serializer_class = serializers.ExerciseInWorkoutSerializer
-        return super().get_serializer_class()
+            return serializers.ExerciseInWorkoutCreateSerializer
+        return serializers.ExerciseInWorkoutSerializer
 
 
 class RatingViewSet(viewsets.ModelViewSet):
