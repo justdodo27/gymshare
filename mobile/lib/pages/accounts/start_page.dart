@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gymshare/components/logo.dart';
-import 'package:gymshare/components/rounded_rectangle_button.dart';
-import 'package:gymshare/components/scroll_configuration.dart';
+import 'package:gymshare/components/utils/routes.dart';
+import 'package:gymshare/components/widgets/logo.dart';
+import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
+import 'package:gymshare/components/widgets/scroll_configuration.dart';
+import 'package:gymshare/pages/accounts/login_page.dart';
+import 'package:gymshare/pages/accounts/signup_page.dart';
 import 'package:gymshare/settings/colors.dart';
 
 class StartPage extends StatefulWidget {
@@ -16,14 +19,18 @@ class _StartPageState extends State<StartPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           RoundedRectangleButton(
-            onPress: () {},
+            onPress: () => Navigator.of(context).push(
+              createPageRouteWithAnimation(const LoginPage()),
+            ),
             child: const Text(
               'I am a Gym Rat',
               style: TextStyle(fontSize: 18),
             ),
           ),
           RoundedRectangleButton(
-            onPress: () {},
+            onPress: () => Navigator.of(context).push(
+              createPageRouteWithAnimation(const SignupPage()),
+            ),
             padding: const EdgeInsets.only(top: 20),
             child: const Text(
               'I am brand new to GymShare',
@@ -33,22 +40,10 @@ class _StartPageState extends State<StartPage> {
         ],
       );
 
-  Widget buildLogo(Size size) => Padding(
-        padding: const EdgeInsets.only(top: 60),
-        child: GymShareLogo(
-          size: size.width * 0.5,
-        ),
-      );
-
   Widget buildWelcomeBanner() => Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 30),
-            decoration: BoxDecoration(
-                color: secondaryColor,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: tertiaryColor, width: 2)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 30.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: const [
@@ -66,7 +61,7 @@ class _StartPageState extends State<StartPage> {
                     'Improve the efficiency and pleasure of your training with GymShare',
                     style: TextStyle(
                       color: primaryTextColor,
-                      fontSize: 18,
+                      fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -90,16 +85,14 @@ class _StartPageState extends State<StartPage> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       vertical: 40.0, horizontal: 10),
-                  child: Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        buildWelcomeBanner(),
-                        buildLogo(size),
-                        buildButtons(),
-                      ],
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      buildWelcomeBanner(),
+                      GymShareLogo(size: size.width * 0.5),
+                      buildButtons(),
+                    ],
                   ),
                 ),
               ),

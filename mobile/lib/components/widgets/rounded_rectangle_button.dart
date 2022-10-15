@@ -27,7 +27,7 @@ class RoundedRectangleButton extends StatelessWidget {
         height: height.toDouble(),
         onPressed: onPress,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(10),
           side: const BorderSide(color: tertiaryColor, width: 2),
         ),
         child: child,

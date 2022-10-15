@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gymshare/components/logo.dart';
+import 'package:gymshare/components/widgets/logo.dart';
 import 'package:gymshare/pages/accounts/start_page.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:gymshare/settings/colors.dart';
