@@ -3,6 +3,7 @@ from . import models
 from workouts.models import Exercise
 from accounts.models import Profile
 
+
 class StatisticCaloriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.StatisticCalories
@@ -12,6 +13,7 @@ class StatisticCaloriesSerializer(serializers.ModelSerializer):
         if value < 0:
             return serializers.ValidationError('Calories value must be a positive number')
         return value
+
 
 class StatisticExerciseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -99,7 +101,8 @@ class ExerciseDataSerializer(serializers.Serializer):
 
     def calc_calories(self, exerciseAttrs, exercise: Exercise, user) -> float:
         user_weight = Profile.objects.get(user=user).weight
-        if not user_weight: raise Exception('User Profile don\'t have weight data')
+        if not user_weight:
+            raise Exception('User Profile don\'t have weight data')
         if exerciseAttrs.get('time', None):
             return exercise.calories_burn_rate * user_weight * exerciseAttrs['time'] / 60
         elif exerciseAttrs.get('repeats', None):
@@ -116,11 +119,11 @@ class ExerciseDataSerializer(serializers.Serializer):
         exerciseAttrs = None
 
         if exercise.exercise_type == Exercise.WITH_A_WEIGHT:
-            exerciseAttrs = {'weight': validated_data['weight'], 'repeats': validated_data['repeats']*validated_data['series']}
+            exerciseAttrs = {'weight': validated_data['weight'], 'repeats': validated_data['repeats'] * validated_data['series']}
         elif exercise.exercise_type == Exercise.WITH_OWN_BODY_WEIGHT:
-            exerciseAttrs = {'repeats': validated_data['repeats']*validated_data['series']}
+            exerciseAttrs = {'repeats': validated_data['repeats'] * validated_data['series']}
         elif exercise.exercise_type == Exercise.WITH_TIME:
-            exerciseAttrs = {'time': validated_data['time']*validated_data['series']}
+            exerciseAttrs = {'time': validated_data['time'] * validated_data['series']}
 
         exercise_stats = models.StatisticExercise(
             date=validated_data['date'],
@@ -135,8 +138,8 @@ class ExerciseDataSerializer(serializers.Serializer):
             calories_stats.calories += self.calc_calories(exerciseAttrs, exercise, validated_data['user'])
         else:
             calories_stats = models.StatisticCalories(
-                date=workout_date, 
-                user=validated_data['user'], 
+                date=workout_date,
+                user=validated_data['user'],
                 calories=self.calc_calories(exerciseAttrs, exercise, validated_data['user'])
             )
         calories_stats.save()

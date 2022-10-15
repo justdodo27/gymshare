@@ -50,7 +50,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
 
         if user_object.is_anonymous:
-             raise NotAuthenticated("No Token Provided")
+            raise NotAuthenticated("No Token Provided")
 
         if serializer.is_valid():
             profile_object = models.Profile.objects.get(user__id=user_object.id)
@@ -74,7 +74,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class ChangePasswordView(generics.UpdateAPIView):
     """
     API endpoint for changing user password.
@@ -91,7 +90,7 @@ class ChangePasswordView(generics.UpdateAPIView):
         serializer = self.get_serializer(data=request.data)
 
         if user_object.is_anonymous:
-             raise NotAuthenticated("No Token Provided")
+            raise NotAuthenticated("No Token Provided")
 
         if serializer.is_valid():
             if not user_object.check_password(serializer.data.get("old_password")):
