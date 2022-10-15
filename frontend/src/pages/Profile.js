@@ -87,6 +87,7 @@ export default function Profile() {
         const fav = []
         console.log(data.results.length)
         for (let i = 0; i < data.results.length; i++){
+          console.log(data)
           if(data.results[i].author.id == userId){
             workouts.push(data.results[i])
           }
