@@ -46,6 +46,9 @@ export default function DashboardApp() {
 
   let month= useSelector(state => state.month.month);
 
+  let dayCheck= useSelector(state => state.day.day);
+  console.log(dayCheck)
+
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
   const navigate = useNavigate()
@@ -60,11 +63,81 @@ export default function DashboardApp() {
   const theme = useTheme();
   let token = useSelector(state => state.auth.token);
   const [caloriesToday, setCaloriesToday] = useState(0)
+  const [exercisesToday, setExercisesToday] = useState([])
+  const [time, setTime] = useState([])
   const [pastDays, setPastDays] = useState([])
   const [caloriesDays, setCaloriesDays] = useState([])
   const [avgCalories, setAvgCalories] = useState("")
 
   let year = new Date().getFullYear() 
+
+  const fetchExercises = useCallback(async () => {
+    
+    try {
+      const response = await fetch("http://localhost:1337/stats/stats_exercise/", {
+      method: 'GET',
+      headers: {
+      Authorization: "Bearer " +token
+      }
+    });
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+      const temp = await response.json();
+  
+      
+
+      const days_exercise = [...Array(temp.length)].map((_, index) => ({
+        id: temp[index].id,
+        day: temp[index].date,
+        repeats: temp[index].repeats,
+        time: temp[index].time,
+        exerciseId: temp[index].exercise
+      }));
+
+      
+
+      const nowDate = new Date(); 
+      function getMonth(date) {
+        var month = date.getMonth() + 1;
+        return month < 10 ? '0' + month : '' + month; // ('' + month) for string result
+      }  
+
+      function getDay(date) {
+        var month = date.getDate();
+        return month < 10 ? '0' + month : '' + month; // ('' + month) for string result
+      } 
+
+      const today = nowDate.getFullYear()+'-'+(getMonth(nowDate))+'-'+getDay(nowDate);
+
+      let exercises = []
+      let timing = []
+
+      for (const element of days_exercise) {
+        if(element["day"].split("-")[0]+"-"+element["day"].split("-")[1]+"-"+element["day"].split("-")[2].toString().substring(0,2)===dayCheck){
+          if(element["repeats"]!=null){
+            exercises.push(element["exerciseId"] + ", " + element["repeats"]+ " repeats")
+            timing.push(element["day"].split("-")[2].toString().substring(3,8))
+          } else {
+            exercises.push(element["exerciseId"] + ", " + parseInt(element["time"]) + " seconds")
+            timing.push(element["day"].split("-")[2].toString().substring(3,8))
+          }
+           
+        }
+    }
+
+    console.log(exercises)
+    console.log(timing)
+
+    setTime(timing)
+    setExercisesToday(exercises)
+      
+
+    } catch (error) {
+      return<p>Error</p>;
+    }
+    ;
+  }, [month]);
 
 
   const fetchMoviesHandler = useCallback(async () => {
@@ -181,7 +254,8 @@ export default function DashboardApp() {
 
   useEffect(() => {
     fetchMoviesHandler();
-  }, [fetchMoviesHandler]);
+    fetchExercises();
+  }, [fetchMoviesHandler, fetchExercises]);
 
   function toMonthName(monthNumber) {
     const date = new Date();
@@ -193,9 +267,7 @@ export default function DashboardApp() {
   }
 
   let selectedMonth = toMonthName(month).toString()
-  console.log(selectedMonth)
   let title = "Average of calories burned in " + selectedMonth
-  console.log(title)
 
   
 
@@ -233,6 +305,20 @@ export default function DashboardApp() {
             />
           </Grid>
         </Grid>
+
+        <Grid item xs={12} md={6} lg={4} sx={{
+    marginTop: 5,
+  }}>
+            <AppOrderTimeline
+              title="Exercises performed"
+              list={[...Array(exercisesToday.length)].map((_, index) => ({
+                id: faker.datatype.uuid(),
+                title: exercisesToday[index],
+                type: `order${index + 1}`,
+                time: time[index],
+              }))}
+            />
+          </Grid>
       </Container>
     </Page>
   );
