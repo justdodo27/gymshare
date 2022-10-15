@@ -1,8 +1,8 @@
 import { useState, useEffect, forwardRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Container, Button, Box, Stack, Typography, Card, CardContent, CardMedia, 
-        DialogTitle, DialogContentText, DialogContent, DialogActions, Dialog } from '@mui/material';
+import { Container, Button, Box, Stack, Typography, Card, CardContent, CardMedia, CardHeader, CardActionArea,
+        DialogTitle, DialogContentText, DialogContent, DialogActions, Dialog, Backdrop, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Slide from '@mui/material/Slide';
 // components
@@ -43,6 +43,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.primary.dark,
@@ -79,6 +80,7 @@ export default function WorkoutDetail() {
   const navigate = useNavigate();
   let token = useSelector(state => state.auth.token);
   const userId = useSelector(state => state.auth.userId);
+  
 
   
     const ProductImgStyle = styled('img')({
@@ -110,6 +112,17 @@ export default function WorkoutDetail() {
     const [addAlert, setAddAlert] = useState(false);
     const [styleAlert, setStyleAlert] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [openVideo, setOpenVideo] = useState(false);
+    const [Video, setVideo] = useState('');
+    
+    const handleCloseVideo = () => {
+      setVideo('');
+      setOpenVideo(false);
+    };
+    const handleToggleVideo = (src) => {
+      setVideo(src);
+      setOpenVideo(!openVideo);
+    };
     
 
     const handleClickOpen = (title, description, cbr, difficulty, type, thumbnail, video) => {
@@ -193,6 +206,7 @@ export default function WorkoutDetail() {
     }else{
       workoutThumbnail = nophoto
     }
+    console.log()
 
     const handleClickSave = () => {
       if(saved)
@@ -324,7 +338,10 @@ export default function WorkoutDetail() {
           <Typography variant="body2" color="text.secondary">
             Time: {avg_time}
           </Typography>
-          <Typography padding='2%'variant="body2" color="text.secondary">
+          <Typography padding='2%'variant="body2" color="text.secondary" sx={{
+                color: 'text.disabled',
+                wordBreak: "break-word"
+              }}>
             {description}
           </Typography>
         </Stack>
@@ -415,22 +432,34 @@ export default function WorkoutDetail() {
       </Container>
       <Dialog
         fullWidth
-        minWidth="100%"
+        maxWidth="sm"
         open={open}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
-        
       >
         <DialogTitle>        
-        <Box sx={{ pt: '100%', position: 'relative' }}>
-        <ProductImgStyle alt={title} src={exe[5]} />
-        <PlayImgStyle alt={title} src={icon} />
-      </Box>
-          {exe[0]}
         </DialogTitle>
         <DialogContent>
+        <Box sx={{ pt: '90%', position: 'relative' }}>
+        <ProductImgStyle alt={title} src={exe[5]} />
+        <PlayImgStyle alt={title} src={icon} 
+        onClick={() => {handleToggleVideo(exe[6])}}  />
+        <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openVideo}
+        onClick={handleCloseVideo}
+      >
+      {Video && <video autoPlay loop width="60%">
+      <source src={Video} type="video/webm" />
+      <source src={Video} type="video/mp4"
+      />
+               <CircularProgress color="inherit" />
+    </video>}
+      </Backdrop>
+      </Box>
+          {exe[0]}
         <Typography variant="body2" color="text.secondary">
             {exe[4]} 
           </Typography>
@@ -459,6 +488,8 @@ export default function WorkoutDetail() {
           <DialogContentText margin="1vh" id="alert-dialog-slide-description">
             {exe[1]}
           </DialogContentText>
+
+
         </DialogContent>
       </Dialog>
       

@@ -65,6 +65,10 @@ export default function ShopProductCard({ product }) {
     else{
       source=icon
     }
+    let desc = description
+    if(description.length>85){
+      desc = description.substring(0,85)+'...'
+    }
 
     const handleClick = (workoutId) => {
       dispatch(workoutActions.getWorkout(workoutId))
@@ -76,7 +80,7 @@ export default function ShopProductCard({ product }) {
       <CardActionArea onClick={() => {
           handleClick(id)
         }}>
-      <Box sx={{ pt: '100%', position: 'relative' }}>
+      <Box sx={{ pt: '80%', position: 'relative' }}>
         {visibility && (
           <Label
             variant="filled"
@@ -99,8 +103,8 @@ export default function ShopProductCard({ product }) {
           <Typography variant="subtitle2" noWrap>
             {title}
           </Typography>
-
         <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Stack direction="column" alignItems="left" justifyContent="space-between">
           <Typography variant="subtitle1">
             <Typography
               component="span"
@@ -112,8 +116,36 @@ export default function ShopProductCard({ product }) {
               @{author.username}
             </Typography>
           </Typography>
+          <Typography variant="subtitle1">
+            <Typography
+              component="span"
+              variant="body1"
+              sx={{
+                color: 'text.disabled',
+              }}
+            >
+              Calories Burned: {parseFloat(sum_of_cb)}
+            </Typography>
+          </Typography>
+          <Typography variant="subtitle1">
+            <Typography
+              component="span"
+              variant="body1"
+              
+              sx={{
+                color: 'text.disabled',
+                wordBreak: "break-word",
+                flex: 1,
+              }}
+            >
+              {desc}
+            </Typography>
+          </Typography>
+          
           
         </Stack>
+        <Stack direction="column" alignItems="center" justifyContent="space-between">
+        <Rating name="read-only" value={parseFloat(avg_rating)} precision={0.5} readOnly />
         <Typography variant="subtitle1">
             <Typography
               component="span"
@@ -122,18 +154,29 @@ export default function ShopProductCard({ product }) {
                 color: 'text.disabled',
               }}
             >
-              difficulty
+              Rating
             </Typography>
           </Typography>
         <StyledRating
-       
-        value={parseFloat(difficulty)/2}
-        readOnly
-        precision={0.5}
-        icon={<FavoriteIcon fontSize="inherit" />}
-        emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
-      />
-    
+       value={parseFloat(difficulty)/2}
+       readOnly
+       precision={0.5}
+       icon={<FavoriteIcon fontSize="inherit" />}
+       emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+     />
+             <Typography variant="subtitle1">
+            <Typography
+              component="span"
+              variant="body3"
+              sx={{
+                color: 'text.disabled',
+              }}
+            >
+              Difficulty
+            </Typography>
+          </Typography>
+        </Stack>
+        </Stack>
       </Stack>
       </CardActionArea>
     </Card>
