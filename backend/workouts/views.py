@@ -67,15 +67,17 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             return serializers.WorkoutCreateSerializer
         return serializers.WorkoutSerializerWithAuthor
 
-    @action(detail=False, methods=['post'], url_path='upload-exercises')
+    @action(detail=False, methods=['post'], url_path='upload')
     def upload_exercises(self, request):
         """
-        Deletes old exercises and creates new ones from the given data.
-        Parameters "workout" - ID of the workout. "exercises" - List of ExercisesInWorkout in json format to save.
+        Deletes old exercises and creates new ones from the given data or creates new workout with exercises.
         """
-        serializer = serializers.ExerciseInWorkoutUploadSerializer(data=request.data)
+        serializer = serializers.WorkoutUploadSerializer(data=request.data, context=self.get_serializer_context())
         if serializer.is_valid():
-            serializer.save()
+            workout = serializer.save()
+            if serializer.data.get('workout_to_create'):
+                serializer.data['workout_to_create']['id'] = workout.id
+            print(serializer.data)
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
