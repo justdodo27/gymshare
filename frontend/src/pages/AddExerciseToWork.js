@@ -50,6 +50,7 @@ export default function AddExerciseToWork() {
 
   const navigate = useNavigate();
   const [repeats, setRepeats] = React.useState(5);
+  const [type, setType] = React.useState('With a weight');
   const [series, setSeries] = React.useState(5);
   const [time, setTime] = React.useState(30);
   const [alignment, setAlignment] = React.useState('repeats');
@@ -72,13 +73,11 @@ export default function AddExerciseToWork() {
   console.log(selectedOption + '--Selected')
 
   const [searchText, setSearchText] = useState("zzzzzzz");
-  console.log(searchText)
   const displayedOptions = useMemo(
     () => array.filter((option) => containsText(option, searchText)),
     [searchText, array]
   );
 
-  console.log(searchText)
 
   const fetchMoviesHandler = useCallback(async () => {
     try {
@@ -89,8 +88,6 @@ export default function AddExerciseToWork() {
       const data = await response.json();
       const arrayInput = data.map(data => data.title);
       const arrayIndex = data.map(data => data.id);
-      console.log(arrayInput)
-      console.log(data)
       setArray(arrayInput)
       setIndexes(arrayIndex)
       
@@ -113,6 +110,9 @@ export default function AddExerciseToWork() {
       }
       const data = await response.json();
       const descriptions = data.map(data => data.description)
+      const exerciseType = data.map(data => data.exercise_type)
+
+      setType(exerciseType[0])
       setDescription(descriptions[0])
 
     } catch (error) {
@@ -127,17 +127,15 @@ export default function AddExerciseToWork() {
 
   const temp = array.indexOf(selectedOption)
     const index = indexes[temp]
-    console.log(index + "--INDEX")
+   
 
   const descriptionData= description[temp]
-    console.log(descriptionData + "--DESCR")
 
   const handleChange1 = (event, newAlignment) => {
     setAlignment(newAlignment);
   };
 
-  let token = useSelector(state => state.auth.token);
-  console.log(token)
+  let token = useSelector(state => state.auth.token)
 
   const handleSliderChange = (event, newValue) => {
     setSeries(newValue);
@@ -166,8 +164,8 @@ export default function AddExerciseToWork() {
   const handleBlur = () => {
     if (series < 0) {
       setSeries(1);
-    } else if (series > 10) {
-      setSeries(10);
+    } else if (series > 20) {
+      setSeries(20);
     }
   };
 
@@ -182,13 +180,13 @@ export default function AddExerciseToWork() {
   const handleCaloriesBlur = () => {
     if (repeats< 0) {
       setRepeats(1);
-    } else if (repeats> 20) {
-      setRepeats(20);
+    } else if (repeats> 50) {
+      setRepeats(50);
     }
   };
 
   const end = (event) => {
-    if(alignment==="repeats" && selectedOption!==''){
+    if((type==='With own body weight' || type==='With a weight') && selectedOption!==''){
       fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
         method: 'POST',
           body: JSON.stringify({
@@ -214,7 +212,6 @@ export default function AddExerciseToWork() {
           }
         })
         .then((data) => {
-          console.log(data)
           setOrder(order+1)
           setDescription('')
           setSelectedOption('')
@@ -227,7 +224,7 @@ export default function AddExerciseToWork() {
         });
     }
 
-    if(alignment==="time" && selectedOption!==''){
+    if(type==='With time' && selectedOption!==''){
       fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
         method: 'POST',
           body: JSON.stringify({
@@ -253,7 +250,6 @@ export default function AddExerciseToWork() {
           }
         })
         .then((data) => {
-          console.log(data)
           setOrder(order+1)
           setDescription('')
           setSelectedOption('')
@@ -272,7 +268,7 @@ export default function AddExerciseToWork() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if(alignment==="repeats" && selectedOption!==''){
+    if((type==='With own body weight' || type==='With a weight') && selectedOption!==''){
     rows.push(createData(order+'. '+selectedOption, repeats, series))
     fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
       method: 'POST',
@@ -299,7 +295,6 @@ export default function AddExerciseToWork() {
         }
       })
       .then((data) => {
-        console.log(data)
         setOrder(order+1)
         setDescription('')
         setSelectedOption('')
@@ -312,7 +307,7 @@ export default function AddExerciseToWork() {
       });
   }
 
-  if(alignment==="time" && selectedOption!==''){
+  if(type==='With time' && selectedOption!==''){
     rows.push(createData(order+'. '+selectedOption, time+' s', series))
     fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
       method: 'POST',
@@ -339,7 +334,6 @@ export default function AddExerciseToWork() {
         }
       })
       .then((data) => {
-        console.log(data)
         setOrder(order+1)
         setDescription('')
         setSelectedOption('')
@@ -379,6 +373,9 @@ export default function AddExerciseToWork() {
         <Select
           // Disables auto focus on MenuItems and allows TextField to be in focus
           MenuProps={{ autoFocus: false }}
+          sx={{
+            marginBottom:2
+          }}
           labelId="search-select-label"
           id="search-select"
           value={selectedOption}
@@ -423,17 +420,6 @@ export default function AddExerciseToWork() {
     </div>
     <p>{selectedOption.length>1 && description}</p>
     <Grid item marginTop={2} alignItems="center">
-    <ToggleButtonGroup
-      color="primary"
-      value={alignment}
-      exclusive
-      fullWidth
-      onChange={handleChange1}
-      size='large'
-    >
-      <ToggleButton size='medium' value="repeats">Repeats</ToggleButton>
-      <ToggleButton size='medium' value="time">On Time</ToggleButton>
-    </ToggleButtonGroup>
     </Grid>
       <Typography id="input-slider" gutterBottom marginTop={2}>
         Series
@@ -445,7 +431,7 @@ export default function AddExerciseToWork() {
             onChange={handleSliderChange}
             aria-labelledby="input-slider"
             min={1}
-            max={10}
+            max={20}
           />
         </Grid>
         <Grid item>
@@ -457,24 +443,24 @@ export default function AddExerciseToWork() {
             inputProps={{
               step: 1,
               min: 1,
-              max: 10,
+              max: 20,
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}
           />
         </Grid>
       </Grid>
-      {alignment==='repeats' && <Typography id="input-slider" gutterBottom marginTop={2}>
+      {(type==='With own body weight' || type==='With a weight') && <Typography id="input-slider" gutterBottom marginTop={2}>
         Repeats
       </Typography>}
-      {alignment==='repeats' && <Grid container spacing={2} alignItems="center">
+      {(type==='With own body weight' || type==='With a weight') && <Grid container spacing={2} alignItems="center">
       <Grid item xs>
           <Slider
             value={typeof repeats === 'number' ? repeats : 0}
             onChange={handleCaloriesSliderChange}
             aria-labelledby="input-slider"
             min={1}
-            max={10}
+            max={50}
           />
         </Grid>
         <Grid item marginBottom={3}>
@@ -486,17 +472,17 @@ export default function AddExerciseToWork() {
             inputProps={{
               step: 1,
               min: 1,
-              max: 20,
+              max: 50,
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}
           />
         </Grid>
       </Grid>}
-      {alignment==='time' && <Typography id="input-slider" gutterBottom marginTop={2}>
+      {type==='With time' && <Typography id="input-slider" gutterBottom marginTop={2}>
         Time
       </Typography>}
-      {alignment==='time' && <Grid container spacing={2} alignItems="center">
+      {type==='With time' && <Grid container spacing={2} alignItems="center">
       <Grid item xs>
           <Slider
             value={typeof time === 'number' ? time : 0}
