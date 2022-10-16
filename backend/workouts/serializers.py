@@ -48,34 +48,71 @@ class ExerciseInWorkoutSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ExerciseInWorkoutUploadSerializer(serializers.Serializer):
-    workout = serializers.IntegerField()
-    exercises = ExerciseInWorkoutCreateSerializer(many=True)
+class WorkoutCreateSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        context_user = self.context.get('user')
+        return models.Workout.objects.create(author=context_user, **validated_data)
+
+    class Meta:
+        model = models.Workout
+        fields = ('id', 'title', 'description', 'visibility', 'cycles', 'thumbnail')
+
+
+class ExerciseInWorkoutUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ExcerciseInWorkout
+        fields = ('id', 'exercise', 'order', 'repeats', 'time', 'series')
+
+
+class WorkoutUploadSerializer(serializers.Serializer):
+    workout_for_update_id = serializers.IntegerField(required=False)
+    workout_to_create = WorkoutCreateSerializer(required=False)
+    exercises = ExerciseInWorkoutUploadSerializer(many=True, required=False)
 
     def validate(self, attrs):
-        workout_id = attrs.get('workout', None)
+        workout_for_update_id = attrs.get('workout_for_update_id', None)
+        workout_to_create = attrs.get('workout_to_create', None)
         exercises = attrs.get('exercises', [])
 
-        if not models.Workout.objects.filter(id=workout_id).exists():
-            raise serializers.ValidationError('The workout does not exists.')
+        if workout_to_create is None and workout_for_update_id is None:
+            raise serializers.ValidationError('Workout not sepcified. Specify the "workout_for_update_id" or "workout_to_create" field.')
 
-        for exercise in exercises:
-            if exercise['workout'].id != workout_id:
-                raise serializers.ValidationError('Not all exercises belongs to specified workout.')
+        if workout_to_create and workout_for_update_id:
+            raise serializers.ValidationError('You have to specify only one workout.')
+
+        if len(exercises) == 0:
+            raise serializers.ValidationError('Exercises list can not be empty.')
+
+        if workout_for_update_id:
+            if not models.Workout.objects.filter(id=workout_for_update_id).exists():
+                raise serializers.ValidationError('The workout does not exists.')
 
         return attrs
 
     def create(self, validated_data):
-        exercises = models.ExcerciseInWorkout.objects.filter(workout__id=validated_data['workout'])
-        exercises.delete()
+        workout_for_update_id = validated_data.get('workout_for_update_id')
+        workout_to_create = validated_data.get('workout_to_create')
 
-        for exercise_data in validated_data['exercises']:
-            exercise = models.ExcerciseInWorkout.objects.create(**exercise_data)
+        if workout_for_update_id:
+            workout = models.Workout.objects.get(id=workout_for_update_id)
+            exercises = models.ExcerciseInWorkout.objects.filter(workout=workout)
+            exercises.delete()
 
-        return exercise
+        if workout_to_create:
+            context_user = self.context.get('user')
+            workout = models.Workout.objects.create(author=context_user, **workout_to_create)
+            validated_data['workout_id'] = workout.id
+
+        for exercise_data in validated_data.get('exercises', []):
+            models.ExcerciseInWorkout.objects.create(
+                workout=workout, **exercise_data
+            )
+
+        return workout
 
     def save(self, **kwargs):
-        return self.validated_data
+        workout = self.create(self.validated_data)
+        return workout
 
 
 class WorkoutSerializer(serializers.ModelSerializer):
@@ -88,16 +125,6 @@ class WorkoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Workout
         fields = '__all__'
-
-
-class WorkoutCreateSerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
-        context_user = self.context.get('user')
-        return models.Workout.objects.create(author=context_user, **validated_data)
-
-    class Meta:
-        model = models.Workout
-        fields = ('title', 'description', 'visibility', 'cycles', 'thumbnail')
 
 
 class SimpleAuthorSerializer(serializers.ModelSerializer):
