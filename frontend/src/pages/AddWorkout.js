@@ -97,6 +97,7 @@ export default function AddWorkout() {
       })
       .then((data) => {
         console.log(data)
+        console.log(data.id)
         dispatch(workoutActions.getWorkout(data.id))
         navigate('/gymshare/addExerciseToWork', { replace: true });
       })

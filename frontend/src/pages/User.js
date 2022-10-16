@@ -37,6 +37,8 @@ import Rating from '@mui/material/Rating';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { styled } from '@mui/material/styles';
+import { useSelector} from 'react-redux';
+import { authActions } from '../store/auth'
 
 // ----------------------------------------------------------------------
 
@@ -94,8 +96,17 @@ function applySortFilter(array, comparator, query) {
 
 export default function User() {
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const dispatch = useDispatch()
+  let exp = useSelector(state => state.auth.exp);
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (exp<parseInt(Date.now()/1000)) {
+      dispatch(authActions.logout())
+      navigate('/', {replace: true});
+    }
+  }, [dispatch, exp, navigate]);
+
 
   const [page, setPage] = useState(0);
 
@@ -120,6 +131,8 @@ export default function User() {
       }
       const data = await response.json();
       const temp = data.results
+      console.log(temp)
+
   
       
 
@@ -128,9 +141,9 @@ export default function User() {
         avatarUrl: `/static/mock-images/avatars/avatar_${index + 1}.jpg`,
         name: temp[index].title,
         company: temp[index].author.username,
-        isVerified: temp[index].avg_time<60 ? temp[index].avg_time.toSting()+ " seconds" : temp[index].avg_time<3600 ?  (temp[index].avg_time/60).toFixed(2).toString()+ " minutes" : (temp[index].avg_time/3600).toFixed(2).toString()+ " hours",
-        status: temp[index].avg_rating,
-        role: temp[index].difficulty,
+        isVerified: temp[index].avg_time<60 ? temp[index].avg_time.toString()+ " seconds" : temp[index].avg_time<3600&&temp[index].avg_time>=60 ?  (temp[index].avg_time/60).toFixed(2).toString()+ " minutes" : temp[index].avg_time>=3600 ? (temp[index].avg_time/3600).toFixed(2).toString()+ " hours" : "no data",
+        status: temp[index].avg_rating!=null ? temp[index].avg_rating : 0,
+        role: temp[index].difficulty!=null ? temp[index].difficulty : 0,
       }));
 
       console.log(users)

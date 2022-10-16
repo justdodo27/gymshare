@@ -83,10 +83,13 @@ export default function Login() {
       })
       .then((data) => {
         console.log(data)
+        console.log(parseInt(Date.now()/1000))
         const decodedData = jwt_decode(data.access)
         const decodedId = decodedData.user_id
+        const decodedExpTime = decodedData.exp
+        console.log(decodedExpTime)
         console.log(data.access)
-        dispatch(authActions.login([data.access, decodedId, username]))
+        dispatch(authActions.login([data.access, decodedId, username, decodedExpTime]))
         navigate('/gymshare/app', { replace: true });
       })
       .catch((err) => {

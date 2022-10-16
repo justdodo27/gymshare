@@ -4,7 +4,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
 import Iconify from '../components/Iconify';
 import {
-  AppWidgetSummary,
   AppWidgetProfile,
 } from '../sections/@dashboard/app';
 import { useTheme } from '@mui/material/styles';
@@ -14,13 +13,25 @@ import { useSelector} from 'react-redux';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-import { ProductSort, ProductList, ProductFilterSidebar } from '../sections/@dashboard/products';
-// mock
-import PRODUCTS from '../_mock/products';
+import { ProductList } from '../sections/@dashboard/products';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch} from 'react-redux';
+import { authActions } from '../store/auth'
 
 export default function Profile() {
-  const theme = useTheme();
 
+  const dispatch = useDispatch()
+  let exp = useSelector(state => state.auth.exp);
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (exp<parseInt(Date.now()/1000)) {
+      dispatch(authActions.logout())
+      navigate('/', {replace: true});
+    }
+  }, [dispatch, exp, navigate]);
+
+  const theme = useTheme();
    const userId = useSelector(state => state.auth.userId);
    const username = useSelector(state => state.auth.username);
    let token = useSelector(state => state.auth.token)
@@ -29,9 +40,11 @@ export default function Profile() {
   const [weight, setWeight] = useState(null)
   const [firstName, setFirstName] = useState(null)
   const [lastName, setLastName] = useState(null)
-  const [alignment, setAlignment] = React.useState('your');
-  const [myWorkouts, setWorkouts] = React.useState([]);
-  const [favWorkouts, setFavWorkouts] = React.useState([]);
+  const [photo, setPhoto] = useState(null)
+  const [alignment, setAlignment] = useState('your');
+  const [myWorkouts, setWorkouts] = useState([]);
+  const [favWorkouts, setFavWorkouts] = useState([]);
+  const [next, setNext] = useState();
 
   const handleChange1 = (event, newAlignment) => {
     setAlignment(newAlignment);
@@ -54,7 +67,7 @@ export default function Profile() {
         setWeight(data.weight)
         setFirstName(data.user.first_name)
         setLastName(data.user.last_name)
-        
+        setPhoto(data.user.profile_picture)
       })
   }
 
@@ -70,19 +83,21 @@ export default function Profile() {
         return response.json()
       })
       .then(data => {
-        const myWorkouts = []
-        const favWorkouts = []
+        const workouts = []
+        const fav = []
         console.log(data.results.length)
         for (let i = 0; i < data.results.length; i++){
+          console.log(data)
           if(data.results[i].author.id == userId){
-            myWorkouts.push(data.results[i])
+            workouts.push(data.results[i])
           }
           if(data.results[i].is_favorite == true){
-            favWorkouts.push(data.results[i])
+            fav.push(data.results[i])
           }
         }
-        setWorkouts(myWorkouts);
-        setFavWorkouts(favWorkouts);
+        setNext(data.next)
+        setWorkouts(workouts);
+        setFavWorkouts(fav);
       })
   }
 
@@ -91,49 +106,53 @@ export default function Profile() {
     fetchData()
     fetchWorkout()
   }, [])
-  
+
+
+const fetchNextWorkout = () => {
+  if(next){
+  fetch(next, {
+    headers: {
+      Authorization: "Bearer " +token
+    },
+    })
+
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        const workouts = myWorkouts
+        const fav = favWorkouts
+        for (let i = 0; i < data.results.length; i++){
+          if(data.results[i].author.id == userId){
+            workouts.push(data.results[i])
+          }
+            if(data.results[i].is_favorite == true){
+              fav.push(data.results[i])
+            }
+        }
+        setNext(data.next)
+        setWorkouts(workouts);
+        setFavWorkouts(fav);
+      })
+    }
+  }
   return (
     <Page title="Profile">
       <Container component="main" maxWidth="lg">
       <Typography variant="h4" sx={{ mb: 5 }}>
-          Gymshare - train more effectively
+          Gymshare - view Your Profile
         </Typography>
 
-        <Grid container spacing={3} >
+        <Grid container spacing={1} >
 
-          <Grid item xs={12} sm={6} md={12}>
-            <AppWidgetProfile name={firstName} last={lastName} height={height} weight={weight} color="info" />
+          <Grid item xs={12} sm={12} md={12}>
+            <AppWidgetProfile name={firstName} last={lastName} height={height} weight={weight} photo={photo} color="secondary" />
           </Grid>
-          <Grid item xs={12} sm={6} md={12}>
-          <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-          >
-      <Button variant="contained" component={RouterLink} to="/gymshare/EditProfile" style={{ minWidth: '40vh'}}>
-            Edit Profile
-          </Button>
-          </Box>
           </Grid>
-          
-          </Grid>
-        <Box sx={{
-            marginTop: 8,
-            marginBottom: 10,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            color: "primary.main",
-          }}
-          >
-      <Button variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New Workout
-          </Button>
-          </Box>
         <Box
           sx={{
-            marginTop: 8,
-            marginBottom: 10,
+            marginTop: 4,
+            marginBottom: 5,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -151,14 +170,23 @@ export default function Profile() {
       <ToggleButton size='medium' value="your">Your Workouts</ToggleButton>
       <ToggleButton size='medium' value="liked">Liked Workouts</ToggleButton>
     </ToggleButtonGroup>
-    {alignment==='your' && <Grid container spacing={0}>
-    <ProductList products={myWorkouts} />
-    </Grid>}
-    {alignment==='liked' && <Grid container spacing={0}>
-    <ProductList products={favWorkouts} />
-    </Grid>}
-
     </Box>
+    {alignment==='your' && <Box>
+    <ProductList products={myWorkouts} />
+     <Box m={3} pt={5}>
+        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+            See more
+          </Button>
+          </Box>
+          </Box>}
+    {alignment==='liked' && <Box>
+    <ProductList products={favWorkouts} />
+     <Box m={3} pt={5}>
+        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+            See more
+          </Button>
+          </Box>
+          </Box>}
       </Container>
       </Page>
   );

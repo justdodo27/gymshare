@@ -1,9 +1,8 @@
 import { useState, useEffect, forwardRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Container, Button, Box, Stack, Typography, Card, CardContent, CardActionArea, 
-        List, ListItem, ListItemButton, Grid,
-        DialogTitle, DialogContentText, DialogContent, DialogActions, Dialog } from '@mui/material';
+import { Container, Button, Box, Stack, Typography, Card, CardContent, CardMedia, CardHeader, CardActionArea,
+        DialogTitle, DialogContentText, DialogContent, DialogActions, Dialog, Backdrop, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Slide from '@mui/material/Slide';
 // components
@@ -12,6 +11,7 @@ import Label from '../components/Label';
 // mock
 import { useSelector} from 'react-redux';
 import icon from "../pictures/play.png"
+import nophoto from "../pictures/nophoto.jpg"
 import { useDispatch } from 'react-redux';
 import { useNavigate} from 'react-router-dom';
 import { workoutActions } from '../store/workout';
@@ -23,8 +23,41 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 // ----------------------------------------------------------------------
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+    fontSize: 18,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 18,
+  },
+}));
+
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
+    
+  },
+  "&:hover": {
+    cursor: "pointer",
+    backgroundColor: theme.palette.primary.light,
+  },
+}));
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={5} ref={ref} variant="filled" {...props} />;
 });
@@ -47,6 +80,7 @@ export default function WorkoutDetail() {
   const navigate = useNavigate();
   let token = useSelector(state => state.auth.token);
   const userId = useSelector(state => state.auth.userId);
+  
 
   
     const ProductImgStyle = styled('img')({
@@ -55,6 +89,20 @@ export default function WorkoutDetail() {
         height: '100%',
         objectFit: 'cover',
         position: 'absolute',
+        opacity: 0.7
+      });
+      const PlayImgStyle = styled('img')({
+        top: '15%',
+        left: '15%',
+        width: '70%',
+        height: '70%',
+        objectFit: 'cover',
+        position: 'absolute',
+        opacity: 0.4,
+        "&:hover": {
+          cursor: "pointer",
+          opacity: 0.6,
+        },
       });
 
     const workoutId = useSelector(state => state.workout.workoutId);
@@ -64,15 +112,32 @@ export default function WorkoutDetail() {
     const [addAlert, setAddAlert] = useState(false);
     const [styleAlert, setStyleAlert] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [openVideo, setOpenVideo] = useState(false);
+    const [Video, setVideo] = useState('');
+    
+    const handleCloseVideo = () => {
+      setVideo('');
+      setOpenVideo(false);
+    };
+    const handleToggleVideo = (src) => {
+      setVideo(src);
+      setOpenVideo(!openVideo);
+    };
     
 
-    const handleClickOpen = (title, description, cbr, difficulty, type) => {
+    const handleClickOpen = (title, description, cbr, difficulty, type, thumbnail, video) => {
         let array = []
         array.push(title)
         array.push(description)
         array.push(cbr)
         array.push(difficulty)
         array.push(type)
+        if(thumbnail){
+          array.push(thumbnail)
+        }else{
+          array.push(icon)
+        }
+        array.push(video)
         setExe(array);
         setOpen(true);
     };
@@ -95,11 +160,14 @@ export default function WorkoutDetail() {
     };
 
     const fetchWorkout = () => {
-
+      let head = ''
+      if(token){
+        head = "Bearer " +token
+      }
     fetch("http://localhost:1337/workouts/plans/" + workoutId, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: "Bearer " +token
+        Authorization: head
       },
     })
 
@@ -129,8 +197,16 @@ export default function WorkoutDetail() {
     is_favorite,
     sum_of_cb,
     title,
-    visibility 
+    visibility ,
+    thumbnail
     } = workout
+    let workoutThumbnail = ''
+    if(thumbnail){
+      workoutThumbnail = thumbnail
+    }else{
+      workoutThumbnail = nophoto
+    }
+    console.log()
 
     const handleClickSave = () => {
       if(saved)
@@ -210,16 +286,15 @@ export default function WorkoutDetail() {
     <Page title="Workout Details">
       <Container>
         <Card sx={{ maxWidth: "90%", minWidth: "90%"}}>
-      <Box sx={{ pt: '1%', position: 'relative' }}>
-      
+        <Box sx={{ pt: '2', position: 'relative' }}>
         {visibility && (
           <Label
             variant="filled"
             color={(visibility === 'Hidden' && 'error') || 'info'}
             sx={{
               zIndex: 9,
-              top: '100%',
-              right: '5%',
+              top: 10,
+              right: 10,
               position: 'absolute',
               textTransform: 'uppercase',
             }}
@@ -227,15 +302,31 @@ export default function WorkoutDetail() {
             {visibility}
           </Label>
         )}
-        
-      </Box>
-      <IconButton aria-label="backarrow" size="large" color="secondary" onClick={() => navigate('/')}>
+        <IconButton variant="filled" aria-label="backarrow" size="large" color="secondary"             
+        sx={{
+              zIndex: 9,
+              top: 0,
+              left: 0,
+              position: 'absolute',
+              textTransform: 'uppercase',
+            }}onClick={() => navigate('/')}>
         <ArrowBackIcon  fontSize="inherit" />
       </IconButton>
+      
+        <CardMedia
+        component="img"
+        height="600vh"
+        weight="100%"
+        objectFit='cover'
+        position='absolute'
+        image={workoutThumbnail}
+        alt="workout thumbnail"
+      />
+        </Box>
         <CardContent sx={{minHeigth:500}}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-        <Stack direction="column" alignItems="left" justifyContent="space-between" mb={1}>
-        <Typography gutterBottom variant="h3" component="div">
+        <Stack margin='1%' direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+        <Stack direction="column" alignItems="left" justifyContent="space-between" mb={5}>
+        <Typography variant="h3" component="div">
           {title}
           </Typography>
           {author && <Typography variant="subtitle1" gutterBottom>
@@ -246,6 +337,12 @@ export default function WorkoutDetail() {
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Time: {avg_time}
+          </Typography>
+          <Typography padding='2%'variant="body2" color="text.secondary" sx={{
+                color: 'text.disabled',
+                wordBreak: "break-word"
+              }}>
+            {description}
           </Typography>
         </Stack>
 
@@ -296,44 +393,41 @@ export default function WorkoutDetail() {
           </Typography>
         </Stack>
         </Stack>
-          <Typography variant="body2" color="text.secondary">
-            {description}
-          </Typography>
         </CardContent>
         <Typography align="center" variant="body2" color="subtitle3">
             Workout cycles: {cycles}
           </Typography>
-        {exercises && <List
-      sx={{ width: '100%', bgcolor: 'background.paper' }}
-      aria-label="exercises"
-    >
-    <Grid container spacing={1}>
-      {exercises.map((exercise) => (
-        <Grid key={exercise.id} item sm={1} md={12}>
-        <ListItem disablePadding>
-        <ListItemButton onClick={() => {
-          handleClickOpen(
-            exercise.exercise.title, exercise.exercise.description, exercise.exercise.calories_burn_rate, 
-            exercise.exercise.difficulty, exercise.exercise.exercise_type
-      )}}
-        >
-            <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ width: '90%'}}>
-                {exercise.time && <Typography gutterBottom variant="h5">
-                {exercise.order}. {exercise.exercise.title} ({exercise.time} s)
-                </Typography>}
-                {exercise.repeats && <Typography gutterBottom variant="h5">
-                {exercise.order}. {exercise.exercise.title} (x{exercise.repeats})
-                </Typography>}
-                <Typography gutterBottom variant="h5">
-                {exercise.series} series
-                </Typography>
-            </Stack>
-        </ListItemButton>
-      </ListItem>  
-        </Grid>
-      ))}
-    </Grid>
-    </List>}
+
+          {exercises && <TableContainer component={Paper}>
+      <Table  sx={{ minWidth: 700 }} aria-label="customized table">
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>Order</StyledTableCell>
+            <StyledTableCell align="left">Title</StyledTableCell>
+            <StyledTableCell align="left">Repeats/Time</StyledTableCell>
+            <StyledTableCell align="left">Series</StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+        {exercises.map((exercise) => (
+            <StyledTableRow key={exercise.order} onClick={() => {
+              handleClickOpen(
+                exercise.exercise.title, exercise.exercise.description, exercise.exercise.calories_burn_rate, 
+                exercise.exercise.difficulty, exercise.exercise.exercise_type, exercise.exercise.thumbnail, exercise.exercise.video,
+          )}}>
+              <StyledTableCell component="th" scope="row">
+                {exercise.order}
+              </StyledTableCell>
+              <StyledTableCell align="left">{exercise.exercise.title}</StyledTableCell>
+              {exercise.time && <StyledTableCell align="left">{exercise.time} s</StyledTableCell>}
+              {exercise.repeats && <StyledTableCell align="left">x{exercise.repeats}</StyledTableCell>}
+              <StyledTableCell align="left">{exercise.series}</StyledTableCell>
+            </StyledTableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>}
+
     </Card>
       </Container>
       <Dialog
@@ -344,15 +438,28 @@ export default function WorkoutDetail() {
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
-        
       >
         <DialogTitle>        
-        <Box sx={{ pt: '90%', position: 'relative' }}>
-        <ProductImgStyle alt={title} src={icon} />
-      </Box>
-          {exe[0]}
         </DialogTitle>
         <DialogContent>
+        <Box sx={{ pt: '90%', position: 'relative' }}>
+        <ProductImgStyle alt={title} src={exe[5]} />
+        <PlayImgStyle alt={title} src={icon} 
+        onClick={() => {handleToggleVideo(exe[6])}}  />
+        <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openVideo}
+        onClick={handleCloseVideo}
+      >
+      {Video && <video autoPlay loop width="60%">
+      <source src={Video} type="video/webm" />
+      <source src={Video} type="video/mp4"
+      />
+               <CircularProgress color="inherit" />
+    </video>}
+      </Backdrop>
+      </Box>
+          {exe[0]}
         <Typography variant="body2" color="text.secondary">
             {exe[4]} 
           </Typography>
@@ -381,6 +488,8 @@ export default function WorkoutDetail() {
           <DialogContentText margin="1vh" id="alert-dialog-slide-description">
             {exe[1]}
           </DialogContentText>
+
+
         </DialogContent>
       </Dialog>
       

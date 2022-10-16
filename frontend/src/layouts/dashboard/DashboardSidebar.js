@@ -68,8 +68,8 @@ const navConfig = isAuth ? [
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   {
-    title: 'profile',
-    path: '/gymshare/profile',
+    title: 'logout',
+    path: '/gymshare/logout',
     icon: getIcon('eva:person-fill'),
   },
 ] : [
@@ -94,15 +94,6 @@ const navConfig = isAuth ? [
 
   const isDesktop = useResponsive('up', 'lg');
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   useEffect(() => {
     if (isOpenSidebar) {
       onCloseSidebar();
@@ -121,36 +112,19 @@ const navConfig = isAuth ? [
         <Logo />
       </Box>
 
-      {isAuth && <Box sx={{ mb: 5, mx: 2.5 }}>
+      {isAuth && <Box  sx={{ mb: 5, mx: 2.5, '&:hover': {
+          opacity: [0.1, 0.1, 0.8],
+        }, }}>
+      <Link underline="none" component={RouterLink} to="/gymshare/profile">
           <AccountStyle>
-          <Button
-        style={{minWidth: '100%'}}
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-        >
             <Avatar src={account.photoURL} alt="photoURL" />
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
                 {username}
               </Typography>
             </Box>
-            </Button>
           </AccountStyle>
-          <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
-      >
-        <MenuItem onClick={handleClose} component={RouterLink} to="/gymshare/ChangePassword">Change Password</MenuItem>
-        <MenuItem onClick={handleClose} component={RouterLink} to="/gymshare/Logout">Logout</MenuItem>
-      </Menu>
+        </Link>
       </Box>}
 
       <NavSection navConfig={navConfig} />
