@@ -1,7 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialWorkoutState = {
-  workoutId: '',
+  title: '',
+  description: '',
+  visibility: '',
+  cycles: ''
 };
 
 const workoutSlice = createSlice({
@@ -9,7 +12,10 @@ const workoutSlice = createSlice({
   initialState: initialWorkoutState,
   reducers: {
     getWorkout(state, action) {
-      state.workoutId= action.payload;
+      state.title= action.payload[0];
+      state.description= action.payload[1];
+      state.visibility= action.payload[2];
+      state.cycles= action.payload[3];
     },
   },
 });
