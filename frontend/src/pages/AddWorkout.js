@@ -68,7 +68,7 @@ export default function AddWorkout() {
     console.log(value)
     console.log(author)
 
-    dispatch(workoutActions.getWorkout([title, description, visibility, value]))
+    dispatch(workoutActions.getWorkoutStats([title, description, visibility, value]))
     navigate('/gymshare/addExerciseToWork', { replace: true });
   };
 
