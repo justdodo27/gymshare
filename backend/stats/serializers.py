@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from workouts.serializers import ExerciseSerializer
 from . import models
 from workouts.models import Exercise
 from accounts.models import Profile
@@ -54,6 +56,14 @@ class StatisticExerciseSerializer(serializers.ModelSerializer):
                 return serializers.ValidationError('Time must be a positive number')
 
         return data
+
+
+class StatisticExerciseGetSerializer(serializers.ModelSerializer):
+    exercise = ExerciseSerializer()
+
+    class Meta:
+        model = models.StatisticExercise
+        fields = '__all__'
 
 
 class ExerciseDataSerializer(serializers.Serializer):
