@@ -1,4 +1,4 @@
-# Gymshare
+![Logo](https://github.com/justdodo27/gymshare/blob/main/logo.svg)
 
 Color theme from MUI: [Blue Grey 800](https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=37474F)
 
@@ -16,9 +16,9 @@ TODO:
 - [x] UA Login to account
 - [x] UA Create workouts from exercises
 - [ ] UA Run any workout from mobile app
-- [ ] UA View profile with stats etc.
+- [x] UA View profile with stats etc.
 - [ ] UA Search/Filter other accounts
-- [ ] UA Add to favorites
+- [x] UA Add to favorites
 - [x] A Create exercise
 - [ ] A Edit/Delete any public workouts
 
@@ -28,7 +28,7 @@ User can download workout to phone and edit it (changes will be local).
 - [ ] Chat room
 - [ ] Instagram like workouts share (main page works similar to instagram)
 - [ ] Friends list
-- [ ] Rating public workouts
+- [x] Rating public workouts
 
 ![Database Model](https://github.com/justdodo27/gymshare/blob/main/db_model.png)
 

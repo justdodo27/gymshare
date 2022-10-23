@@ -68,5 +68,4 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         data['is_staff'] = self.user.is_staff
-        del data['refresh']
         return data

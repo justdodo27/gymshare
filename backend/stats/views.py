@@ -1,10 +1,11 @@
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework import permissions, filters
 from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView, ListAPIView
 from rest_framework.exceptions import NotAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import StatisticExercise, StatisticCalories
-from .serializers import ExerciseDataSerializer, StatisticCaloriesSerializer, StatisticExerciseSerializer
+from .serializers import ExerciseDataSerializer, StatisticCaloriesSerializer, StatisticExerciseGetSerializer, StatisticExerciseSerializer
 
 
 class SyncStats(CreateAPIView):
@@ -24,7 +25,10 @@ class SyncStats(CreateAPIView):
 
 class StatisticExerciseList(ListAPIView):
     queryset = StatisticExercise.objects.all()
-    serializer_class = StatisticExerciseSerializer
+    serializer_class = StatisticExerciseGetSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['exercise', ]
+    ordering_fields = ['date', 'repeats', 'time', 'weight',]
 
     def get_queryset(self):
         if self.request.user.is_anonymous:

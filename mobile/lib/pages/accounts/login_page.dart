@@ -1,8 +1,42 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gymshare/api/models/token.dart';
+import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/custom_text_form_field.dart';
 import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
+import 'package:gymshare/pages/dashboard.dart';
 import 'package:gymshare/settings/colors.dart';
+import 'package:gymshare/settings/settings.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<bool> gatherToken(String username, String password)
+async {
+  final response = await http.post(
+    Uri.parse(buildUrl('api/token/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'username': username,
+      'password': password
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final token = JWT.fromJSON(jsonDecode(response.body));
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('accessToken', token.accessToken);
+    await prefs.setString('refreshToken', token.refreshToken);
+    await prefs.setBool('isStaff', token.isStaff);
+    
+    return true;
+  } else {
+    
+    return false;
+  }
+}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -67,10 +101,19 @@ class _LoginPageState extends State<LoginPage> {
                             style: TextStyle(
                                 color: primaryTextColor, fontSize: 16),
                           ),
-                          onPress: () {
+                          onPress: () async{
                             final isValid = _formKey.currentState!.validate();
                             if (isValid) {
                               _formKey.currentState!.save();
+                              if (await gatherToken(username, password)){
+                                Navigator.of(context).push(createPageRouteWithAnimation(const DashboardPage()));
+                              } else { 
+                                const snackBar = SnackBar(
+                                  content: SizedBox(height: 60, child: Center(child: Text('Wrong Credentials!', style: TextStyle(color: primaryTextColor, fontSize: 18),))),
+                                  backgroundColor: tertiaryColor,
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              }
                             }
                           },
                         )
