@@ -34,12 +34,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-function createData(name, calories, fat) {
-  return { name, calories, fat };
-}
 
-let rows = [];
+
+
 
 
 const Input = styled(MuiInput)`
@@ -59,11 +59,21 @@ export default function AddExerciseToWork() {
   const [description, setDescription] = React.useState([''])
   const [order, setOrder] = React.useState(0)
   const [table, setTable] = React.useState([])
-  let workoutId = useSelector(state => state.workout.workoutId);
-  console.log(workoutId)
+  const [data, setData] = React.useState([])
+  let workoutTitle = useSelector(state => state.workout.title);
+  let workoutDescription = useSelector(state => state.workout.description);
+  let workoutVisibility = useSelector(state => state.workout.visibility);
+  let workoutCycles = useSelector(state => state.workout.cycles);
+  console.log(workoutTitle)
 
-  rows = table
+  function handleDeleting(index) {
+    console.log(table)
+    console.log(index)
+    setTable(table.filter(item => item.order !== index))
+    setData(data.filter(item => item.order !== index))
+  };
 
+ 
 
   const containsText = (text, searchText) =>
   text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
@@ -127,6 +137,7 @@ export default function AddExerciseToWork() {
 
   const temp = array.indexOf(selectedOption)
     const index = indexes[temp]
+    console.log(index)
    
 
   const descriptionData= description[temp]
@@ -186,15 +197,17 @@ export default function AddExerciseToWork() {
   };
 
   const end = (event) => {
-    if((type==='With own body weight' || type==='With a weight') && selectedOption!==''){
-      fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
+      fetch("http://localhost:1337/workouts/plans/upload/", {
         method: 'POST',
           body: JSON.stringify({
-            order: order,
-            repeats: repeats,
-            series: series,
-            exercise: index,
-            workout: workoutId
+            workout_to_create: {
+              title: workoutTitle,
+              description: workoutDescription,
+              visibility: workoutVisibility,
+              cycles: workoutCycles
+            },
+            exercises: data,
+            
         }), 
         headers: {
           'Content-Type': 'application/json',
@@ -222,45 +235,6 @@ export default function AddExerciseToWork() {
         .catch((err) => {
           alert(err.message);
         });
-    }
-
-    if(type==='With time' && selectedOption!==''){
-      fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
-        method: 'POST',
-          body: JSON.stringify({
-            order: order,
-            series: series,
-            time: time,
-            exercise: index,
-            workout: workoutId
-        }), 
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " +token
-        },
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            return res.json().then((data) => {
-              let errorMessage = 'Wrong username or password!';
-              throw new Error(errorMessage);
-            });
-          }
-        })
-        .then((data) => {
-          setOrder(order+1)
-          setDescription('')
-          setSelectedOption('')
-          setSeries(1)
-          setRepeats(1)
-          setTime(1)
-        })
-        .catch((err) => {
-          alert(err.message);
-        });
-    }
 
     navigate('/gymshare/app', { replace: true });
   };
@@ -269,90 +243,67 @@ export default function AddExerciseToWork() {
     event.preventDefault();
 
     if((type==='With own body weight' || type==='With a weight') && selectedOption!==''){
-    rows.push(createData(order+'. '+selectedOption, repeats, series))
-    fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
-      method: 'POST',
-        body: JSON.stringify({
-          order: order,
-          repeats: repeats,
-          series: series,
-          exercise: index,
-          workout: workoutId
-      }), 
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: "Bearer " +token
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          return res.json().then((data) => {
-            let errorMessage = 'Wrong username or password!';
-            throw new Error(errorMessage);
-          });
-        }
-      })
-      .then((data) => {
+
+      let exerciseToAdd = {
+        "exercise": selectedOption.toString(),
+        "order": order,
+        "series": series,
+        "repeats": repeats
+      }
+
+      let dataToAdd = {
+        "exercise": index,
+        "order": order,
+        "series": series,
+        "repeats": repeats
+      }
+
+    setTable([...table, exerciseToAdd])
+    setData([...data, dataToAdd])
         setOrder(order+1)
         setDescription('')
         setSelectedOption('')
         setSeries(1)
         setRepeats(1)
         setTime(1)
-      })
-      .catch((err) => {
-        alert(err.message);
-      });
+     
   }
 
   if(type==='With time' && selectedOption!==''){
-    rows.push(createData(order+'. '+selectedOption, time+' s', series))
-    fetch("http://localhost:1337/workouts/exercises-in-workouts/", {
-      method: 'POST',
-        body: JSON.stringify({
-          order: order,
-          series: series,
-          time: time,
-          exercise: index,
-          workout: workoutId
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: "Bearer " +token
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          return res.json().then((data) => {
-            let errorMessage = 'Wrong username or password!';
-            throw new Error(errorMessage);
-          });
-        }
-      })
-      .then((data) => {
+
+    let exerciseToAdd = {
+      "exercise": selectedOption.toString(),
+      "order": order,
+      "series": series,
+      "time": time
+    }
+
+    let dataToAdd = {
+      "exercise": index,
+      "order": order,
+      "series": series,
+      "repeats": repeats
+    }
+
+    setTable([...table, exerciseToAdd])
+    setData([...data, dataToAdd])
+    
         setOrder(order+1)
         setDescription('')
         setSelectedOption('')
         setSeries(1)
         setRepeats(1)
         setTime(1)
-      })
-      .catch((err) => {
-        alert(err.message);
-      });
+     
   }
 
 
 };
 
-  
-
   return (
-      <Container component="main" maxWidth="xs">
+      <Container component="main" sx={{
+        width: 500,
+      }}>
         <Box
           sx={{
             marginTop: 8,
@@ -526,31 +477,46 @@ export default function AddExerciseToWork() {
             </Button>
           </Box>
         </Box>
-      <TableContainer component={Paper}>
+      {table.length>0 && <TableContainer component={Paper}>
       <Table sx={{ minWidth: "100%" }} aria-label="simple table">
         <TableHead>
           <TableRow>
+            <TableCell align="center"></TableCell>
             <TableCell>Exercise</TableCell>
-            <TableCell align="right">Repeats/Time</TableCell>
-            <TableCell align="right">Series</TableCell>
+            <TableCell align="center">Repeats/Time</TableCell>
+            <TableCell align="center">Series</TableCell>
+            <TableCell align="center"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {table.map((row, index) => (
             <TableRow
-              key={row.name}
+              key={row.order}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.name}
+            > 
+              <TableCell component="th" scope="row" align="center">{(index+1)+"."}</TableCell>
+              <TableCell align="center">
+                {row.exercise}
               </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
+              <TableCell align="center">{row.repeats!=null ? row.repeats : row.time}</TableCell>
+              <TableCell align="center">{row.series}</TableCell>
+              <TableCell align="center"><IconButton edge="end" aria-label="delete">
+                      <DeleteIcon onClick={()=>handleDeleting(index)} sx={[
+    {
+      color: "white"
+    },
+    {
+      '&:hover': {
+        color: 'black',
+      },
+    },
+  ]}/>
+                    </IconButton></TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </TableContainer>
+    </TableContainer>}
       </Container>
   );
 }

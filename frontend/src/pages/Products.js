@@ -62,6 +62,8 @@ export default function EcommerceShop() {
 
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
+  let token = useSelector(state => state.auth.token);
+  console.log(token)
   const navigate = useNavigate()
   let isAuth = useSelector(state => state.auth.isAuthenticated);
   const [open, setOpen] = useState(null);

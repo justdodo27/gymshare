@@ -66,8 +66,11 @@ export default function ShopProductCard({ product }) {
       source=icon
     }
     let desc = description
-    if(description.length>85){
-      desc = description.substring(0,85)+'...'
+    if(description!==null && description!==undefined && description!=='')
+    {
+      if(description.length>85){
+        desc = description.substring(0,85)+'...'
+      }
     }
 
     const handleClick = (workoutId) => {

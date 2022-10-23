@@ -68,42 +68,8 @@ export default function AddWorkout() {
     console.log(value)
     console.log(author)
 
-    fetch("http://localhost:1337/workouts/plans/", {
-      method: 'POST',
-        body: JSON.stringify({
-          title: title,
-          description: description,
-          sum_of_cb: 0,
-          difficulty: 0,
-          visibility: visibility,
-          avg_time: 0,
-          cycles: value,
-          author: author
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: "Bearer " +token
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          return res.json().then((data) => {
-            let errorMessage = 'Wrong username or password!';
-            throw new Error(errorMessage);
-          });
-        }
-      })
-      .then((data) => {
-        console.log(data)
-        console.log(data.id)
-        dispatch(workoutActions.getWorkout(data.id))
-        navigate('/gymshare/addExerciseToWork', { replace: true });
-      })
-      .catch((err) => {
-        alert(err.message);
-      });
+    dispatch(workoutActions.getWorkoutStats([title, description, visibility, value]))
+    navigate('/gymshare/addExerciseToWork', { replace: true });
   };
 
   return (
