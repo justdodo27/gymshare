@@ -7,6 +7,8 @@ class RoundedRectangleButton extends StatelessWidget {
   final EdgeInsets padding;
   final num height;
   final num width;
+  final Color backgroundColor;
+  final Color borderColor;
 
   const RoundedRectangleButton({
     Key? key,
@@ -15,6 +17,8 @@ class RoundedRectangleButton extends StatelessWidget {
     this.padding = const EdgeInsets.only(top: 70.0),
     this.height = 60,
     this.width = double.infinity,
+    this.backgroundColor = primaryColor,
+    this.borderColor = tertiaryColor,
   }) : super(key: key);
 
   @override
@@ -22,13 +26,13 @@ class RoundedRectangleButton extends StatelessWidget {
     return Padding(
       padding: padding,
       child: MaterialButton(
-        color: secondaryColor,
+        color: backgroundColor,
         minWidth: width.toDouble(),
         height: height.toDouble(),
         onPressed: onPress,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: tertiaryColor, width: 2),
+          borderRadius: BorderRadius.circular(50),
+          side: BorderSide(color: borderColor, width: 2),
         ),
         child: child,
       ),
