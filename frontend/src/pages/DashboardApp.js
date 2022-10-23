@@ -92,7 +92,7 @@ export default function DashboardApp() {
         day: temp[index].date,
         repeats: temp[index].repeats,
         time: temp[index].time,
-        exerciseId: temp[index].exercise
+        exerciseId: temp[index].exercise.title
       }));
 
       

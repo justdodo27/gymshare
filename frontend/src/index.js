@@ -11,17 +11,21 @@ import store from './store/index';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistStore } from 'redux-persist';
 
 // ----------------------------------------------------------------------
-
+let persistor = persistStore(store);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <HelmetProvider>
   <Provider store={store}>
+  <PersistGate loading={null} persistor={persistor}>
     <BrowserRouter>
       <App />
     </BrowserRouter>
+    </PersistGate>
     </Provider>
   </HelmetProvider>
 );
