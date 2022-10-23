@@ -37,7 +37,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description', 'author__username']
     filterset_fields = ['visibility', ]
-    ordering_fields = ['title', 'sum_of_cb', 'difficulty', 'avg_time']
+    ordering_fields = ['id', 'title', 'sum_of_cb', 'difficulty', 'avg_time']
     pagination_class = PageNumberPagination
     pagination_class.page_size = 15
 
