@@ -28,6 +28,14 @@ class CustomTextFormField extends StatefulWidget {
 }
 
 class _CustomTextFormFieldState extends State<CustomTextFormField> {
+  late bool isTextVisible;
+
+  @override
+  void initState() {
+    super.initState();
+    isTextVisible = widget.obsecureText;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -37,20 +45,53 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         controller: widget.controller,
         validator: widget.validator,
         onSaved: widget.onSaved,
-        obscureText: widget.obsecureText,
+        obscureText: isTextVisible,
         keyboardType: widget.keyboardType,
         style: const TextStyle(color: primaryTextColor, fontSize: 16),
         decoration: InputDecoration(
-          suffixIcon: IconButton(
-            splashRadius: 20,
-            padding: const EdgeInsets.all(10),
-            icon: const Icon(Icons.close_outlined),
-            onPressed: () {
-              if (widget.controller != null) {
-                setState(() => widget.controller!.text = '');
-              }
-            },
-          ),
+          suffixIcon: widget.obsecureText
+              ? Padding(
+                  padding: const EdgeInsets.all(0.0),
+                  child: SizedBox(
+                    width: 100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          splashRadius: 20,
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            setState(() => isTextVisible = !isTextVisible);
+                          },
+                          icon: isTextVisible
+                              ? const Icon(Icons.visibility)
+                              : const Icon(Icons.visibility_off),
+                        ),
+                        IconButton(
+                          splashRadius: 20,
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            if (widget.controller != null) {
+                              setState(() => widget.controller!.text = '');
+                            }
+                          },
+                          icon: const Icon(Icons.close_outlined),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : IconButton(
+                  splashRadius: 20,
+                  padding: const EdgeInsets.all(10),
+                  icon: const Icon(Icons.close_outlined),
+                  onPressed: () {
+                    if (widget.controller != null) {
+                      setState(() => widget.controller!.text = '');
+                    }
+                  },
+                ),
           labelText: widget.labelText,
           labelStyle: const TextStyle(color: Colors.grey),
           focusedBorder: OutlineInputBorder(

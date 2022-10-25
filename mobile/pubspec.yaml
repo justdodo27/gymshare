@@ -17,6 +17,7 @@ dependencies:
   http: ^0.13.5
   shared_preferences: ^2.0.15
   flutter_svg: ^1.1.5
+  curved_navigation_bar: ^1.0.3
 
 dev_dependencies:
   flutter_test:
