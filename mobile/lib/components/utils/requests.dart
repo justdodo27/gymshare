@@ -4,7 +4,6 @@ import 'package:gymshare/settings/settings.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 Future<bool> gatherToken(String username, String password) async {
   final response = await http.post(
     Uri.parse(buildUrl('api/token/')),

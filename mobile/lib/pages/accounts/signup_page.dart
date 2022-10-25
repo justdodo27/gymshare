@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:gymshare/components/utils/routes.dart';
@@ -7,6 +9,8 @@ import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/pages/accounts/login_page.dart';
 import 'package:gymshare/settings/colors.dart';
+import 'package:gymshare/settings/settings.dart';
+import 'package:http/http.dart' as http;
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -26,6 +30,8 @@ class _SignupPageState extends State<SignupPage> {
   late String username;
   late String password;
 
+  bool _buttonDisabled = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -42,6 +48,99 @@ class _SignupPageState extends State<SignupPage> {
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeIn,
     );
+  }
+
+  String? validatePassword(String? value) {
+    RegExp validPasswordRegExp =
+        RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$');
+    if (value != null && !validPasswordRegExp.hasMatch(value)) {
+      return 'Password should have:\n'
+          '     - minimum eight characters,\n'
+          '     - at least one uppercase letter,\n'
+          '     - one lowercase letter,\n'
+          '     - one number.';
+    }
+    return null;
+  }
+
+  String? validateUsername(String? value) {
+    if (value!.isEmpty) {
+      return 'Enter at least 1 characters.';
+    }
+    return null;
+  }
+
+  String? validateEmail(String? value) {
+    if (value != null && !EmailValidator.validate(value)) {
+      return 'Enter a valid email address.';
+    }
+    return null;
+  }
+
+  Future<bool> createUser() async {
+    final response = await http.post(
+      Uri.parse(buildUrl('accounts/users/')),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+        'username': username,
+        'password': password,
+      }),
+    );
+
+    return response.statusCode == 201;
+  }
+
+  void _signUp() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final isValid = _formKey.currentState!.validate();
+    if (isValid) {
+      setState(() => _buttonDisabled = true);
+      _formKey.currentState!.save();
+      if (await createUser()) {
+        const snackBar = SnackBar(
+          duration: Duration(milliseconds: 500),
+          content: SizedBox(
+            height: 60,
+            child: Center(
+              child: Text(
+                'Account created successfully!',
+                style: TextStyle(
+                  color: primaryTextColor,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+          backgroundColor: secondaryColor,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        Navigator.of(context)
+            .pushReplacement(createPageRoute(const LoginPage()));
+      } else {
+        setState(() => _buttonDisabled = false);
+        const snackBar = SnackBar(
+          duration: Duration(seconds: 1),
+          content: SizedBox(
+            height: 60,
+            child: Center(
+              child: Text(
+                'User with provided credentials already exists.',
+                style: TextStyle(
+                  color: primaryTextColor,
+                  fontSize: 17,
+                ),
+              ),
+            ),
+          ),
+          backgroundColor: errorColor,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    }
   }
 
   @override
@@ -65,24 +164,14 @@ class _SignupPageState extends State<SignupPage> {
                       controller: _emailController,
                       labelText: 'Email',
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value != null && !EmailValidator.validate(value)) {
-                          return 'Enter a valid email address.';
-                        }
-                        return null;
-                      },
+                      validator: validateEmail,
                       onSaved: (value) => setState(() => email = value!),
                       onTap: _scrollToBottom,
                     ),
                     CustomTextFormField(
                       controller: _usernameController,
                       labelText: 'Username',
-                      validator: (value) {
-                        if (value!.length < 4) {
-                          return 'Enter at least 4 characters.';
-                        }
-                        return null;
-                      },
+                      validator: validateUsername,
                       onSaved: (value) => setState(() => username = value!),
                       onTap: _scrollToBottom,
                     ),
@@ -91,44 +180,35 @@ class _SignupPageState extends State<SignupPage> {
                       obsecureText: true,
                       labelText: 'Password',
                       keyboardType: TextInputType.visiblePassword,
-                      validator: (value) {
-                        RegExp validPasswordRegExp = RegExp(
-                            r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$');
-                        if (value != null &&
-                            !validPasswordRegExp.hasMatch(value)) {
-                          return 'Password should have:\n'
-                              '     - minimum eight characters,\n'
-                              '     - at least one uppercase letter,\n'
-                              '     - one lowercase letter,\n'
-                              '     - one number.';
-                        }
-                        return null;
-                      },
+                      validator: validatePassword,
                       onSaved: (value) => setState(() => password = value!),
                       onTap: _scrollToBottom,
                     ),
                     const SizedBox(height: 30),
-                    const Divider(
-                      color: primaryTextColor,
-                    ),
-                    RoundedRectangleButton(
-                      width: size.width * 0.8,
-                      padding: const EdgeInsets.only(top: 10),
-                      child: const Text(
-                        'Signup',
-                        style: TextStyle(color: primaryTextColor, fontSize: 16),
+                    const Hero(
+                      tag: 'divider',
+                      child: Divider(
+                        color: primaryTextColor,
                       ),
-                      onPress: () {
-                        final isValid = _formKey.currentState!.validate();
-                        if (isValid) {
-                          _formKey.currentState!.save();
-                        }
-                      },
+                    ),
+                    Hero(
+                      tag: 'button',
+                      child: RoundedRectangleButton(
+                        isButtonDisabled: _buttonDisabled,
+                        width: size.width * 0.8,
+                        padding: const EdgeInsets.only(top: 10),
+                        child: const Text(
+                          'Signup',
+                          style:
+                              TextStyle(color: primaryTextColor, fontSize: 16),
+                        ),
+                        onPress: () => _signUp(),
+                      ),
                     ),
                     const SizedBox(height: 30),
                     GestureDetector(
                       onTap: () => Navigator.of(context).pushReplacement(
-                        createPageRouteWithAnimation(
+                        createPageRoute(
                           const LoginPage(),
                         ),
                       ),
