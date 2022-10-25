@@ -25,6 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   late String username;
   late String password;
 
+  bool _buttonDisabled = false;
+
   @override
   void dispose() {
     _usernameController.dispose();
@@ -33,11 +35,8 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  String? _validateInput(value) {
-    if (value!.length < 4) {
-      return 'Enter at least 4 characters.';
-    }
-    return null;
+  String? _validateInput(String? value) {
+    return value!.isEmpty ? 'Enter at least 1 character.' : null;
   }
 
   void _scrollToBottom() async {
@@ -47,6 +46,56 @@ class _LoginPageState extends State<LoginPage> {
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeIn,
     );
+  }
+
+  void _logIn() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final isValid = _formKey.currentState!.validate();
+    if (isValid) {
+      setState(() => _buttonDisabled = true);
+      _formKey.currentState!.save();
+      if (await gatherToken(username, password)) {
+        const snackBar = SnackBar(
+          duration: Duration(milliseconds: 500),
+          content: SizedBox(
+            height: 60,
+            child: Center(
+              child: Text(
+                'Successfuly logged in.',
+                style: TextStyle(
+                  color: primaryTextColor,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+          backgroundColor: secondaryColor,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        Navigator.of(context).pushReplacement(
+          createBottomToTopPageRouteAnimation(const DashboardPage()),
+        );
+      } else {
+        setState(() => _buttonDisabled = false);
+        const snackBar = SnackBar(
+          duration: Duration(seconds: 1),
+          content: SizedBox(
+            height: 60,
+            child: Center(
+              child: Text(
+                'Login failed with the specified credentials',
+                style: TextStyle(
+                  color: primaryTextColor,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+          backgroundColor: errorColor,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    }
   }
 
   @override
@@ -82,52 +131,30 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: _scrollToBottom,
                     ),
                     const SizedBox(height: 30),
-                    const Divider(
-                      color: primaryTextColor,
-                    ),
-                    RoundedRectangleButton(
-                      width: size.width * 0.8,
-                      padding: const EdgeInsets.only(top: 10),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(color: primaryTextColor, fontSize: 16),
+                    const Hero(
+                      tag: 'divider',
+                      child: Divider(
+                        color: primaryTextColor,
                       ),
-                      onPress: () async {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        final isValid = _formKey.currentState!.validate();
-                        if (isValid) {
-                          _formKey.currentState!.save();
-                          if (await gatherToken(username, password)) {
-                            Navigator.of(context).pushReplacement(
-                              createPageRouteWithAnimation(
-                                  const DashboardPage()),
-                            );
-                          } else {
-                            const snackBar = SnackBar(
-                              content: SizedBox(
-                                height: 60,
-                                child: Center(
-                                  child: Text(
-                                    'Wrong Credentials!',
-                                    style: TextStyle(
-                                        color: primaryTextColor, fontSize: 18),
-                                  ),
-                                ),
-                              ),
-                              backgroundColor: tertiaryColor,
-                            );
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                          }
-                        }
-                      },
+                    ),
+                    Hero(
+                      tag: 'button',
+                      child: RoundedRectangleButton(
+                        isButtonDisabled: _buttonDisabled,
+                        width: size.width * 0.8,
+                        padding: const EdgeInsets.only(top: 10),
+                        child: const Text(
+                          'Login',
+                          style:
+                              TextStyle(color: primaryTextColor, fontSize: 16),
+                        ),
+                        onPress: () => _logIn(),
+                      ),
                     ),
                     const SizedBox(height: 30),
                     GestureDetector(
                       onTap: () => Navigator.of(context).pushReplacement(
-                        createPageRouteWithAnimation(
-                          const SignupPage(),
-                        ),
+                        createPageRoute(const SignupPage()),
                       ),
                       child: Container(
                         padding: const EdgeInsets.only(
