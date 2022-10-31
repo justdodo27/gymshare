@@ -1,7 +1,8 @@
 import { filter } from 'lodash';
-import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useState,forwardRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import icon from "../pictures/play.png"
+import nophotoicon from "../pictures/nophoto.jpg"
 // material
 import {
   Card,
@@ -9,22 +10,20 @@ import {
   Stack,
   Avatar,
   Button,
-  Checkbox,
   TableRow,
   TableBody,
   TableCell,
   Container,
   Typography,
-  TableContainer,
-  TablePagination,
+  TableContainer, Slide,
+  TablePagination, Dialog, DialogTitle, DialogContent, Box, Backdrop, CircularProgress, DialogContentText
 } from '@mui/material';
 // components
 import Page from '../components/Page';
-import Label from '../components/Label';
 import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
-import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
+import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import { useCallback } from 'react';
 import { useEffect } from 'react';
@@ -45,11 +44,10 @@ import { authActions } from '../store/auth'
 
 const TABLE_HEAD = [
   { id: 'title', label: 'Title', alignRight: false },
-  { id: 'author', label: 'Author', alignRight: false },
+  { id: 'type', label: 'Type', alignRight: false },
   { id: 'difficulty', label: 'Difficulty', alignRight: false },
-  { id: 'avg_time', label: 'Avg Time', alignRight: false },
-  { id: 'rating', label: 'Rating', alignRight: false },
-  { id: '' },
+  { id: 'cbr', label: 'Calories Burn Rate', alignRight: false },
+
 ];
 
 const StyledRating = styled(Rating)({
@@ -59,6 +57,10 @@ const StyledRating = styled(Rating)({
   '& .MuiRating-iconHover': {
     color: '#ff3d47',
   },
+});
+
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
 });
 
 // ----------------------------------------------------------------------
@@ -92,10 +94,12 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function User() {
+export default function Exercises() {
 
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
+  let is_staff = useSelector(state => state.auth.is_staff);
+  console.log(is_staff)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -119,29 +123,53 @@ export default function User() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [open, setOpen] = useState(false);
+  const [exe, setExe] = useState([]);
+  const [openVideo, setOpenVideo] = useState(false);
+  const [Video, setVideo] = useState('');
+  const ProductImgStyle = styled('img')({
+    top: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    position: 'absolute',
+    opacity: 0.7
+  });
+  const PlayImgStyle = styled('img')({
+    top: '15%',
+    left: '15%',
+    width: '70%',
+    height: '70%',
+    objectFit: 'cover',
+    position: 'absolute',
+    opacity: 0.4,
+    "&:hover": {
+      cursor: "pointer",
+      opacity: 0.6,
+    },
+  });
+
 
   const fetchMoviesHandler = useCallback(async () => {
     
     try {
-      const response = await fetch("http://localhost:1337/workouts/plans/");
+      const response = await fetch("http://localhost:1337/workouts/exercises/");
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
       const data = await response.json();
-      const temp = data.results
-      console.log(temp)
+      console.log('Hello')
+      console.log(data)
 
-  
-      
-
-      const users = [...Array(temp.length)].map((_, index) => ({
-        id: temp[index].id,
-        avatarUrl: temp[index].thumbnail ? temp[index].thumbnail : ".../pictures/nophoto.jpg",
-        name: temp[index].title,
-        company: temp[index].author.username,
-        isVerified: temp[index].avg_time<60 ? temp[index].avg_time.toString()+ " seconds" : temp[index].avg_time<3600&&temp[index].avg_time>=60 ?  (temp[index].avg_time/60).toFixed(2).toString()+ " minutes" : temp[index].avg_time>=3600 ? (temp[index].avg_time/3600).toFixed(2).toString()+ " hours" : "no data",
-        status: temp[index].avg_rating!=null ? temp[index].avg_rating : 0,
-        role: temp[index].difficulty!=null ? temp[index].difficulty : 0,
+      const users = [...Array(data.length)].map((_, index) => ({
+        id: data[index].id,
+        avatarUrl: data[index].thumbnail ? data[index].thumbnail : "/pictures/nophoto.jpg",
+        name: data[index].title,
+        company: data[index].exercise_type,
+        isVerified: data[index].calories_burn_rate!=null ? data[index].calories_burn_rate : 0,
+        role: data[index].difficulty!=null ? data[index].difficulty : 0,
+        description: data[index].description,
+        video: data[index].video,
       }));
 
       console.log(users)
@@ -174,25 +202,27 @@ export default function User() {
     setSelected([]);
   };
 
-  // const handleClick = (event, name) => {
-  //   const selectedIndex = selected.indexOf(name);
-  //   let newSelected = [];
-  //   if (selectedIndex === -1) {
-  //     newSelected = newSelected.concat(selected, name);
-  //   } else if (selectedIndex === 0) {
-  //     newSelected = newSelected.concat(selected.slice(1));
-  //   } else if (selectedIndex === selected.length - 1) {
-  //     newSelected = newSelected.concat(selected.slice(0, -1));
-  //   } else if (selectedIndex > 0) {
-  //     newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-  //   }
-  //   setSelected(newSelected);
-  // };
-
-  const handleClick = (workoutId) => {
-    dispatch(workoutActions.getWorkout(workoutId))
-    navigate('/gymshare/workoutDetail', { replace: true });
+  const handleCloseVideo = () => {
+    setVideo('');
+    setOpenVideo(false);
   };
+  const handleToggleVideo = (src) => {
+    setVideo(src);
+    setOpenVideo(!openVideo);
+  };
+
+  const handleClick = (exercise) => {
+    console.log(exercise)
+    if(exercise[5] === ""){
+      exercise[5] = nophotoicon
+    }
+    setExe(exercise);
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setExe([]);
+    setOpen(false);
+};
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -214,15 +244,15 @@ export default function User() {
   const isUserNotFound = filteredUsers.length === 0;
 
   return (
-    <Page title="User">
+    <Page title="Exercise">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             Workouts
           </Typography>
-          <Button variant="contained" component={RouterLink} to="/gymshare/addWorkout" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New Workout
-          </Button>
+          {is_staff && <Button color="warning" variant="contained" component={RouterLink} to="/gymshare/addExercise" startIcon={<Iconify icon="eva:alert-circle-outline" />}>
+            New Exercise (admin)
+          </Button>}
         </Stack>
 
         <Card>
@@ -242,7 +272,7 @@ export default function User() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
+                    const { id, name, role, company, avatarUrl, isVerified, description, video } = row;
                     const isItemSelected = selected.indexOf(name) !== -1;
 
                     return (
@@ -253,7 +283,7 @@ export default function User() {
                         role="checkbox"
                         selected={isItemSelected}
                         aria-checked={isItemSelected}
-                        onClick={() => handleClick(id)}
+                        onClick={() => handleClick([name, description, isVerified, role, company, avatarUrl, video] )}
                       >
                         <TableCell padding="checkbox">
                           {/* <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} /> */}
@@ -278,12 +308,6 @@ export default function User() {
       />
                         </TableCell>
                         <TableCell align="left">{isVerified}</TableCell>
-                        <TableCell align="left">
-                          <Rating name="read-only" value={status} precision={0.5} readOnly />
-                        </TableCell>
-
-                        <TableCell align="right">
-                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -318,6 +342,69 @@ export default function User() {
           />
         </Card>
       </Container>
+
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={open}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>        
+        </DialogTitle>
+        <DialogContent>
+        <Box sx={{ pt: '90%', position: 'relative' }}>
+        <ProductImgStyle alt={exe[0]} src={exe[5]} />
+        <PlayImgStyle alt={exe[0]} src={icon} 
+        onClick={() => {handleToggleVideo(exe[6])}}  />
+        <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openVideo}
+        onClick={handleCloseVideo}
+      >
+      {Video && <video autoPlay loop width="60%">
+      <source src={Video} type="video/webm" />
+      <source src={Video} type="video/mp4"
+      />
+               <CircularProgress color="inherit" />
+    </video>}
+      </Backdrop>
+      </Box>
+          {exe[0]}
+        <Typography variant="body2" color="text.secondary">
+            {exe[4]} 
+          </Typography>
+        <Typography variant="body2" color="text.secondary">
+            Calories Burn Rate: {exe[2]}
+          </Typography>
+          <Typography variant="subtitle1">
+            <Typography
+              component="span"
+              variant="body3"
+              sx={{
+                color: 'text.disabled',
+              }}
+            >
+              Difficulty
+            </Typography>
+          </Typography>
+        <StyledRating
+       
+        value={parseFloat(exe[3])/2}
+        readOnly
+        precision={0.5}
+        icon={<FavoriteIcon fontSize="inherit" />}
+        emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+      />
+          <DialogContentText margin="1vh" id="alert-dialog-slide-description">
+            {exe[1]}
+          </DialogContentText>
+
+
+        </DialogContent>
+      </Dialog>
     </Page>
   );
 }

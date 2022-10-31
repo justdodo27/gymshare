@@ -14,7 +14,6 @@ import icon from "../pictures/play.png"
 import nophoto from "../pictures/nophoto.jpg"
 import { useDispatch } from 'react-redux';
 import { useNavigate} from 'react-router-dom';
-import { workoutActions } from '../store/workout';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Rating from '@mui/material/Rating';
@@ -30,6 +29,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import nophotoicon from "../pictures/nophoto.jpg"
 
 // ----------------------------------------------------------------------
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -135,7 +135,7 @@ export default function WorkoutDetail() {
         if(thumbnail){
           array.push(thumbnail)
         }else{
-          array.push(icon)
+          array.push(nophotoicon)
         }
         array.push(video)
         setExe(array);

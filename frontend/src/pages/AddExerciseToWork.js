@@ -18,8 +18,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import {
   ListSubheader,
   InputAdornment
@@ -57,7 +55,7 @@ export default function AddExerciseToWork() {
   const [array, setArray] = React.useState([''])
   const [indexes, setIndexes] = React.useState([''])
   const [description, setDescription] = React.useState([''])
-  const [order, setOrder] = React.useState(0)
+  const [order, setOrder] = React.useState(1)
   const [table, setTable] = React.useState([])
   const [data, setData] = React.useState([])
   let workoutTitle = useSelector(state => state.workout.title);

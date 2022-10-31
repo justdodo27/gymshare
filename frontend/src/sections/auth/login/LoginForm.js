@@ -89,7 +89,7 @@ export default function Login() {
         const decodedExpTime = decodedData.exp
         console.log(decodedExpTime)
         console.log(data.access)
-        dispatch(authActions.login([data.access, decodedId, username, decodedExpTime]))
+        dispatch(authActions.login([data.access, decodedId, username, decodedExpTime, data.is_staff]))
         navigate('/gymshare/app', { replace: true });
       })
       .catch((err) => {

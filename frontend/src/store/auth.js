@@ -6,6 +6,7 @@ const initialAuthState = {
   userId: '',
   username: '',
   exp: '',
+  is_staff: false,
 };
 
 const authSlice = createSlice({
@@ -18,6 +19,7 @@ const authSlice = createSlice({
       state.userId = action.payload[1];
       state.username = action.payload[2]
       state.exp = action.payload[3]
+      state.is_staff = action.payload[4]
     },
     logout(state) {
       state.isAuthenticated = false;
@@ -25,6 +27,7 @@ const authSlice = createSlice({
       state.userId = ''
       state.username = ''
       state.exp = ''
+      state.is_staff = false
     },
   },
 });
