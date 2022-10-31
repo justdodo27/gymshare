@@ -1,6 +1,7 @@
 ![Logo](https://github.com/justdodo27/gymshare/blob/main/logo.svg)
 
 Color theme from MUI: [Blue Grey 800](https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=37474F)
+[Figma sheets](https://www.figma.com/file/NBXKdLdnr68XTPzFJYrgUF/Mobile-View-Gymshare?node-id=0%3A1)
 
 ## Installation
 - Build images ```docker-compose build```
