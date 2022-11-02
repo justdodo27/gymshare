@@ -19,6 +19,10 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch} from 'react-redux';
 import { authActions } from '../../../store/auth';
 import jwt_decode from "jwt-decode";
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import {forwardRef} from 'react';
+import { useState } from 'react';
 
 function Copyright(props) {
   return (
@@ -32,6 +36,11 @@ function Copyright(props) {
     </Typography>
   );
 }
+
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={5} ref={ref} variant="filled" {...props} />;
+});
+
 
 const theme = createTheme({
   palette: {
@@ -50,8 +59,21 @@ const theme = createTheme({
 );
 
 export default function Login() {
+  const [styleAlert, setStyleAlert] = useState(false);
+  const [addAlert, setAddAlert] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const handleCloseAlert = (event, reason) => {
+    if(styleAlert){
+      navigate('/gymshare/app', { replace: true });
+    }
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddAlert(false);
+  };
 
 
   const handleSubmit = (event) => {
@@ -90,10 +112,12 @@ export default function Login() {
         console.log(decodedExpTime)
         console.log(data.access)
         dispatch(authActions.login([data.access, decodedId, username, decodedExpTime, data.is_staff]))
-        navigate('/gymshare/app', { replace: true });
+        setStyleAlert(true);
+        setAddAlert(true);
       })
       .catch((err) => {
-        alert(err.message);
+        setAddAlert(true);
+        setStyleAlert(false)
       });
   };
 
@@ -169,6 +193,11 @@ export default function Login() {
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'error'} sx={{ width: '100%' }}>
+{!styleAlert && <Typography>Wrong username or password!</Typography>}
+        </Alert>
+      </Snackbar>
       </Container>
     </ThemeProvider>
     </Fragment>

@@ -15,6 +15,8 @@ import Select from '@mui/material/Select';
 import { useDispatch } from 'react-redux';
 import { workoutActions } from '../store/workout';
 import { useTheme } from '@mui/material/styles';
+import { authActions } from '../store/auth';
+import { useEffect } from 'react';
 
 const Input = styled(MuiInput)`
   width: 42px;
@@ -31,6 +33,17 @@ export default function AddWorkout() {
   let token = useSelector(state => state.auth.token);
   let author = useSelector(state => state.auth.userId);
   const dispatch = useDispatch();
+
+  
+  let exp = useSelector(state => state.auth.exp);
+ 
+
+  useEffect(() => {
+    if (exp<parseInt(Date.now()/1000)) {
+      dispatch(authActions.logout())
+      navigate('/', {replace: true});
+    }
+  }, [dispatch, exp, navigate]);
 
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
