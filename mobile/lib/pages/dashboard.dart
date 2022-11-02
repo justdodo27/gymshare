@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gymshare/pages/accounts/profile_page.dart';
 import 'package:gymshare/pages/statistics/statistics_page.dart';
 import 'package:gymshare/pages/workouts/favorites_page.dart';
-import 'package:gymshare/pages/workouts/search_page.dart';
+import 'package:gymshare/pages/workouts/home_page.dart';
 import 'package:gymshare/pages/workouts/training_page.dart';
 import 'package:gymshare/settings/colors.dart';
 
@@ -15,11 +15,11 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  int currentPage = 2;
+  int currentPage = 0;
 
   static List<Widget> screens = [
+    const HomePage(),
     const FavoritesPage(),
-    const SearchPage(),
     const TrainingPage(),
     const StatisticsPage(),
     const ProfilePage(),
@@ -43,8 +43,8 @@ class _DashboardPageState extends State<DashboardPage> {
         animationCurve: Curves.linearToEaseOut,
         animationDuration: const Duration(milliseconds: 400),
         items: const [
+          Icon(Icons.home),
           Icon(Icons.favorite),
-          Icon(Icons.search),
           Icon(Icons.fitness_center),
           Icon(Icons.show_chart),
           Icon(Icons.person),

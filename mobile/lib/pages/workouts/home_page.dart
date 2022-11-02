@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/settings/colors.dart';
 
-class FavoritesPage extends StatelessWidget {
-  const FavoritesPage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class FavoritesPage extends StatelessWidget {
           child: SeamlessPattern(
             child: Center(
                   child: Text(
-            'Favorites',
+            'Home',
             style: TextStyle(fontSize: 40, color: primaryTextColor),
                   ),
                 ),

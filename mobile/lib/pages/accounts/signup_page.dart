@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:gymshare/components/utils/routes.dart';
+import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/components/widgets/custom_text_form_field.dart';
 import 'package:gymshare/components/widgets/logo.dart';
 import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
@@ -150,89 +151,91 @@ class _SignupPageState extends State<SignupPage> {
       body: SafeArea(
         child: Form(
           key: _formKey,
-          child: ScrollConfig(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    SizedBox(height: size.height * 0.05),
-                    const GymShareLogo(),
-                    SizedBox(height: size.height * 0.05),
-                    CustomTextFormField(
-                      controller: _emailController,
-                      labelText: 'Email',
-                      keyboardType: TextInputType.emailAddress,
-                      validator: validateEmail,
-                      onSaved: (value) => setState(() => email = value!),
-                      onTap: _scrollToBottom,
-                    ),
-                    CustomTextFormField(
-                      controller: _usernameController,
-                      labelText: 'Username',
-                      validator: validateUsername,
-                      onSaved: (value) => setState(() => username = value!),
-                      onTap: _scrollToBottom,
-                    ),
-                    CustomTextFormField(
-                      controller: _passwordController,
-                      obsecureText: true,
-                      labelText: 'Password',
-                      keyboardType: TextInputType.visiblePassword,
-                      validator: validatePassword,
-                      onSaved: (value) => setState(() => password = value!),
-                      onTap: _scrollToBottom,
-                    ),
-                    const SizedBox(height: 30),
-                    const Hero(
-                      tag: 'divider',
-                      child: Divider(
-                        color: primaryTextColor,
+          child: SeamlessPattern(
+            child: ScrollConfig(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      SizedBox(height: size.height * 0.05),
+                      const GymShareLogo(),
+                      SizedBox(height: size.height * 0.05),
+                      CustomTextFormField(
+                        controller: _emailController,
+                        labelText: 'Email',
+                        keyboardType: TextInputType.emailAddress,
+                        validator: validateEmail,
+                        onSaved: (value) => setState(() => email = value!),
+                        onTap: _scrollToBottom,
                       ),
-                    ),
-                    Hero(
-                      tag: 'button',
-                      child: RoundedRectangleButton(
-                        isButtonDisabled: _buttonDisabled,
-                        width: size.width * 0.8,
-                        padding: const EdgeInsets.only(top: 10),
-                        child: const Text(
-                          'Signup',
-                          style:
-                              TextStyle(color: primaryTextColor, fontSize: 16),
-                        ),
-                        onPress: () => _signUp(),
+                      CustomTextFormField(
+                        controller: _usernameController,
+                        labelText: 'Username',
+                        validator: validateUsername,
+                        onSaved: (value) => setState(() => username = value!),
+                        onTap: _scrollToBottom,
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pushReplacement(
-                        createPageRoute(
-                          const LoginPage(),
+                      CustomTextFormField(
+                        controller: _passwordController,
+                        obsecureText: true,
+                        labelText: 'Password',
+                        keyboardType: TextInputType.visiblePassword,
+                        validator: validatePassword,
+                        onSaved: (value) => setState(() => password = value!),
+                        onTap: _scrollToBottom,
+                      ),
+                      const SizedBox(height: 30),
+                      const Hero(
+                        tag: 'divider',
+                        child: Divider(
+                          color: primaryTextColor,
                         ),
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                          bottom: 2, // Space between underline and text
+                      Hero(
+                        tag: 'button',
+                        child: RoundedRectangleButton(
+                          isButtonDisabled: _buttonDisabled,
+                          width: size.width * 0.8,
+                          padding: const EdgeInsets.only(top: 10),
+                          child: const Text(
+                            'Signup',
+                            style:
+                                TextStyle(color: primaryTextColor, fontSize: 16),
+                          ),
+                          onPress: () => _signUp(),
                         ),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
+                      ),
+                      const SizedBox(height: 30),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pushReplacement(
+                          createPageRoute(
+                            const LoginPage(),
+                          ),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                            bottom: 2, // Space between underline and text
+                          ),
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: primaryTextColor,
+                                width: 1.0, // Underline thickness
+                              ),
+                            ),
+                          ),
+                          child: const Text(
+                            'Do you have account? Log in',
+                            style: TextStyle(
                               color: primaryTextColor,
-                              width: 1.0, // Underline thickness
                             ),
                           ),
                         ),
-                        child: const Text(
-                          'Do you have account? Log in',
-                          style: TextStyle(
-                            color: primaryTextColor,
-                          ),
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -5,6 +5,7 @@ import 'package:gymshare/components/widgets/custom_text_form_field.dart';
 import 'package:gymshare/components/widgets/logo.dart';
 import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
+import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/pages/accounts/signup_page.dart';
 import 'package:gymshare/pages/dashboard.dart';
 import 'package:gymshare/settings/colors.dart';
@@ -103,80 +104,83 @@ class _LoginPageState extends State<LoginPage> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ScrollConfig(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    SizedBox(height: size.height * 0.05),
-                    const GymShareLogo(),
-                    SizedBox(height: size.height * 0.05),
-                    CustomTextFormField(
-                      controller: _usernameController,
-                      labelText: 'Username',
-                      validator: _validateInput,
-                      onSaved: (value) => setState(() => username = value!),
-                      onTap: _scrollToBottom,
-                    ),
-                    CustomTextFormField(
-                      controller: _passwordController,
-                      obsecureText: true,
-                      labelText: 'Password',
-                      validator: _validateInput,
-                      onSaved: (value) => setState(() => password = value!),
-                      onTap: _scrollToBottom,
-                    ),
-                    const SizedBox(height: 30),
-                    const Hero(
-                      tag: 'divider',
-                      child: Divider(
-                        color: primaryTextColor,
+        child: SeamlessPattern(
+          child: Form(
+            key: _formKey,
+            child: ScrollConfig(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      SizedBox(height: size.height * 0.05),
+                      const GymShareLogo(),
+                      SizedBox(height: size.height * 0.05),
+                      CustomTextFormField(
+                        controller: _usernameController,
+                        labelText: 'Username',
+                        validator: _validateInput,
+                        onSaved: (value) => setState(() => username = value!),
+                        onTap: _scrollToBottom,
                       ),
-                    ),
-                    Hero(
-                      tag: 'button',
-                      child: RoundedRectangleButton(
-                        isButtonDisabled: _buttonDisabled,
-                        width: size.width * 0.8,
-                        padding: const EdgeInsets.only(top: 10),
-                        child: const Text(
-                          'Login',
-                          style:
-                              TextStyle(color: primaryTextColor, fontSize: 16),
+                      CustomTextFormField(
+                        controller: _passwordController,
+                        obsecureText: true,
+                        labelText: 'Password',
+                        validator: _validateInput,
+                        onSaved: (value) => setState(() => password = value!),
+                        onTap: _scrollToBottom,
+                      ),
+                      const SizedBox(height: 30),
+                      const Hero(
+                        tag: 'divider',
+                        child: Divider(
+                          color: primaryTextColor,
                         ),
-                        onPress: () => _logIn(),
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pushReplacement(
-                        createPageRoute(const SignupPage()),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                          bottom: 2, // Space between underline and text
+                      Hero(
+                        tag: 'button',
+                        child: RoundedRectangleButton(
+                          isButtonDisabled: _buttonDisabled,
+                          width: size.width * 0.8,
+                          padding: const EdgeInsets.only(top: 10),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                                color: primaryTextColor, fontSize: 16),
+                          ),
+                          onPress: () => _logIn(),
                         ),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
+                      ),
+                      const SizedBox(height: 30),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pushReplacement(
+                          createPageRoute(const SignupPage()),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                            bottom: 2, // Space between underline and text
+                          ),
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: primaryTextColor,
+                                width: 1.0, // Underline thickness
+                              ),
+                            ),
+                          ),
+                          child: const Text(
+                            'Don’t have account yet? Create a new one',
+                            style: TextStyle(
                               color: primaryTextColor,
-                              width: 1.0, // Underline thickness
                             ),
                           ),
                         ),
-                        child: const Text(
-                          'Don’t have account yet? Create a new one',
-                          style: TextStyle(
-                            color: primaryTextColor,
-                          ),
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
