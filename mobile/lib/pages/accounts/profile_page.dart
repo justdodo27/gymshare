@@ -1,22 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/components/widgets/logo.dart';
 import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
+import 'package:gymshare/pages/accounts/change_password.dart';
+import 'package:gymshare/pages/accounts/edit_profile.dart';
+import 'package:gymshare/pages/accounts/login_page.dart';
 import 'package:gymshare/settings/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
-  final backgroundHeight = 220.0;
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final backgroundHeight = 180.0;
   final profileSize = 120.0;
 
-  editProfile() {}
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
-  logOut() {}
-
-  changePassword() {}
-
-  deleteAccount() {}
+  void deleteTokens() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('accessToken');
+    prefs.remove('refreshToken');
+    prefs.remove('isStaff');
+  }
 
   Widget _buildTop() {
     return Stack(
@@ -36,7 +52,10 @@ class ProfilePage extends StatelessWidget {
         width: double.infinity,
         height: backgroundHeight,
         color: secondaryColor,
-        child: const GymShareLogo(),
+        child: const Hero(
+          tag: 'logo',
+          child: GymShareLogo(),
+        ),
       );
 
   Widget _buildProfileImage() => Container(
@@ -53,7 +72,7 @@ class ProfilePage extends StatelessWidget {
         ),
       );
 
-  Widget _buildContent(Size size) {
+  Widget _buildContent(BuildContext context, Size size) {
     return Container(
       padding: EdgeInsets.only(top: profileSize * 0.7),
       child: Center(
@@ -79,7 +98,7 @@ class ProfilePage extends StatelessWidget {
             ),
             const Divider(thickness: 1, color: secondaryColor),
             Container(
-              width: size.width * 0.8,
+              width: size.width * 0.9,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -87,22 +106,27 @@ class ProfilePage extends StatelessWidget {
                   _buildButton(
                     icon: Icons.edit,
                     label: 'Edit profile',
-                    onPress: editProfile,
-                  ),
-                  _buildButton(
-                    icon: Icons.logout,
-                    label: 'Logout',
-                    onPress: logOut,
+                    onPress: () => Navigator.of(context).push(
+                      createLeftToRightRouteAnimation(const EditProfilePage()),
+                    ),
                   ),
                   _buildButton(
                     icon: Icons.password,
                     label: 'Change password',
-                    onPress: changePassword,
+                    onPress: () => Navigator.of(context).push(
+                      createLeftToRightRouteAnimation(
+                        const ChangePasswordPage(),
+                      ),
+                    ),
                   ),
                   _buildButton(
-                    icon: Icons.delete,
-                    label: 'Delete account',
-                    onPress: deleteAccount,
+                    icon: Icons.logout,
+                    label: 'Logout',
+                    onPress: () {
+                      deleteTokens();
+                      Navigator.of(context)
+                          .pushReplacement(createPageRoute(const LoginPage()));
+                    },
                   ),
                 ],
               ),
@@ -175,7 +199,7 @@ class ProfilePage extends StatelessWidget {
             child: ListView(
               children: [
                 _buildTop(),
-                _buildContent(size),
+                _buildContent(context, size),
               ],
             ),
           ),
@@ -183,4 +207,6 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
+  void _fetchUserData() async {}
 }

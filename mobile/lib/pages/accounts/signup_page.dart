@@ -160,7 +160,7 @@ class _SignupPageState extends State<SignupPage> {
                   child: Column(
                     children: [
                       SizedBox(height: size.height * 0.05),
-                      const GymShareLogo(),
+                      const Hero(tag: 'logo', child: GymShareLogo()),
                       SizedBox(height: size.height * 0.05),
                       CustomTextFormField(
                         controller: _emailController,
@@ -201,8 +201,8 @@ class _SignupPageState extends State<SignupPage> {
                           padding: const EdgeInsets.only(top: 10),
                           child: const Text(
                             'Signup',
-                            style:
-                                TextStyle(color: primaryTextColor, fontSize: 16),
+                            style: TextStyle(
+                                color: primaryTextColor, fontSize: 16),
                           ),
                           onPress: () => _signUp(),
                         ),

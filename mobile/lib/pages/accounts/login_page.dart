@@ -116,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       SizedBox(height: size.height * 0.05),
-                      const GymShareLogo(),
+                      const Hero(tag: 'logo', child: GymShareLogo()),
                       SizedBox(height: size.height * 0.05),
                       CustomTextFormField(
                         controller: _usernameController,
