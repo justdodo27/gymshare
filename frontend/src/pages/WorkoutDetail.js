@@ -19,6 +19,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Rating from '@mui/material/Rating';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -30,6 +31,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import nophotoicon from "../pictures/nophoto.jpg"
+import { workoutActions } from '../store/workout';
 
 // ----------------------------------------------------------------------
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -106,6 +108,7 @@ export default function WorkoutDetail() {
       });
 
     const workoutId = useSelector(state => state.workout.workoutId);
+    let is_staff = useSelector(state => state.auth.is_staff);
     const [workout, setWorkouts] = useState([]);
     const [open, setOpen] = useState(false);
     const [exe, setExe] = useState([]);
@@ -152,6 +155,11 @@ export default function WorkoutDetail() {
         })
         .then(() => {navigate('/', { replace: true });})
         
+  };
+
+  const handleClickEdit = () => {
+    dispatch(workoutActions.getWorkout(workoutId))
+    navigate('/gymshare/editWorkout', { replace: true });
   };
   
     const handleClose = () => {
@@ -211,7 +219,7 @@ export default function WorkoutDetail() {
     const handleClickSave = () => {
       if(saved)
       {
-        fetch('http://localhost:1337/workouts/favorites/0/', {
+        fetch('http://localhost:1337/workouts/favorites/', {
           method: 'DELETE',
             body: JSON.stringify({
               workout: workoutId
@@ -351,11 +359,14 @@ export default function WorkoutDetail() {
             <IconButton 
               aria-label="favoriteicon" 
               size="large" 
-              color={(saved === true && 'warning') || 'secondary'} 
+              color={(saved === true && 'error') || 'secondary'} 
               onClick={() => handleClickSave()}>
         <FavoriteIcon fontSize="inherit" />
       </IconButton>
-          {author.id === userId && <IconButton aria-label="delete" size="large" color="secondary" onClick={() => handleClickDelete()}>
+      {author.id === userId && <IconButton aria-label="edit" size="large" color="secondary" onClick={() => handleClickEdit()}>
+        <EditIcon  fontSize="inherit" />
+      </IconButton>}
+      {(author.id === userId || is_staff )  && <IconButton aria-label="delete" size="large" color={ is_staff && 'warning' ||"secondary"} onClick={() => handleClickDelete()}>
         <DeleteIcon  fontSize="inherit" />
       </IconButton>}
 

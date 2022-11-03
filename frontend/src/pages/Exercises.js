@@ -35,7 +35,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { styled } from '@mui/material/styles';
 import { useSelector} from 'react-redux';
-import { authActions } from '../store/auth'
+import { authActions } from '../store/auth';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // ----------------------------------------------------------------------
 
@@ -202,6 +204,18 @@ export default function Exercises() {
     setSelected([]);
   };
 
+  const handleClickDelete = () => {
+    // fetch('http://localhost:1337/workouts/plans/'+workoutId, {
+    //       method: 'DELETE',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //         Authorization: "Bearer " +token,
+    //       },
+    //     })
+    //     .then(() => {navigate('/', { replace: true });})
+        
+  };
+
   const handleCloseVideo = () => {
     setVideo('');
     setOpenVideo(false);
@@ -285,6 +299,7 @@ export default function Exercises() {
                         aria-checked={isItemSelected}
                         onClick={() => handleClick([name, description, isVerified, role, company, avatarUrl, video] )}
                       >
+                        
                         <TableCell padding="checkbox">
                           {/* <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} /> */}
                         </TableCell>
@@ -373,6 +388,9 @@ export default function Exercises() {
       </Backdrop>
       </Box>
           {exe[0]}
+          {is_staff  && <IconButton aria-label="delete" size="large" color={ is_staff && 'warning' ||"secondary"} onClick={() => handleClickDelete()}>
+                          <DeleteIcon  fontSize="inherit" />
+                        </IconButton>}
         <Typography variant="body2" color="text.secondary">
             {exe[4]} 
           </Typography>
