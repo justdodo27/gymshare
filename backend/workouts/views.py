@@ -117,7 +117,7 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'Favorite workout does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
         self.perform_destroy(instance)
-        return Response({'detail': 'Favorite workout has been deleted.'}, status=status.HTTP_204_NO_CONTENT)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
 class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):
