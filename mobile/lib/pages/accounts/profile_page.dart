@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/user.dart';
 import 'package:gymshare/components/utils/helpers.dart';
+import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/components/widgets/logo.dart';
@@ -265,6 +266,9 @@ class _ProfilePageState extends State<ProfilePage> {
     if (response.statusCode == 200) {
       setState(() => _profile = Profile.fromJson(jsonDecode(response.body)));
       return _profile;
+    } else if (response.statusCode == 401) {
+      await refreshToken(refresh: token.refreshToken);
+      return _fetchUserData();
     } else {
       throw Exception('User data could not be fetched.');
     }

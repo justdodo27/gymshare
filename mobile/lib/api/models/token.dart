@@ -22,4 +22,6 @@ class JWT {
   Map<String, dynamic> get decodedAccessToken {
     return JwtDecoder.decode(accessToken);
   }
+
+  bool get isExpired => JwtDecoder.isExpired(accessToken);
 }
