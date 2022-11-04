@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/custom_text_form_field.dart';
 import 'package:gymshare/components/widgets/logo.dart';
 import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
+import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/pages/accounts/signup_page.dart';
 import 'package:gymshare/pages/dashboard.dart';
 import 'package:gymshare/settings/colors.dart';
@@ -39,15 +41,6 @@ class _LoginPageState extends State<LoginPage> {
     return value!.isEmpty ? 'Enter at least 1 character.' : null;
   }
 
-  void _scrollToBottom() async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeIn,
-    );
-  }
-
   void _logIn() async {
     FocusManager.instance.primaryFocus?.unfocus();
     final isValid = _formKey.currentState!.validate();
@@ -55,45 +48,17 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => _buttonDisabled = true);
       _formKey.currentState!.save();
       if (await gatherToken(username, password)) {
-        const snackBar = SnackBar(
-          duration: Duration(milliseconds: 500),
-          content: SizedBox(
-            height: 60,
-            child: Center(
-              child: Text(
-                'Successfuly logged in.',
-                style: TextStyle(
-                  color: primaryTextColor,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ),
-          backgroundColor: secondaryColor,
+        ScaffoldMessenger.of(context).showSnackBar(
+          getInfoSnackBar(text: 'Successfuly logged in.'),
         );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         Navigator.of(context).pushReplacement(
           createBottomToTopPageRouteAnimation(const DashboardPage()),
         );
       } else {
         setState(() => _buttonDisabled = false);
-        const snackBar = SnackBar(
-          duration: Duration(seconds: 1),
-          content: SizedBox(
-            height: 60,
-            child: Center(
-              child: Text(
-                'Login failed with the specified credentials',
-                style: TextStyle(
-                  color: primaryTextColor,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ),
-          backgroundColor: errorColor,
+        ScaffoldMessenger.of(context).showSnackBar(
+          getErrorSnackBar(text: 'Login failed with the specified credentials'),
         );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
   }
@@ -103,80 +68,83 @@ class _LoginPageState extends State<LoginPage> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ScrollConfig(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    SizedBox(height: size.height * 0.05),
-                    const GymShareLogo(),
-                    SizedBox(height: size.height * 0.05),
-                    CustomTextFormField(
-                      controller: _usernameController,
-                      labelText: 'Username',
-                      validator: _validateInput,
-                      onSaved: (value) => setState(() => username = value!),
-                      onTap: _scrollToBottom,
-                    ),
-                    CustomTextFormField(
-                      controller: _passwordController,
-                      obsecureText: true,
-                      labelText: 'Password',
-                      validator: _validateInput,
-                      onSaved: (value) => setState(() => password = value!),
-                      onTap: _scrollToBottom,
-                    ),
-                    const SizedBox(height: 30),
-                    const Hero(
-                      tag: 'divider',
-                      child: Divider(
-                        color: primaryTextColor,
+        child: SeamlessPattern(
+          child: Form(
+            key: _formKey,
+            child: ScrollConfig(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      SizedBox(height: size.height * 0.05),
+                      const Hero(tag: 'logo', child: GymShareLogo()),
+                      SizedBox(height: size.height * 0.05),
+                      CustomTextFormField(
+                        controller: _usernameController,
+                        labelText: 'Username',
+                        validator: _validateInput,
+                        onSaved: (value) => setState(() => username = value!),
+                        onTap: () => scrollToBottom(_scrollController),
                       ),
-                    ),
-                    Hero(
-                      tag: 'button',
-                      child: RoundedRectangleButton(
-                        isButtonDisabled: _buttonDisabled,
-                        width: size.width * 0.8,
-                        padding: const EdgeInsets.only(top: 10),
-                        child: const Text(
-                          'Login',
-                          style:
-                              TextStyle(color: primaryTextColor, fontSize: 16),
+                      CustomTextFormField(
+                        controller: _passwordController,
+                        obsecureText: true,
+                        labelText: 'Password',
+                        validator: _validateInput,
+                        onSaved: (value) => setState(() => password = value!),
+                        onTap: () => scrollToBottom(_scrollController),
+                      ),
+                      const SizedBox(height: 30),
+                      const Hero(
+                        tag: 'divider',
+                        child: Divider(
+                          color: primaryTextColor,
                         ),
-                        onPress: () => _logIn(),
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pushReplacement(
-                        createPageRoute(const SignupPage()),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                          bottom: 2, // Space between underline and text
+                      Hero(
+                        tag: 'button',
+                        child: RoundedRectangleButton(
+                          isButtonDisabled: _buttonDisabled,
+                          width: size.width * 0.8,
+                          padding: const EdgeInsets.only(top: 10),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                                color: primaryTextColor, fontSize: 16),
+                          ),
+                          onPress: () => _logIn(),
                         ),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
+                      ),
+                      const SizedBox(height: 30),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pushReplacement(
+                          createPageRoute(const SignupPage()),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                            bottom: 2, // Space between underline and text
+                          ),
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: primaryTextColor,
+                                width: 1.0, // Underline thickness
+                              ),
+                            ),
+                          ),
+                          child: const Text(
+                            'Don’t have account yet? Create a new one',
+                            style: TextStyle(
                               color: primaryTextColor,
-                              width: 1.0, // Underline thickness
                             ),
                           ),
                         ),
-                        child: const Text(
-                          'Don’t have account yet? Create a new one',
-                          style: TextStyle(
-                            color: primaryTextColor,
-                          ),
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

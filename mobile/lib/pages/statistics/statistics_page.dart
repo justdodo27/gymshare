@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/settings/colors.dart';
 
 class StatisticsPage extends StatelessWidget {
@@ -9,10 +10,12 @@ class StatisticsPage extends StatelessWidget {
     return const Scaffold(
       backgroundColor: primaryColor,
       body: SafeArea(
-          child: Center(
-        child: Text(
-          'Statistics',
-          style: TextStyle(fontSize: 40, color: primaryTextColor),
+          child: SeamlessPattern(
+        child: Center(
+          child: Text(
+            'Statistics',
+            style: TextStyle(fontSize: 40, color: primaryTextColor),
+          ),
         ),
       )),
     );

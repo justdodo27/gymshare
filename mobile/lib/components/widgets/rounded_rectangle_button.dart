@@ -10,6 +10,7 @@ class RoundedRectangleButton extends StatelessWidget {
   final Color backgroundColor;
   final Color borderColor;
   final bool isButtonDisabled;
+  final num borderWidth;
 
   const RoundedRectangleButton({
     Key? key,
@@ -21,6 +22,7 @@ class RoundedRectangleButton extends StatelessWidget {
     this.backgroundColor = primaryColor,
     this.borderColor = tertiaryColor,
     this.isButtonDisabled = false,
+    this.borderWidth = 2,
   }) : super(key: key);
 
   @override
@@ -38,7 +40,7 @@ class RoundedRectangleButton extends StatelessWidget {
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
-          side: BorderSide(color: borderColor, width: 2),
+          side: BorderSide(color: borderColor, width: borderWidth.toDouble()),
         ),
         child: isButtonDisabled
             ? const SizedBox(
