@@ -4,7 +4,7 @@ import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
 //
 import { useSelector } from 'react-redux';
-import Blog from './pages/Blog';
+import Exercises from './pages/Exercises';
 import User from './pages/User';
 import Login from './pages/Login';
 import Forgot from './pages/ForgotPassword';
@@ -15,6 +15,7 @@ import DashboardApp from './pages/DashboardApp';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import AddWorkout from './pages/AddWorkout';
+import AddExercise from './pages/AddExercise';
 import ChangePassword from './pages/ChangePassword';
 import AddExerciseToWork from './pages/AddExerciseToWork';
 import Logout from './pages/Logout';
@@ -35,9 +36,11 @@ export default function Router() {
         { path: 'profile', element: isAuth ? (<Profile /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'editProfile', element: isAuth ? (<EditProfile/> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'workouts', element: isAuth ? (<User /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'exercises', element: isAuth ? (<Exercises /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'app', element: <Products /> },
         { path: 'statistics', element: isAuth ? (<DashboardApp /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'addWorkout', element: isAuth ? (<AddWorkout /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'addExercise', element: isAuth ? (<AddExercise /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'changePassword', element: isAuth ? (<ChangePassword /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'addExerciseToWork', element: isAuth ? (<AddExerciseToWork /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'logout', element: isAuth ? (<Logout /> ) : (<Navigate to="/gymshare/app" />  )},

@@ -15,6 +15,9 @@ import { useSelector} from 'react-redux';
 import { authActions } from '../store/auth'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch} from 'react-redux';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import {forwardRef} from 'react';
 // ----------------------------------------------------------------------
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -30,6 +33,10 @@ const Search = styled('div')(({ theme }) => ({
     width: 'auto',
   },
 }));
+
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={5} ref={ref} variant="filled" {...props} />;
+});
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -66,15 +73,37 @@ export default function EcommerceShop() {
   console.log(token)
   const navigate = useNavigate()
   let isAuth = useSelector(state => state.auth.isAuthenticated);
+  let autoLogout = useSelector(state => state.auth.logout);
   const [open, setOpen] = useState(null);
   const [term, setTerm] = useState('');
+  const [styleAlert, setStyleAlert] = useState(false);
+  const [addAlert, setAddAlert] = useState(false);
   const [sort, setSort] = useState({ value: 'newest', label: 'Newest' });
+
+  const handleCloseAlert = (event, reason) => {
+    if(styleAlert){
+      navigate('/gymshare/app', { replace: true });
+    }
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddAlert(false);
+  };
 
   const SORT_BY_OPTIONS = [
     { value: 'newest', label: 'Newest' },
     { value: 'rate', label: 'Rate' },
     { value: 'title', label: 'Title' },
   ];
+
+  useEffect(() => {
+    if (autoLogout) {
+      setAddAlert(true);
+      setStyleAlert(false)
+      dispatch(authActions.autoLogout())
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (isAuth && exp<parseInt(Date.now()/1000)) {
@@ -222,6 +251,11 @@ const fetchNextWorkout = () => {
             See more
           </Button>
           </Box>
+          <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'warning'} sx={{ width: '100%' }}>
+{!styleAlert && <Typography>You have been logged out!</Typography>}
+        </Alert>
+      </Snackbar>
       </Container>
     </Page>
     

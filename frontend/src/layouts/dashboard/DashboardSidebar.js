@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useState, useEffect } from "react";
 import * as React from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack, Menu, MenuItem } from '@mui/material';
+import { Box, Link, Drawer, Typography, Avatar } from '@mui/material';
 
 // mock
 import account from '../../_mock/account';
@@ -44,23 +44,55 @@ DashboardSidebar.propTypes = {
   onCloseSidebar: PropTypes.func,
 };
 
+
 export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
 
 const getIcon = (name) => <Iconify icon={name} width={22} height={22} />;
 
 let isAuth = useSelector(state => state.auth.isAuthenticated);
 const username = useSelector(state => state.auth.username);
+const userId = useSelector(state => state.auth.userId);
+let token = useSelector(state => state.auth.token)
+const [photo, setPhoto] = useState(null)
+
+const fetchData = () => {
+
+  fetch("http://localhost:1337/accounts/profiles/" +userId, {
+    headers: {
+      Authorization: "Bearer " +token
+    },
+  })
+
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      console.log(data)
+      if(data.profile_picture){ setPhoto(data.profile_picture) }
+      else {setPhoto(account.photoURL)}
+      console.log(data.profile_picture)
+    })
+}
+
+useEffect(() => {
+  fetchData()
+}, [])
 
 const navConfig = isAuth ? [
   {
     title: 'dashboard',
     path: '/gymshare/app',
-    icon: getIcon('eva:home-fill'),
+    icon: getIcon('eva:globe-2-fill'),
   },
   {
     title: 'workouts',
     path: '/gymshare/workouts',
-    icon: getIcon('eva:shopping-bag-fill'),
+    icon: getIcon('eva:grid-fill'),
+  },
+  {
+    title: 'exercises',
+    path: '/gymshare/exercises',
+    icon: getIcon('eva:grid-outline'),
   },
   {
     title: 'statistics',
@@ -76,12 +108,12 @@ const navConfig = isAuth ? [
   {
     title: 'dashboard',
     path: '/gymshare/app',
-    icon: getIcon('eva:home-fill'),
+    icon: getIcon('eva:globe-2-fill'),
   },
   {
     title: 'login',
     path: '/login',
-    icon: getIcon('eva:lock-fill'),
+    icon: getIcon('eva:person-fill'),
   },
   {
     title: 'register',
@@ -117,7 +149,7 @@ const navConfig = isAuth ? [
         }, }}>
       <Link underline="none" component={RouterLink} to="/gymshare/profile">
           <AccountStyle>
-            <Avatar src={account.photoURL} alt="photoURL" />
+            <Avatar src={photo} alt="photoURL" />
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
                 {username}

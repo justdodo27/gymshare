@@ -13,48 +13,43 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useDispatch } from 'react-redux';
-import { workoutActions } from '../store/workout';
 import { useTheme } from '@mui/material/styles';
-import { authActions } from '../store/auth';
-import { useEffect } from 'react';
 
 const Input = styled(MuiInput)`
   width: 42px;
 `;
 
-export default function AddWorkout() {
+export default function AddExercise() {
   const theme = useTheme();
 
   const navigate= useNavigate();
   const [passwordError, setPasswordError] = useState(false)
   const [value, setValue] = React.useState(1);
-  const [visibility, setVisibility] = React.useState('Public');
+  const [cbr, setCbr] = React.useState(0);
+  const [type, setType] = React.useState('With own body weight');
   let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
   let author = useSelector(state => state.auth.userId);
   const dispatch = useDispatch();
 
-  
-  let exp = useSelector(state => state.auth.exp);
- 
-
-  useEffect(() => {
-    if (exp<parseInt(Date.now()/1000)) {
-      dispatch(authActions.logout())
-      navigate('/', {replace: true});
-    }
-  }, [dispatch, exp, navigate]);
-
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
+    
+  };
+  const handleCbrChange = (event, newValue) => {
+    setCbr(newValue/100);
+    console.log(typeof cbr)
   };
 
   const handleVisibilityChange = (event) => {
-    setVisibility(event.target.value);
+    setType(event.target.value);
   };
 
   const handleInputChange = (event) => {
     setValue(event.target.value === '' ? '' : Number(event.target.value));
+  };
+  const handleInputCbrChange = (event) => {
+    setCbr(event.target.value === '' ? '' : Number(event.target.value));
   };
 
 
@@ -68,6 +63,13 @@ export default function AddWorkout() {
         setValue(1)
     }
   };
+  const handleBlur2 = () => {
+    if (cbr < 1) {
+      setCbr(0.01);
+    } else if (cbr > 5) {
+      setCbr(5);
+    }
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -77,12 +79,42 @@ export default function AddWorkout() {
 
     console.log(title)
     console.log(description)
-    console.log(visibility)
+    console.log(type)
     console.log(value)
-    console.log(author)
+    console.log(cbr)
 
-    dispatch(workoutActions.getWorkoutStats([title, description, visibility, value]))
-    navigate('/gymshare/addExerciseToWork', { replace: true });
+    fetch("http://localhost:1337/workouts/exercises/", {
+      method: 'POST',
+      body: JSON.stringify({
+        title: title,
+        description: description,
+        difficulty: value,
+        calories_burn_rate: cbr,
+        exercise_type: type,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " +token
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            console.log(data)
+            let errorMessage = 'Enter correct data!';
+            throw new Error(errorMessage);
+          });
+        }
+      })
+      .then((data) => {
+        console.log(data)
+        navigate('/gymshare/exercises', {replace: true})
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
   };
 
   return (
@@ -99,7 +131,7 @@ export default function AddWorkout() {
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
           </Avatar>
           <Typography component="h1" variant="h5">
-            Add New Workout
+            Add New Exercise
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} fullWidth>
           <FormControl fullWidth>
@@ -133,23 +165,24 @@ export default function AddWorkout() {
             
           <FormControl>
           <Grid item xs={12}>
-        <InputLabel id="demo-simple-select-autowidth-label">Visibility</InputLabel>
+        <InputLabel id="demo-simple-select-autowidth-label">Type</InputLabel>
         <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
-          value={visibility}
+          value={type}
           onChange={handleVisibilityChange}
           fullWidth
           label="Visibility"
         >
-          <MenuItem value="Public">Public</MenuItem>
-          <MenuItem value="Hidden">Hidden</MenuItem>
+          <MenuItem value="With own body weight">With own body</MenuItem>
+          <MenuItem value="With a weight">With a weight</MenuItem>
+          <MenuItem value="With time">With time</MenuItem>
         </Select>
     </Grid>
     </FormControl>
 
     <Typography id="input-slider" gutterBottom marginTop={2}>
-        Cycles
+        Difficulty
       </Typography>
       <Grid container spacing={2} alignItems="center">
       <Grid item xs>
@@ -177,6 +210,37 @@ export default function AddWorkout() {
           />
         </Grid>
       </Grid>
+      <Typography id="input-slider" gutterBottom marginTop={2}>
+        Calories Burn Rate
+      </Typography>
+      <FormControl fullWidth>
+      <Grid container spacing={2} alignItems="center">
+      <Grid item xs>
+          <Slider
+            value={typeof cbr === 'number' ? (cbr*100) : 1}
+            onChange={handleCbrChange}
+            aria-labelledby="input-slider"
+            min={1}
+            max={500}
+          />
+        </Grid>
+        <Grid item>
+          <Input
+            value={cbr}
+            size="small"
+            onChange={handleInputCbrChange}
+            onBlur={handleBlur2}
+            inputProps={{
+              step: 0.01,
+              min: 1,
+              max: 5,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            }}
+          />
+        </Grid>
+      </Grid>
+      </FormControl>
       </FormControl>
             <Button
               type="submit"

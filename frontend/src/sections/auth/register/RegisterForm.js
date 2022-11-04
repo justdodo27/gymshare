@@ -16,7 +16,9 @@ import { blueGrey, indigo } from '@mui/material/colors';
 import icon from '../../../pictures/icon.jpg'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import {forwardRef} from 'react';
 
 function Copyright(props) {
   return (
@@ -30,6 +32,10 @@ function Copyright(props) {
     </Typography>
   );
 }
+
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={5} ref={ref} variant="filled" {...props} />;
+});
 
 function validateEmail (email) {
   const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -60,10 +66,24 @@ const theme = createTheme({
 export default function SignUp() {
   const [emailError, setEmailError] = useState(false)
   const [passwordError, setPasswordError] = useState(false)
+  const [styleAlert, setStyleAlert] = useState(false);
+  const [addAlert, setAddAlert] = useState(false);
   const navigate = useNavigate();
 
   let emailErrorCheck = false
   let passwordErrorCheck = false
+
+
+  const handleCloseAlert = (event, reason) => {
+    if(styleAlert){
+      navigate('/gymshare/app', { replace: true });
+    }
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddAlert(false);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -113,11 +133,13 @@ export default function SignUp() {
           }
         })
         .then((data) => {
+          setStyleAlert(true);
+          setAddAlert(true);
           console.log(data)
-          navigate('/gymshare/app', { replace: true });
         })
         .catch((err) => {
-          alert(err.message);
+          setAddAlert(true);
+          setStyleAlert(false)
         });
     };
   }
@@ -236,6 +258,13 @@ export default function SignUp() {
         </Box>
         <Copyright sx={{ mt: 5 }} />
       </Container>
+      <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'error'} sx={{ width: '100%' }}>
+          {styleAlert && <Typography>
+Registration was successful. Now you can log in.</Typography>}
+{!styleAlert && <Typography>Username or email is already taken!</Typography>}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
     </Fragment>
   );
