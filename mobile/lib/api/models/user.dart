@@ -30,10 +30,12 @@ class Profile {
   final User user;
   final int? height;
   final double? weight;
+  final int likes;
 
   Profile({
     required this.id,
     required this.user,
+    required this.likes,
     this.height,
     this.weight,
   });
@@ -41,6 +43,7 @@ class Profile {
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
         id: json['id'],
         user: User.fromJson(json['user']),
+        likes: json['likes'],
         height: json['height'],
         weight: json['weight'],
       );

@@ -117,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildTile(
                           text: 'Weight',
                           value: '${_profile.weight ?? '???'}kg'),
-                      _buildTile(text: 'Likes', value: '245 ❤'),
+                      _buildTile(text: 'Likes', value: '${_profile.likes} ❤'),
                     ],
                   ),
                   const Divider(thickness: 1, color: secondaryColor),
