@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/custom_text_form_field.dart';
@@ -40,15 +41,6 @@ class _LoginPageState extends State<LoginPage> {
     return value!.isEmpty ? 'Enter at least 1 character.' : null;
   }
 
-  void _scrollToBottom() async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeIn,
-    );
-  }
-
   void _logIn() async {
     FocusManager.instance.primaryFocus?.unfocus();
     final isValid = _formKey.currentState!.validate();
@@ -56,45 +48,17 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => _buttonDisabled = true);
       _formKey.currentState!.save();
       if (await gatherToken(username, password)) {
-        const snackBar = SnackBar(
-          duration: Duration(milliseconds: 500),
-          content: SizedBox(
-            height: 60,
-            child: Center(
-              child: Text(
-                'Successfuly logged in.',
-                style: TextStyle(
-                  color: primaryTextColor,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ),
-          backgroundColor: secondaryColor,
+        ScaffoldMessenger.of(context).showSnackBar(
+          getInfoSnackBar(text: 'Successfuly logged in.'),
         );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         Navigator.of(context).pushReplacement(
           createBottomToTopPageRouteAnimation(const DashboardPage()),
         );
       } else {
         setState(() => _buttonDisabled = false);
-        const snackBar = SnackBar(
-          duration: Duration(seconds: 1),
-          content: SizedBox(
-            height: 60,
-            child: Center(
-              child: Text(
-                'Login failed with the specified credentials',
-                style: TextStyle(
-                  color: primaryTextColor,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ),
-          backgroundColor: errorColor,
+        ScaffoldMessenger.of(context).showSnackBar(
+          getErrorSnackBar(text: 'Login failed with the specified credentials'),
         );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
   }
@@ -123,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                         labelText: 'Username',
                         validator: _validateInput,
                         onSaved: (value) => setState(() => username = value!),
-                        onTap: _scrollToBottom,
+                        onTap: () => scrollToBottom(_scrollController),
                       ),
                       CustomTextFormField(
                         controller: _passwordController,
@@ -131,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                         labelText: 'Password',
                         validator: _validateInput,
                         onSaved: (value) => setState(() => password = value!),
-                        onTap: _scrollToBottom,
+                        onTap: () => scrollToBottom(_scrollController),
                       ),
                       const SizedBox(height: 30),
                       const Hero(

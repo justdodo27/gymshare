@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/components/widgets/custom_text_form_field.dart';
@@ -42,27 +43,7 @@ class _SignupPageState extends State<SignupPage> {
     super.dispose();
   }
 
-  void _scrollToBottom() async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeIn,
-    );
-  }
-
-  String? validatePassword(String? value) {
-    RegExp validPasswordRegExp =
-        RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$');
-    if (value != null && !validPasswordRegExp.hasMatch(value)) {
-      return 'Password should have:\n'
-          '     - minimum eight characters,\n'
-          '     - at least one uppercase letter,\n'
-          '     - one lowercase letter,\n'
-          '     - one number.';
-    }
-    return null;
-  }
+  
 
   String? validateUsername(String? value) {
     if (value!.isEmpty) {
@@ -101,45 +82,18 @@ class _SignupPageState extends State<SignupPage> {
       setState(() => _buttonDisabled = true);
       _formKey.currentState!.save();
       if (await createUser()) {
-        const snackBar = SnackBar(
-          duration: Duration(milliseconds: 500),
-          content: SizedBox(
-            height: 60,
-            child: Center(
-              child: Text(
-                'Account created successfully!',
-                style: TextStyle(
-                  color: primaryTextColor,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ),
-          backgroundColor: secondaryColor,
+        ScaffoldMessenger.of(context).showSnackBar(
+          getInfoSnackBar(text: 'Account created successfully!'),
         );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-        Navigator.of(context)
-            .pushReplacement(createPageRoute(const LoginPage()));
+        Navigator.of(context).pushReplacement(
+          createPageRoute(const LoginPage()),
+        );
       } else {
         setState(() => _buttonDisabled = false);
-        const snackBar = SnackBar(
-          duration: Duration(seconds: 1),
-          content: SizedBox(
-            height: 60,
-            child: Center(
-              child: Text(
-                'User with provided credentials already exists.',
-                style: TextStyle(
-                  color: primaryTextColor,
-                  fontSize: 17,
-                ),
-              ),
-            ),
-          ),
-          backgroundColor: errorColor,
+        ScaffoldMessenger.of(context).showSnackBar(
+          getErrorSnackBar(
+              text: 'User with provided credentials already exists.'),
         );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
   }
@@ -168,14 +122,14 @@ class _SignupPageState extends State<SignupPage> {
                         keyboardType: TextInputType.emailAddress,
                         validator: validateEmail,
                         onSaved: (value) => setState(() => email = value!),
-                        onTap: _scrollToBottom,
+                        onTap: () => scrollToBottom(_scrollController),
                       ),
                       CustomTextFormField(
                         controller: _usernameController,
                         labelText: 'Username',
                         validator: validateUsername,
                         onSaved: (value) => setState(() => username = value!),
-                        onTap: _scrollToBottom,
+                        onTap: () => scrollToBottom(_scrollController),
                       ),
                       CustomTextFormField(
                         controller: _passwordController,
@@ -184,7 +138,7 @@ class _SignupPageState extends State<SignupPage> {
                         keyboardType: TextInputType.visiblePassword,
                         validator: validatePassword,
                         onSaved: (value) => setState(() => password = value!),
-                        onTap: _scrollToBottom,
+                        onTap: () => scrollToBottom(_scrollController),
                       ),
                       const SizedBox(height: 30),
                       const Hero(

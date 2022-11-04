@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gymshare/settings/colors.dart';
 
 class CustomTextFormField extends StatefulWidget {
@@ -6,21 +7,23 @@ class CustomTextFormField extends StatefulWidget {
   final EdgeInsets padding;
   final bool obsecureText;
   final String? Function(String?) validator;
-  final void Function(String?) onSaved;
+  final void Function(String?)? onSaved;
   final void Function()? onTap;
   final TextInputType keyboardType;
   final TextEditingController? controller;
+  final List<TextInputFormatter> inputFormatters;
 
   const CustomTextFormField({
     Key? key,
     required this.labelText,
     required this.validator,
-    required this.onSaved,
+    this.onSaved,
     this.onTap,
     this.controller,
     this.padding = const EdgeInsets.symmetric(vertical: 10.0),
     this.obsecureText = false,
     this.keyboardType = TextInputType.name,
+    this.inputFormatters = const <TextInputFormatter>[],
   }) : super(key: key);
 
   @override
@@ -48,6 +51,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         obscureText: isTextVisible,
         keyboardType: widget.keyboardType,
         style: const TextStyle(color: primaryTextColor, fontSize: 16),
+        inputFormatters: widget.inputFormatters,
         decoration: InputDecoration(
           suffixIcon: widget.obsecureText
               ? Padding(
