@@ -26,3 +26,24 @@ Future<bool> gatherToken(String username, String password) async {
     return false;
   }
 }
+
+Future<bool> refreshToken({required String refresh}) async {
+  final response = await http.post(
+    Uri.parse(buildUrl('api/token/refresh/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'refresh': refresh,
+    }),
+  );
+
+  final prefs = await SharedPreferences.getInstance();
+  try {
+    await prefs.setString('accessToken', jsonDecode(response.body)['access']);
+  } on Exception {
+    return false;
+  }
+
+  return response.statusCode == 200;
+}

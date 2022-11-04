@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/settings/settings.dart';
 import 'package:http/http.dart' as http;
 import 'package:gymshare/components/utils/helpers.dart';
@@ -38,6 +39,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         'new_password': newPassword,
       }),
     );
+
+    if (response.statusCode == 401) {
+      await refreshToken(refresh: token.refreshToken);
+      return _changePassword(
+          oldPassword: oldPassword, newPassword: newPassword);
+    }
 
     return response.statusCode == 200;
   }
