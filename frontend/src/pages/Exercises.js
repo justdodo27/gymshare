@@ -16,7 +16,7 @@ import {
   Container,
   Typography,
   TableContainer, Slide,
-  TablePagination, Dialog, DialogTitle, DialogContent, Box, Backdrop, CircularProgress, DialogContentText
+  TablePagination, Dialog, DialogTitle, DialogContent, Box, Backdrop, CircularProgress, DialogContentText, DialogActions
 } from '@mui/material';
 // components
 import Page from '../components/Page';
@@ -101,6 +101,7 @@ export default function Exercises() {
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
   let is_staff = useSelector(state => state.auth.is_staff);
+  let token = useSelector(state => state.auth.token);
   console.log(is_staff)
   const navigate = useNavigate()
 
@@ -129,6 +130,7 @@ export default function Exercises() {
   const [exe, setExe] = useState([]);
   const [openVideo, setOpenVideo] = useState(false);
   const [Video, setVideo] = useState('');
+  const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
   const ProductImgStyle = styled('img')({
     top: 0,
     width: '100%',
@@ -204,17 +206,26 @@ export default function Exercises() {
     setSelected([]);
   };
 
-  const handleClickDelete = () => {
-    // fetch('http://localhost:1337/workouts/plans/'+workoutId, {
-    //       method: 'DELETE',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //         Authorization: "Bearer " +token,
-    //       },
-    //     })
-    //     .then(() => {navigate('/', { replace: true });})
-        
+  const handleDeleteAlertClick = () => {
+    setOpenDeleteAlert(true);
   };
+
+  const handleDeleteAlertClose = () => {
+    setOpenDeleteAlert(false);
+  };
+
+const handleClickDelete = (id) => {
+  console.log(id)
+  fetch('http://localhost:1337/workouts/exercises/'+id, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: "Bearer " +token,
+        },
+      })
+      .then(() => {navigate('/', { replace: true });})
+      
+};
 
   const handleCloseVideo = () => {
     setVideo('');
@@ -264,7 +275,7 @@ export default function Exercises() {
           <Typography variant="h4" gutterBottom>
             Workouts
           </Typography>
-          {is_staff && <Button color="warning" variant="contained" component={RouterLink} to="/gymshare/addExercise" startIcon={<Iconify icon="eva:alert-circle-outline" />}>
+          {is_staff && <Button color="warning" variant="contained" component={RouterLink} to="/gymshare/addExercise" startIcon={<Iconify icon="eva:plus-fill" />}>
             New Exercise (admin)
           </Button>}
         </Stack>
@@ -297,7 +308,7 @@ export default function Exercises() {
                         role="checkbox"
                         selected={isItemSelected}
                         aria-checked={isItemSelected}
-                        onClick={() => handleClick([name, description, isVerified, role, company, avatarUrl, video] )}
+                        onClick={() => handleClick([name, description, isVerified, role, company, avatarUrl, video, id] )}
                       >
                         
                         <TableCell padding="checkbox">
@@ -387,10 +398,14 @@ export default function Exercises() {
     </video>}
       </Backdrop>
       </Box>
+      <Stack marginTop='2%' direction="row" alignItems="left" justifyContent="space-between" >
+        <Typography variant="h4">  
           {exe[0]}
-          {is_staff  && <IconButton aria-label="delete" size="large" color={ is_staff && 'warning' ||"secondary"} onClick={() => handleClickDelete()}>
-                          <DeleteIcon  fontSize="inherit" />
-                        </IconButton>}
+          </Typography>
+          {is_staff  && <IconButton aria-label="delete" size="large" color={ is_staff && 'warning' ||"secondary"} onClick={() => handleDeleteAlertClick()} >
+            <DeleteIcon  fontSize="inherit" />
+              </IconButton>}
+        </Stack>
         <Typography variant="body2" color="text.secondary">
             {exe[4]} 
           </Typography>
@@ -419,9 +434,29 @@ export default function Exercises() {
           <DialogContentText margin="1vh" id="alert-dialog-slide-description">
             {exe[1]}
           </DialogContentText>
-
-
         </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={openDeleteAlert}
+        onClose={handleDeleteAlertClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Watch out!
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+          This action will delete "{exe[0]}" forever. Are You sure?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteAlertClose}>Cancel</Button>
+          <Button color="warning" onClick={() => handleClickDelete(exe[7])} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Page>
   );

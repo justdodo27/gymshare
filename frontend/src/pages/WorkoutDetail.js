@@ -117,6 +117,7 @@ export default function WorkoutDetail() {
     const [saved, setSaved] = useState(false);
     const [openVideo, setOpenVideo] = useState(false);
     const [Video, setVideo] = useState('');
+    const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
     
     const handleCloseVideo = () => {
       setVideo('');
@@ -143,6 +144,14 @@ export default function WorkoutDetail() {
         array.push(video)
         setExe(array);
         setOpen(true);
+    };
+
+    const handleDeleteAlertClick = () => {
+      setOpenDeleteAlert(true);
+    };
+  
+    const handleDeleteAlertClose = () => {
+      setOpenDeleteAlert(false);
     };
 
   const handleClickDelete = () => {
@@ -219,7 +228,7 @@ export default function WorkoutDetail() {
     const handleClickSave = () => {
       if(saved)
       {
-        fetch('http://localhost:1337/workouts/favorites/', {
+        fetch('http://localhost:1337/workouts/favorites/delete/', {
           method: 'DELETE',
             body: JSON.stringify({
               workout: workoutId
@@ -366,7 +375,7 @@ export default function WorkoutDetail() {
       {author.id === userId && <IconButton aria-label="edit" size="large" color="secondary" onClick={() => handleClickEdit()}>
         <EditIcon  fontSize="inherit" />
       </IconButton>}
-      {(author.id === userId || is_staff )  && <IconButton aria-label="delete" size="large" color={ is_staff && 'warning' ||"secondary"} onClick={() => handleClickDelete()}>
+      {(author.id === userId || is_staff )  && <IconButton aria-label="delete" size="large" color={ is_staff && 'warning' ||"secondary"} onClick={() => handleDeleteAlertClick()} >
         <DeleteIcon  fontSize="inherit" />
       </IconButton>}
 
@@ -470,7 +479,11 @@ export default function WorkoutDetail() {
     </video>}
       </Backdrop>
       </Box>
+      <Stack marginTop='2%' direction="row" alignItems="left" justifyContent="space-between" >
+        <Typography variant="h4">  
           {exe[0]}
+          </Typography>
+          </Stack>
         <Typography variant="body2" color="text.secondary">
             {exe[4]} 
           </Typography>
@@ -499,9 +512,29 @@ export default function WorkoutDetail() {
           <DialogContentText margin="1vh" id="alert-dialog-slide-description">
             {exe[1]}
           </DialogContentText>
-
-
         </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={openDeleteAlert}
+        onClose={handleDeleteAlertClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Watch out!
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+          This action will delete "{title}" forever. Are You sure?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteAlertClose}>Cancel</Button>
+          <Button color="warning" onClick={() => handleClickDelete()} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
       
       <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
