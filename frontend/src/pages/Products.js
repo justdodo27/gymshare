@@ -18,6 +18,8 @@ import { useDispatch} from 'react-redux';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import {forwardRef} from 'react';
+import SouthIcon from '@mui/icons-material/South';
+import NorthIcon from '@mui/icons-material/North';
 // ----------------------------------------------------------------------
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -78,7 +80,8 @@ export default function EcommerceShop() {
   const [term, setTerm] = useState('');
   const [styleAlert, setStyleAlert] = useState(false);
   const [addAlert, setAddAlert] = useState(false);
-  const [sort, setSort] = useState({ value: 'newest', label: 'Newest' });
+  const [sort, setSort] = useState({ value: 'id', label: 'Newest' });
+  const [arrow, setArrow] = useState(true)
 
   const handleCloseAlert = (event, reason) => {
     if(styleAlert){
@@ -92,10 +95,29 @@ export default function EcommerceShop() {
   };
 
   const SORT_BY_OPTIONS = [
-    { value: 'newest', label: 'Newest' },
-    { value: 'rate', label: 'Rate' },
+    { value: 'id', label: 'Newest' },
+    { value: 'avg_rating', label: 'Rate' },
     { value: 'title', label: 'Title' },
+    { value: 'difficulty', label: 'Difficulty' },
   ];
+
+  const handleSort = (value, label) => {
+    handleClose();
+    setSort({ value: value, label: label });
+    if(sort.value === value){
+      setArrow(!arrow)
+      console.log(arrow)
+    }
+
+  }
+
+  useEffect(() => {
+    try {
+        fetchWorkout(sort.value, term)
+    } catch (error) {
+      
+    }
+  }, [sort,arrow, term])
 
   useEffect(() => {
     if (autoLogout) {
@@ -119,16 +141,11 @@ export default function EcommerceShop() {
 
   const fetchWorkout = (s, term='') => {
     let option = ''
-    if (s === "rate"){
-      option = 'avg_rating'
+    if(!arrow){
+      option = '-'
     }
-    else if (s === 'title'){
-      option = 'title'
-    }
-    else{
-      option = '-id'
-    }
-
+    option = option + s
+    console.log(arrow, sort, option)
     fetch("http://localhost:1337/workouts/plans/?visibility=Public&page=1&ordering="+option+"&search="+term, {
     })
 
@@ -150,7 +167,7 @@ export default function EcommerceShop() {
 
   useEffect(() => {
     try {
-        fetchWorkout('newest')
+        fetchWorkout(sort.value, term)
     } catch (error) {
       
     }
@@ -209,7 +226,7 @@ const fetchNextWorkout = () => {
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
               onInput={(e) => {
-                setTerm(e.target.value);fetchWorkout(sort.value, e.target.value);
+                setTerm(e.target.value);
               }}
             />
           </Search>
@@ -222,6 +239,8 @@ const fetchNextWorkout = () => {
         Sort By:&nbsp;
         <Typography component="span" variant="subtitle2" sx={{ color: 'text.secondary' }}>
           {sort.label}
+        {!arrow && <SouthIcon fontSize="inherit" />}
+        {arrow && <NorthIcon fontSize="inherit" />}
         </Typography>
       </Button>
       <Menu
@@ -236,7 +255,7 @@ const fetchNextWorkout = () => {
           <MenuItem
             key={option.value}
             selected={option.value === sort.value}
-            onClick={() => {handleClose();setSort({ value: option.value, label: option.label });fetchWorkout(option.value)}}
+            onClick={() => {handleSort(option.value, option.label)}}
             sx={{ typography: 'body2' }}
           >
             {option.label}

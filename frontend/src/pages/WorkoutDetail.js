@@ -118,6 +118,7 @@ export default function WorkoutDetail() {
     const [openVideo, setOpenVideo] = useState(false);
     const [Video, setVideo] = useState('');
     const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+    const [rate, setRate] = useState(0);
     
     const handleCloseVideo = () => {
       setVideo('');
@@ -166,6 +167,38 @@ export default function WorkoutDetail() {
         
   };
 
+  const handleClickRate = (newRate) => {
+    setRate(newRate)
+    fetch('http://localhost:1337/workouts/ratings/', {
+      method: 'POST',
+        body: JSON.stringify({
+          workout: workoutId,
+          rate: newRate
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " +token
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = 'Something went wrong!';
+            throw new Error(errorMessage);
+          });
+        }
+      })
+      .then((data) => {
+        console.log(data)
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+        
+  };
+
   const handleClickEdit = () => {
     dispatch(workoutActions.getWorkout(workoutId))
     navigate('/gymshare/editWorkout', { replace: true });
@@ -193,6 +226,7 @@ export default function WorkoutDetail() {
       })
       .then(data => {
         setWorkouts(data);
+        setRate(data.avg_rating)
         setSaved(data.is_favorite);
       })
   }
@@ -223,7 +257,6 @@ export default function WorkoutDetail() {
     }else{
       workoutThumbnail = nophoto
     }
-    console.log()
 
     const handleClickSave = () => {
       if(saved)
@@ -380,7 +413,10 @@ export default function WorkoutDetail() {
       </IconButton>}
 
       </Box>}
-      <Rating name="read-only" value={parseFloat(avg_rating)} precision={0.5} readOnly />
+      {userId && <Rating name="read-only" value={rate} precision={0.5} onChange={(event, newValue) => {
+          handleClickRate(newValue);
+        }}/>}
+      {!userId && <Rating name="read-only" value={rate} precision={0.5} readOnly/>}
         <Typography variant="subtitle1">
             <Typography
               component="span"
