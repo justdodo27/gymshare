@@ -18,8 +18,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import {
   ListSubheader,
   InputAdornment
@@ -36,8 +34,17 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import {forwardRef} from 'react';
+import { authActions } from '../store/auth';
+import { useDispatch} from 'react-redux';
 
 
+
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={5} ref={ref} variant="filled" {...props} />;
+});
 
 
 
@@ -57,20 +64,41 @@ export default function AddExerciseToWork() {
   const [array, setArray] = React.useState([''])
   const [indexes, setIndexes] = React.useState([''])
   const [description, setDescription] = React.useState([''])
-  const [order, setOrder] = React.useState(0)
+  const [order, setOrder] = React.useState(1)
   const [table, setTable] = React.useState([])
   const [data, setData] = React.useState([])
+  const [styleAlert, setStyleAlert] = useState(false);
+  const [addAlert, setAddAlert] = useState(false);
   let workoutTitle = useSelector(state => state.workout.title);
   let workoutDescription = useSelector(state => state.workout.description);
   let workoutVisibility = useSelector(state => state.workout.visibility);
   let workoutCycles = useSelector(state => state.workout.cycles);
   console.log(workoutTitle)
 
+  const dispatch = useDispatch()
+  let exp = useSelector(state => state.auth.exp);
+
+  useEffect(() => {
+    if (exp<parseInt(Date.now()/1000)) {
+      dispatch(authActions.logout())
+      navigate('/', {replace: true});
+    }
+  }, [dispatch, exp, navigate]);
+
   function handleDeleting(index) {
     console.log(table)
     console.log(index)
     setTable(table.filter(item => item.order !== index))
     setData(data.filter(item => item.order !== index))
+  };
+
+  const handleCloseAlert = (event, reason) => {
+    navigate('/gymshare/app', { replace: true });
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddAlert(false);
   };
 
  
@@ -231,12 +259,17 @@ export default function AddExerciseToWork() {
           setSeries(1)
           setRepeats(1)
           setTime(1)
+          setStyleAlert(true);
+          setAddAlert(true);
         })
         .catch((err) => {
-          alert(err.message);
+         
+            if (exp<parseInt(Date.now()/1000)) {
+              dispatch(authActions.logout())
+              navigate('/', {replace: true});
+            }
         });
 
-    navigate('/gymshare/app', { replace: true });
   };
 
   const handleSubmit = (event) => {
@@ -301,19 +334,8 @@ export default function AddExerciseToWork() {
 };
 
   return (
-      <Container component="main" sx={{
-        width: 500,
-      }}>
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
-          </Avatar>
+    <Grid container spacing={2} columns={16}>
+    {table.length===0 && <Grid item xs={7} padding={10} marginLeft={55} marginRight={55} marginTop={7} alignItems="center">
           <Typography component="h1" variant="h5">
             Add Exercise
           </Typography>
@@ -476,8 +498,175 @@ export default function AddExerciseToWork() {
               Done
             </Button>
           </Box>
-        </Box>
-      {table.length>0 && <TableContainer component={Paper}>
+          </Grid>}
+        {table.length>0 && <Grid item xs={7} padding={10} marginLeft={10} marginTop={7}>
+          <Typography component="h1" variant="h5">
+            Add Exercise
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, minWidth: '100%' }}>
+          <div>
+      <FormControl fullWidth>
+        <InputLabel id="search-select-label">Options</InputLabel>
+        <Select
+          // Disables auto focus on MenuItems and allows TextField to be in focus
+          MenuProps={{ autoFocus: false }}
+          sx={{
+            marginBottom:2
+          }}
+          labelId="search-select-label"
+          id="search-select"
+          value={selectedOption}
+          label="Options"
+          onChange={(e) => setSelectedOption(e.target.value)}
+          // This prevents rendering empty string in Select's value
+          // if search text would exclude currently selected option.
+          renderValue={() => selectedOption}
+        >
+          {/* TextField is put into ListSubheader so that it doesn't
+              act as a selectable item in the menu
+              i.e. we can click the TextField without triggering any selection.*/}
+          <ListSubheader>
+            <TextField
+              size="small"
+              // Autofocus on textfield
+              autoFocus
+              placeholder="Type to search..."
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                  </InputAdornment>
+                )
+              }}
+              onChange={(e) => {e.target.value!=='' && setSearchText(e.target.value)}}
+              onKeyDown={(e) => {
+                if (e.key !== "Escape") {
+                  // Prevents autoselecting item while typing (default Select behaviour)
+                  e.stopPropagation();
+                }
+              }}
+            />
+          </ListSubheader>
+          {array.map((option, i) => (
+            <MenuItem key={i} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+    <p>{selectedOption.length>1 && description}</p>
+    <Grid item marginTop={2} alignItems="center">
+    </Grid>
+      <Typography id="input-slider" gutterBottom marginTop={2}>
+        Series
+      </Typography>
+      <Grid container spacing={2} alignItems="center">
+      <Grid item xs>
+          <Slider
+            value={typeof series === 'number' ? series : 0}
+            onChange={handleSliderChange}
+            aria-labelledby="input-slider"
+            min={1}
+            max={20}
+          />
+        </Grid>
+        <Grid item>
+          <Input
+            value={series}
+            size="small"
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            inputProps={{
+              step: 1,
+              min: 1,
+              max: 20,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            }}
+          />
+        </Grid>
+      </Grid>
+      {(type==='With own body weight' || type==='With a weight') && <Typography id="input-slider" gutterBottom marginTop={2}>
+        Repeats
+      </Typography>}
+      {(type==='With own body weight' || type==='With a weight') && <Grid container spacing={2} alignItems="center">
+      <Grid item xs>
+          <Slider
+            value={typeof repeats === 'number' ? repeats : 0}
+            onChange={handleCaloriesSliderChange}
+            aria-labelledby="input-slider"
+            min={1}
+            max={50}
+          />
+        </Grid>
+        <Grid item marginBottom={3}>
+          <Input
+            value={repeats}
+            size="small"
+            onChange={handleCaloriesInputChange}
+            onBlur={handleCaloriesBlur}
+            inputProps={{
+              step: 1,
+              min: 1,
+              max: 50,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            }}
+          />
+        </Grid>
+      </Grid>}
+      {type==='With time' && <Typography id="input-slider" gutterBottom marginTop={2}>
+        Time
+      </Typography>}
+      {type==='With time' && <Grid container spacing={2} alignItems="center">
+      <Grid item xs>
+          <Slider
+            value={typeof time === 'number' ? time : 0}
+            onChange={handleTimeSliderChange}
+            aria-labelledby="input-slider"
+            min={1}
+            max={60}
+          />
+        </Grid>
+        <Grid item marginBottom={3}>
+          <Input
+            value={time}
+            size="small"
+            onChange={handleTimeInputChange}
+            onBlur={handleTimeBlur}
+            inputProps={{
+              step: 1,
+              min: 1,
+              max: 60,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            }}
+          />
+        </Grid>
+      </Grid>}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Add Exercise
+            </Button>
+            <Button
+              onClick={end}
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Done
+            </Button>
+          </Box>
+          </Grid>}
+        
+      {table.length>0 && 
+      <Grid item xs={7} padding={10} marginRight={5} marginTop={10}>
+      <TableContainer component={Paper}>
       <Table sx={{ minWidth: "100%" }} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -516,7 +705,14 @@ export default function AddExerciseToWork() {
           ))}
         </TableBody>
       </Table>
-    </TableContainer>}
-      </Container>
+    </TableContainer> </Grid>}
+    <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'info'} sx={{ width: '100%' }}>
+          {styleAlert && <Typography>
+
+            Successfully added workout.</Typography>}
+        </Alert>
+      </Snackbar>
+      </Grid>
   );
 }

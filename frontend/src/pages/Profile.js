@@ -67,9 +67,12 @@ export default function Profile() {
         setWeight(data.weight)
         setFirstName(data.user.first_name)
         setLastName(data.user.last_name)
-        setPhoto(data.user.profile_picture)
+        setPhoto(data.profile_picture)
+        console.log(data.profile_picture)
       })
   }
+
+  
 
   const fetchWorkout = () => {
 
@@ -85,9 +88,7 @@ export default function Profile() {
       .then(data => {
         const workouts = []
         const fav = []
-        console.log(data.results.length)
         for (let i = 0; i < data.results.length; i++){
-          console.log(data)
           if(data.results[i].author.id == userId){
             workouts.push(data.results[i])
           }

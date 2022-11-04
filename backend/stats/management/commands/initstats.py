@@ -19,7 +19,7 @@ class Command(BaseCommand):
         if StatisticCalories.objects.count() == 0:
             for statistic_calories in STATISTIC_CALORIES:
                 month = dt.datetime.now().replace(day=1)
-                month = month.replace(month=10)
+                month = month.replace(month=11)
                 month_last_date = monthrange(month.year, month.month)[1]
                 for day in range(month_last_date):
                     month = month.replace(day=day+1)
@@ -33,7 +33,7 @@ class Command(BaseCommand):
                     stat_cal = StatisticCalories.objects.create(**stat_cal_kwargs, user=user)
                     stat_cal.save()
                 month = month.replace(day=1)
-                month = month.replace(month=9)
+                month = month.replace(month=10)
                 month_last_date = monthrange(month.year, month.month)[1]
                 for day in range(month_last_date):
                     month = month.replace(day=day+1)
@@ -57,7 +57,7 @@ class Command(BaseCommand):
             )
             
             month = dt.datetime.now().replace(day=1)
-            month = month.replace(month=10)
+            month = month.replace(month=11)
             month_last_date = monthrange(month.year, month.month)[1]
             for day in range(month_last_date):
                 month = month.replace(day=day+1)
@@ -74,7 +74,7 @@ class Command(BaseCommand):
                     stat_ex = StatisticExercise.objects.create(**stat_ex_kwargs, user=user, exercise=exercise)
                     stat_ex.save()
             month = dt.datetime.now().replace(day=1)
-            month = month.replace(month=9)
+            month = month.replace(month=10)
             month_last_date = monthrange(month.year, month.month)[1]
             for day in range(month_last_date):
                 month = month.replace(day=day+1)

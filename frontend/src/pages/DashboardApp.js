@@ -137,7 +137,7 @@ export default function DashboardApp() {
       return<p>Error</p>;
     }
     ;
-  }, [month]);
+  }, [dayCheck, token]);
 
 
   const fetchMoviesHandler = useCallback(async () => {
@@ -250,7 +250,7 @@ export default function DashboardApp() {
       return<p>Error</p>;
     }
     ;
-  }, [month]);
+  }, [month, token, year]);
 
   useEffect(() => {
     fetchMoviesHandler();

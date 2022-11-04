@@ -34,6 +34,11 @@ const navConfig = [
     icon: getIcon('eva:shopping-bag-fill'),
   },
   {
+    title: 'exercises',
+    path: '/gymshare/exercises',
+    icon: getIcon('eva:shopping-bag-fill'),
+  },
+  {
     title: 'statistics',
     path: '/gymshare/statistics',
     icon: getIcon('eva:pie-chart-2-fill'),
