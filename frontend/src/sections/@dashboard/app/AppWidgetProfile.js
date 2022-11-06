@@ -37,8 +37,8 @@ export default function AppWidgetProfile({ name, last, height, weight, photo, co
       <Typography variant="subtitle1">Weight: {weight}kg</Typography>
       <Stack 
       padding={2} margin={2} 
-      marginLeft={25}
-      marginRight={25}
+      marginLeft={20}
+      marginRight={20}
       divider={<Divider orientation="vertical" flexItem />} 
       direction="row" spacing={2} 
       justifyContent="center"
