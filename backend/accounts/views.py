@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import NotAuthenticated
@@ -44,6 +45,12 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def get_user_object(self, queryset=None):
         obj = self.request.user
         return obj
+
+    def retrieve(self, request, pk=None):
+        queryset = models.Profile.objects.all()
+        profile = get_object_or_404(queryset, user__id=pk)
+        serializer = serializers.ProfileSerializer(profile)
+        return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
         user_object = self.get_user_object()

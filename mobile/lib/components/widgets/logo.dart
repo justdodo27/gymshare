@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gymshare/settings/colors.dart';
 
 class GymShareLogo extends StatelessWidget {
   final num size;
@@ -10,17 +12,10 @@ class GymShareLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SvgPicture.asset(
+      'assets/logo.svg',
       height: size.toDouble(),
-      width: size.toDouble(),
-      decoration: BoxDecoration(
-          color: const Color(0xFF7209b7),
-          shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFF2d00f7), width: 2)),
-      child: Icon(
-        Icons.fitness_center,
-        size: size.toDouble() * 0.65,
-      ),
+      color: primaryTextColor,
     );
   }
 }

@@ -7,6 +7,10 @@ class RoundedRectangleButton extends StatelessWidget {
   final EdgeInsets padding;
   final num height;
   final num width;
+  final Color backgroundColor;
+  final Color borderColor;
+  final bool isButtonDisabled;
+  final num borderWidth;
 
   const RoundedRectangleButton({
     Key? key,
@@ -15,6 +19,10 @@ class RoundedRectangleButton extends StatelessWidget {
     this.padding = const EdgeInsets.only(top: 70.0),
     this.height = 60,
     this.width = double.infinity,
+    this.backgroundColor = primaryColor,
+    this.borderColor = tertiaryColor,
+    this.isButtonDisabled = false,
+    this.borderWidth = 2,
   }) : super(key: key);
 
   @override
@@ -22,15 +30,28 @@ class RoundedRectangleButton extends StatelessWidget {
     return Padding(
       padding: padding,
       child: MaterialButton(
-        color: secondaryColor,
+        color: backgroundColor,
         minWidth: width.toDouble(),
         height: height.toDouble(),
-        onPressed: onPress,
+        onPressed: () {
+          if (!isButtonDisabled) {
+            onPress();
+          }
+        },
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: tertiaryColor, width: 2),
+          borderRadius: BorderRadius.circular(50),
+          side: BorderSide(color: borderColor, width: borderWidth.toDouble()),
         ),
-        child: child,
+        child: isButtonDisabled
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  color: primaryTextColor,
+                  strokeWidth: 2,
+                ),
+              )
+            : child,
       ),
     );
   }

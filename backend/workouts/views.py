@@ -37,7 +37,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description', 'author__username']
     filterset_fields = ['visibility', ]
-    ordering_fields = ['title', 'sum_of_cb', 'difficulty', 'avg_time']
+    ordering_fields = ['id', 'title', 'sum_of_cb', 'difficulty', 'avg_time']
     pagination_class = PageNumberPagination
     pagination_class.page_size = 15
 
@@ -117,7 +117,7 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'Favorite workout does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
         self.perform_destroy(instance)
-        return Response({'detail': 'Favorite workout has been deleted.'}, status=status.HTTP_204_NO_CONTENT)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
 class ExerciseInWorkoutViewSet(viewsets.ModelViewSet):

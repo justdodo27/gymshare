@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from . import models
+from workouts.models import FavoriteWorkout
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,6 +43,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    likes = serializers.SerializerMethodField()
+
+    def get_likes(self, profile):
+        return FavoriteWorkout.objects.filter(workout__author=profile.user).count()
 
     class Meta:
         model = models.Profile
