@@ -20,6 +20,7 @@ import ChangePassword from './pages/ChangePassword';
 import AddExerciseToWork from './pages/AddExerciseToWork';
 import Logout from './pages/Logout';
 import WorkoutDetail from './pages/WorkoutDetail';
+import EditWorkout from './pages/EditWorkout';
 
 
 // ----------------------------------------------------------------------
@@ -43,6 +44,7 @@ export default function Router() {
         { path: 'addExercise', element: isAuth ? (<AddExercise /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'changePassword', element: isAuth ? (<ChangePassword /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'addExerciseToWork', element: isAuth ? (<AddExerciseToWork /> ) : (<Navigate to="/gymshare/app" />  )},
+        { path: 'editWorkout', element: isAuth ? (<EditWorkout /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'logout', element: isAuth ? (<Logout /> ) : (<Navigate to="/gymshare/app" />  )},
         { path: 'workoutDetail', element: <WorkoutDetail /> },
       ],
