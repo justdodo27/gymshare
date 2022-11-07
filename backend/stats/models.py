@@ -17,7 +17,7 @@ class StatisticCalories(models.Model):
 
 class StatisticExercise(models.Model):
     date = models.DateTimeField()
-    exercise = models.ForeignKey(Exercise, on_delete=models.PROTECT)
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     repeats = models.IntegerField(null=True, blank=True)
     time = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
