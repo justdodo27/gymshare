@@ -1,10 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/user.dart';
-import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/utils/routes.dart';
-import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/components/widgets/logo.dart';
 import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
@@ -12,8 +9,6 @@ import 'package:gymshare/pages/accounts/change_password.dart';
 import 'package:gymshare/pages/accounts/edit_profile.dart';
 import 'package:gymshare/pages/accounts/login_page.dart';
 import 'package:gymshare/settings/colors.dart';
-import 'package:gymshare/settings/settings.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -27,12 +22,11 @@ class _ProfilePageState extends State<ProfilePage> {
   final backgroundHeight = 180.0;
   final profileSize = 120.0;
   late Future<Profile> _futureProfile;
-  late Profile _profile;
 
   @override
   void initState() {
     super.initState();
-    _futureProfile = _fetchUserData();
+    _futureProfile = fetchUserData();
   }
 
   void deleteTokens() async {
@@ -88,20 +82,21 @@ class _ProfilePageState extends State<ProfilePage> {
           future: _futureProfile,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              final profile = snapshot.data!;
               return Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  (_profile.user.firstName.isNotEmpty ||
-                          _profile.user.lastName.isNotEmpty)
+                  (profile.user.firstName.isNotEmpty ||
+                          profile.user.lastName.isNotEmpty)
                       ? Text(
-                          '${_profile.user.firstName} ${_profile.user.lastName}',
+                          '${profile.user.firstName} ${profile.user.lastName}',
                           style: const TextStyle(
                               color: primaryTextColor,
                               fontSize: 22,
                               fontWeight: FontWeight.bold),
                         )
                       : Text(
-                          _profile.user.username,
+                          profile.user.username,
                           style: const TextStyle(
                               color: primaryTextColor,
                               fontSize: 22,
@@ -114,11 +109,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       _buildTile(
                           text: 'Height',
-                          value: '${_profile.height ?? '???'}cm'),
+                          value: '${profile.height ?? '???'}cm'),
                       _buildTile(
                           text: 'Weight',
-                          value: '${_profile.weight ?? '???'}kg'),
-                      _buildTile(text: 'Likes', value: '${_profile.likes} ❤'),
+                          value: '${profile.weight ?? '???'}kg'),
+                      _buildTile(text: 'Likes', value: '${profile.likes} ❤'),
                     ],
                   ),
                   const Divider(thickness: 1, color: secondaryColor),
@@ -135,14 +130,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               .push(
                                 createLeftToRightRouteAnimation(
                                   EditProfilePage(
-                                    firstName: _profile.user.firstName,
-                                    lastName: _profile.user.lastName,
-                                    weight: _profile.weight,
-                                    height: _profile.height,
+                                    firstName: profile.user.firstName,
+                                    lastName: profile.user.lastName,
+                                    weight: profile.weight,
+                                    height: profile.height,
                                   ),
                                 ),
                               )
-                              .then((value) => _fetchUserData()),
+                              .then((value) => fetchUserData()),
                         ),
                         _buildButton(
                           icon: Icons.password,
@@ -235,42 +230,17 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: SeamlessPattern(
-          child: ScrollConfig(
-            child: ListView(
-              children: [
-                _buildTop(),
-                _buildContent(context, size),
-              ],
-            ),
+        child: ScrollConfig(
+          child: ListView(
+            children: [
+              _buildTop(),
+              _buildContent(context, size),
+            ],
           ),
         ),
       ),
     );
-  }
-
-  Future<Profile> _fetchUserData() async {
-    final token = await getJWT();
-    final userId = token.decodedAccessToken['user_id'];
-
-    final response = await http.get(
-      Uri.parse(buildUrl('accounts/profiles/$userId')),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer ${token.accessToken}',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      setState(() => _profile = Profile.fromJson(jsonDecode(response.body)));
-      return _profile;
-    } else if (response.statusCode == 401) {
-      await refreshToken(refresh: token.refreshToken);
-      return _fetchUserData();
-    } else {
-      throw Exception('User data could not be fetched.');
-    }
   }
 }
