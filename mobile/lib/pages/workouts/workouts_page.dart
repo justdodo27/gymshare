@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gymshare/api/models/workout.dart';
+import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
+import 'package:gymshare/pages/workouts/workout_detail_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:gymshare/settings/settings.dart';
 
@@ -50,7 +52,7 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
   }
 }
 
-class WorkoutTile extends StatelessWidget {
+class WorkoutTile extends StatefulWidget {
   final Workout workout;
 
   const WorkoutTile({
@@ -59,23 +61,45 @@ class WorkoutTile extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<WorkoutTile> createState() => _WorkoutTileState();
+}
+
+class _WorkoutTileState extends State<WorkoutTile> {
+  late bool isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.workout.isFavorite;
+  }
+
+  @override
   Widget build(BuildContext context) {
     const widgetHeight = 220.0;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Container(
-        height: widgetHeight,
-        decoration: const BoxDecoration(
-          color: quaternaryColor,
-          borderRadius: BorderRadius.all(Radius.circular(20)),
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        createPageRoute(
+          WorkoutDetailPage(workout: widget.workout),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            buildImage(),
-            buildFooter(widgetHeight),
-          ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: Container(
+          height: widgetHeight,
+          decoration: const BoxDecoration(
+            color: quaternaryColor,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              buildImage(),
+              buildFooter(
+                widgetHeight,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -92,28 +116,41 @@ class WorkoutTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  workout.title,
+                  widget.workout.title,
                   style: const TextStyle(color: primaryTextColor, fontSize: 16),
                 ),
                 const SizedBox(height: 5),
                 Row(
                   children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: tertiaryColor,
-                      ),
-                      child: const Icon(
-                        Icons.person,
-                        color: primaryColor,
-                        size: 12,
-                      ),
-                    ),
+                    widget.workout.author.profilePictureUrl != null
+                        ? Container(
+                            height: 12,
+                            width: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                    widget.workout.author.profilePictureUrl!),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : Container(
+                            height: 12,
+                            width: 12,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: tertiaryColor,
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: primaryColor,
+                              size: 12,
+                            ),
+                          ),
                     const SizedBox(width: 6),
                     Text(
-                      workout.author.username,
+                      widget.workout.author.username,
                       style: const TextStyle(
                         color: primaryTextColor,
                         fontSize: 14,
@@ -129,7 +166,7 @@ class WorkoutTile extends StatelessWidget {
                         RatingBar.builder(
                           ignoreGestures: true,
                           itemSize: 20,
-                          initialRating: workout.avgRating,
+                          initialRating: widget.workout.avgRating.toDouble(),
                           minRating: 1,
                           direction: Axis.horizontal,
                           allowHalfRating: true,
@@ -142,10 +179,10 @@ class WorkoutTile extends StatelessWidget {
                           onRatingUpdate: (rating) {},
                         ),
                         const SizedBox(width: 5),
-                        const Text(
-                          '(420)',
-                          style:
-                              TextStyle(color: primaryTextColor, fontSize: 12),
+                        Text(
+                          '(${widget.workout.ratingsCount})',
+                          style: const TextStyle(
+                              color: primaryTextColor, fontSize: 12),
                         )
                       ],
                     ),
@@ -158,8 +195,13 @@ class WorkoutTile extends StatelessWidget {
                           splashRadius: 1,
                         ),
                         IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.favorite_outline),
+                          onPressed: () =>
+                              setState(() => isFavorite = !isFavorite),
+                          icon: Icon(
+                            isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_outline,
+                          ),
                           iconSize: 20,
                           splashRadius: 1,
                         )

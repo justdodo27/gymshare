@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/user.dart';
+import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/logo.dart';
@@ -7,9 +8,8 @@ import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/pages/accounts/change_password.dart';
 import 'package:gymshare/pages/accounts/edit_profile.dart';
-import 'package:gymshare/pages/accounts/login_page.dart';
 import 'package:gymshare/settings/colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gymshare/settings/settings.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -26,14 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _futureProfile = fetchUserData();
-  }
-
-  void deleteTokens() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.remove('accessToken');
-    prefs.remove('refreshToken');
-    prefs.remove('isStaff');
+    _futureProfile = fetchUserData(context, mounted);
   }
 
   Widget _buildTop() {
@@ -60,18 +53,41 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       );
 
-  Widget _buildProfileImage() => Container(
-        height: profileSize,
-        width: profileSize,
-        decoration: const BoxDecoration(
-          color: tertiaryColor,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          Icons.person,
-          size: profileSize * 0.7,
-          color: secondaryColor,
-        ),
+  Widget _buildProfileImage() => FutureBuilder<Profile>(
+        future: _futureProfile,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final profile = snapshot.data!;
+            if (profile.profilePictureUrl != null) {
+              return Container(
+                height: profileSize,
+                width: profileSize,
+                decoration: BoxDecoration(
+                  color: tertiaryColor,
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: NetworkImage(
+                        '$serverUrlPrefix${profile.profilePictureUrl!}'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            }
+          }
+          return Container(
+            height: profileSize,
+            width: profileSize,
+            decoration: const BoxDecoration(
+              color: tertiaryColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.person,
+              size: profileSize * 0.7,
+              color: secondaryColor,
+            ),
+          );
+        },
       );
 
   Widget _buildContent(BuildContext context, Size size) {
@@ -137,7 +153,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 ),
                               )
-                              .then((value) => fetchUserData()),
+                              .then((value) => fetchUserData(context, mounted)),
                         ),
                         _buildButton(
                           icon: Icons.password,
@@ -151,11 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         _buildButton(
                           icon: Icons.logout,
                           label: 'Logout',
-                          onPress: () {
-                            deleteTokens();
-                            Navigator.of(context).pushReplacement(
-                                createPageRoute(const LoginPage()));
-                          },
+                          onPress: () => logOut(context),
                         ),
                       ],
                     ),

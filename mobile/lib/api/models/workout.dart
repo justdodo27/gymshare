@@ -3,7 +3,7 @@ import 'package:gymshare/api/models/exercise_in_workout.dart';
 class Author {
   final int id;
   final String username;
-  final String profilePictureUrl;
+  final String? profilePictureUrl;
 
   Author({
     required this.id,
@@ -25,14 +25,15 @@ class Workout {
   final List<ExerciseInWorkout>? exercises;
   final Author author;
   final bool isFavorite;
-  final double avgRating;
-  final double avgTime;
-  final double difficulty;
-  final double sumOfCb;
+  final num avgRating;
+  final num ratingsCount;
+  final num? avgTime;
+  final num difficulty;
+  final num sumOfCb;
   final String title;
   final String? description;
   final String visibility;
-  final int cycles;
+  final num cycles;
   final String? thumbnailUrl;
 
   Workout({
@@ -41,6 +42,7 @@ class Workout {
     required this.author,
     required this.isFavorite,
     required this.avgRating,
+    required this.ratingsCount,
     required this.avgTime,
     required this.difficulty,
     required this.sumOfCb,
@@ -59,6 +61,7 @@ class Workout {
       author: Author.fromJson(json['author']),
       isFavorite: json['is_favorite'],
       avgRating: json['avg_rating'] ?? 0,
+      ratingsCount: json['ratings_count'],
       avgTime: json['avg_time'],
       difficulty: json['difficulty'],
       sumOfCb: json['sum_of_cb'],

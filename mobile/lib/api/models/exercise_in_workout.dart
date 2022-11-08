@@ -3,10 +3,10 @@ import 'package:gymshare/api/models/exercise.dart';
 class ExerciseInWorkout {
   final int id;
   final Exercise exercise;
-  final int order;
-  final int? repeats;
-  final double? time;
-  final int? series;
+  final num order;
+  final num? repeats;
+  final num? time;
+  final num? series;
 
   ExerciseInWorkout({
     required this.id,

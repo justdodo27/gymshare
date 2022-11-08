@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:gymshare/api/models/token.dart';
 import 'package:gymshare/api/models/user.dart';
 import 'package:gymshare/api/models/workout.dart';
@@ -42,16 +43,18 @@ Future<bool> refreshToken({required String refresh}) async {
   );
 
   final prefs = await SharedPreferences.getInstance();
-  try {
-    await prefs.setString('accessToken', jsonDecode(response.body)['access']);
-  } on Exception {
-    return false;
+  final accessToken = jsonDecode(response.body)['access'];
+
+  if (accessToken != null) {
+    await prefs.setString('accessToken', accessToken);
+    return true;
   }
 
-  return response.statusCode == 200;
+  return false;
 }
 
-Future<Profile> fetchUserData() async {
+Future<Profile> fetchUserData(BuildContext context,
+    [bool mounted = true]) async {
   final token = await getJWT();
   final userId = token.decodedAccessToken['user_id'];
 
@@ -66,8 +69,13 @@ Future<Profile> fetchUserData() async {
   if (response.statusCode == 200) {
     return Profile.fromJson(jsonDecode(response.body));
   } else if (response.statusCode == 401) {
-    await refreshToken(refresh: token.refreshToken);
-    return fetchUserData();
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return fetchUserData(context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
   } else {
     throw Exception('User data could not be fetched.');
   }
@@ -86,9 +94,6 @@ Future<List<Workout>> getWorkouts() async {
   if (response.statusCode == 200) {
     final results = jsonDecode(response.body)['results'];
     return List.from(results.map((w) => Workout.fromJson(w)));
-  } else if (response.statusCode == 401) {
-    await refreshToken(refresh: token.refreshToken);
-    return getWorkouts();
   } else {
     throw Exception('Workouts could not be fetched.');
   }

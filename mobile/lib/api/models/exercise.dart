@@ -4,8 +4,8 @@ class Exercise {
   final String? videoUrl;
   final String title;
   final String? description;
-  final int difficulty;
-  final double caloriesBurnRate;
+  final num difficulty;
+  final num caloriesBurnRate;
   final String exerciseType;
 
   Exercise({
