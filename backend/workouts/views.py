@@ -81,10 +81,10 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             calc_rating=Func(Coalesce('rate', Value(0.0), output_field=FloatField()), function="Avg")
         ).order_by('calc_rating')
 
-        qs = qs.annotate(difficulty=Subquery(difficulty_subq.values('calc_difficulty')[:1]))
-        qs = qs.annotate(calc_time=Subquery(time_subq.values('calc_time')[:1]))
-        qs = qs.annotate(calc_calories=Subquery(calories_subq.values('calc_calories')[:1]))
-        qs = qs.annotate(calc_rating=Coalesce(Subquery(rating_subq.values('calc_rating')[:1]), Value(0.0), output_field=FloatField()))
+        qs = qs.annotate(difficulty=Coalesce(Subquery(difficulty_subq.values('calc_difficulty')[:1]), Value(0.0), output_field=FloatField()))
+        qs = qs.annotate(avg_time=Coalesce(Subquery(time_subq.values('calc_time')[:1]), Value(0.0), output_field=FloatField()))
+        qs = qs.annotate(sum_of_cb=Coalesce(Subquery(calories_subq.values('calc_calories')[:1]), Value(0.0), output_field=FloatField()))
+        qs = qs.annotate(avg_rating=Coalesce(Subquery(rating_subq.values('calc_rating')[:1]), Value(0.0), output_field=FloatField()))
 
 
         if self.action == 'list' and (ordering := self.request.query_params.get('ordering')) in \
