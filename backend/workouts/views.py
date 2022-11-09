@@ -91,33 +91,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             ['id', '-id', 'title', '-title', 'difficulty', '-difficulty', 'avg_time', '-avg_time',
             'sum_of_cb', '-sum_of_cb', 'avg_rating', '-avg_rating']:
             
-            match ordering:
-                case 'id': # order by id ASC
-                    qs = qs.order_by('id')
-                case '-id': # order by id DESC
-                    qs = qs.order_by('-id')
-                case 'title': # order by title ASC
-                    qs = qs.order_by('title')
-                case '-title': # order by title DESC
-                    qs = qs.order_by('-title')
-                case 'difficulty': # order by difficulty ASC
-                    qs = qs.order_by('difficulty')
-                case '-difficulty': # order by difficulty DESC
-                    qs = qs.order_by('-difficulty')
-                case 'avg_time': # order by average time ASC
-                    qs = qs.order_by('calc_time')
-                case '-avg_time': # order by average time ASC
-                    qs = qs.order_by('-calc_time')
-                case 'sum_of_cb': # order by sum of cbr ASC
-                    qs = qs.order_by('calc_calories')
-                case '-sum_of_cb': # order by sum of cbr DESC
-                    qs = qs.order_by('-calc_calories')
-                case 'avg_rating': # order by average rating ASC
-                    qs = qs.order_by('calc_rating')
-                case '-avg_rating': # order by average rating ASC
-                    qs = qs.order_by('-calc_rating')
-                case _:
-                    pass
+            qs = qs.order_by(ordering)
             
         return qs
 
