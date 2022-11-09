@@ -3,9 +3,11 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q
+from django.db.models import Q, Avg, Value, FloatField, F, Sum
+from django.db.models.functions import Coalesce
 
 from . import serializers, models
+from .utils import get_user_weight
 
 
 class ExerciseViewSet(viewsets.ModelViewSet):
@@ -34,10 +36,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     """
     queryset = models.Workout.objects.all()
     serializer_class = serializers.WorkoutSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['title', 'description', 'author__username']
     filterset_fields = ['visibility', ]
-    ordering_fields = ['id', 'title', 'sum_of_cb', 'difficulty', 'avg_time']
     pagination_class = PageNumberPagination
     pagination_class.page_size = 15
 
@@ -59,8 +60,54 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         queryset_for_public = Q(visibility=models.Workout.PUBLIC)
 
         if self.request.user.is_anonymous:
-            return self.queryset.filter(queryset_for_public)
-        return self.queryset.filter(queryset_for_public | queryset_for_hidden)
+            qs = self.queryset.filter(queryset_for_public)
+        else:
+            qs = self.queryset.filter(queryset_for_public | queryset_for_hidden)
+
+
+        if self.action == 'list' and (ordering := self.request.query_params.get('ordering')) in \
+            ['id', '-id', 'title', '-title', 'difficulty', '-difficulty', 'avg_time', '-avg_time',
+            'sum_of_cb', '-sum_of_cb', 'avg_rating', '-avg_rating']:
+            
+            match ordering:
+                case 'id': # order by id ASC
+                    pass
+                case '-id': # order by id DESC
+                    qs = qs.order_by('-id')
+                case 'title': # order by title ASC
+                    qs = qs.order_by('title')
+                case '-title': # order by title DESC
+                    qs = qs.order_by('-title')
+                case 'difficulty': # order by difficulty ASC
+                    qs = qs.annotate(difficulty=Avg(Coalesce('excerciseinworkout__exercise__difficulty', Value(0)))).order_by('difficulty')
+                case '-difficulty': # order by difficulty DESC
+                    qs = qs.annotate(difficulty=Avg(Coalesce('excerciseinworkout__exercise__difficulty', Value(0)))).order_by('-difficulty')
+                case 'avg_time': # order by average time ASC
+                    qs = qs.annotate(calc_time=Coalesce('excerciseinworkout__time', F('excerciseinworkout__repeats') * 5, 0, output_field=FloatField()))\
+                        .order_by('calc_time')
+                case '-avg_time': # order by average time ASC
+                    qs = qs.annotate(calc_time=Coalesce('excerciseinworkout__time', F('excerciseinworkout__repeats') * 5, 0, output_field=FloatField()))\
+                        .order_by('-calc_time')
+                case 'sum_of_cb': # order by sum of cbr ASC
+                    qs = qs.annotate(
+                        calc_calories=Coalesce(Coalesce(
+                            F('excerciseinworkout__time') / Value(60.0), F('excerciseinworkout__repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
+                        ) * get_user_weight(self.request.user) * F('excerciseinworkout__exercise__calories_burn_rate'), Value(0.0))
+                    ).order_by('calc_calories')
+                case '-sum_of_cb': # order by sum of cbr DESC
+                    qs = qs.annotate(
+                        calc_calories=Coalesce(Coalesce(
+                            F('excerciseinworkout__time') / Value(60.0), F('excerciseinworkout__repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
+                        ) * get_user_weight(self.request.user) * F('excerciseinworkout__exercise__calories_burn_rate'), Value(0.0))
+                    ).order_by('-calc_calories')
+                case 'avg_rating': # order by average rating ASC
+                    qs = qs.annotate(calc_rating=Avg(Coalesce('rating__rate', Value(0)))).order_by('calc_rating')
+                case '-avg_rating': # order by average rating ASC
+                    qs = qs.annotate(calc_rating=Avg(Coalesce('rating__rate', Value(0)))).order_by('-calc_rating')
+                case _:
+                    pass
+            
+        return qs
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
