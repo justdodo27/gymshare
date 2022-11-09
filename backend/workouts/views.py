@@ -236,3 +236,19 @@ class RatingViewSet(viewsets.ModelViewSet):
 
         self.perform_destroy(instance)
         return Response({'detail': 'Rating has been deleted.'}, status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['put', 'patch'], url_path='update')
+    def update_rating_by_workout(self, request):
+        user_id = self.request.user.id
+        serializer = serializers.RatingCreateSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.update(
+                instance=models.Rating.objects.get(
+                    user__id=user_id,
+                    workout__id=serializer.validated_data['workout'].id
+                ),
+                validated_data=serializer.validated_data)
+            return Response(serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
