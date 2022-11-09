@@ -3,7 +3,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, Avg, Value, FloatField, F, Sum
+from django.db.models import Q, Avg, Value, FloatField, F, Sum, OuterRef, Subquery, Func
 from django.db.models.functions import Coalesce
 
 from . import serializers, models
@@ -64,14 +64,27 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         else:
             qs = self.queryset.filter(queryset_for_public | queryset_for_hidden)
 
-        qs = qs.annotate(difficulty=Avg(Coalesce('excerciseinworkout__exercise__difficulty', Value(0))))\
-            .annotate(calc_time=Coalesce('excerciseinworkout__time', F('excerciseinworkout__repeats') * 5, 0, output_field=FloatField()))\
-            .annotate(
-                calc_calories=Coalesce(Coalesce(
-                    F('excerciseinworkout__time') / Value(60.0), F('excerciseinworkout__repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
-                ) * get_user_weight(self.request.user) * F('excerciseinworkout__exercise__calories_burn_rate'), Value(0.0))
-            )\
-            .annotate(calc_rating=Avg(Coalesce('rating__rate', Value(0))))
+        difficulty_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_difficulty=Avg(Coalesce('exercise__difficulty', Value(0)))
+        )
+        time_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_time=Func(Coalesce('time', F('repeats') * Value(5.0), Value(0.0), output_field=FloatField()), function="Sum")
+        ).order_by('calc_time')
+        calories_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_calories=Func(Coalesce(
+                Coalesce(
+                    F('time') / Value(60.0), F('repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
+                ) * get_user_weight(self.request.user) * F('exercise__calories_burn_rate'), Value(0.0)
+            ), function="Sum")
+        ).order_by('calc_calories')
+        rating_subq = models.Rating.objects.filter(workout=OuterRef('id')).annotate(
+            calc_rating=Avg(Coalesce('rate', Value(0)))
+        )
+
+        qs = qs.annotate(difficulty=Subquery(difficulty_subq.values('calc_difficulty')[:1]))
+        qs = qs.annotate(calc_time=Subquery(time_subq.values('calc_time')[:1]))
+        qs = qs.annotate(calc_calories=Subquery(calories_subq.values('calc_calories')[:1]))
+        qs = qs.annotate(calc_rating=Subquery(rating_subq.values('calc_rating')[:1]))
 
 
         if self.action == 'list' and (ordering := self.request.query_params.get('ordering')) in \
