@@ -161,13 +161,13 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
             workout=workout, user=context_user).exists()
 
     def get_avg_rating(self, workout): # todo give this to singals
-        return workout.calc_rating
+        return round(workout.calc_rating, 2)
 
     def get_avg_time(self, workout):
-        return workout.calc_time
+        return round(workout.calc_time, 2)
 
     def get_difficulty(self, workout):
-        return workout.difficulty
+        return round(workout.difficulty, 2)
 
     def get_sum_of_cb(self, workout):
         return round(workout.calc_calories, 2)

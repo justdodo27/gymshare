@@ -65,8 +65,8 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             qs = self.queryset.filter(queryset_for_public | queryset_for_hidden)
 
         difficulty_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
-            calc_difficulty=Avg(Coalesce('exercise__difficulty', Value(0)))
-        )
+            calc_difficulty=Func(Coalesce('exercise__difficulty', Value(0.0), output_field=FloatField()), function="Avg")
+        ).order_by('calc_difficulty')
         time_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
             calc_time=Func(Coalesce('time', F('repeats') * Value(5.0), Value(0.0), output_field=FloatField()), function="Sum")
         ).order_by('calc_time')
@@ -78,8 +78,8 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             ), function="Sum")
         ).order_by('calc_calories')
         rating_subq = models.Rating.objects.filter(workout=OuterRef('id')).annotate(
-            calc_rating=Avg(Coalesce('rate', Value(0)))
-        )
+            calc_rating=Func(Coalesce('rate', Value(0.0), output_field=FloatField()), function="Avg")
+        ).order_by('calc_rating')
 
         qs = qs.annotate(difficulty=Subquery(difficulty_subq.values('calc_difficulty')[:1]))
         qs = qs.annotate(calc_time=Subquery(time_subq.values('calc_time')[:1]))
