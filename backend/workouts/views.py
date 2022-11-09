@@ -64,7 +64,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         else:
             qs = self.queryset.filter(queryset_for_public | queryset_for_hidden)
 
-        difficulty_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(calc_difficulty=Avg(Coalesce('exercise__difficulty', Value(0))))
+        difficulty_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_difficulty=Avg(Coalesce('exercise__difficulty', Value(0)))
+        )
         time_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
             calc_time=Func(Coalesce('time', F('repeats') * Value(5.0), Value(0.0), output_field=FloatField()), function="Sum")
         ).order_by('calc_time')
