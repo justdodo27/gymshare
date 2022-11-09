@@ -15,6 +15,7 @@ import { useSelector} from 'react-redux';
 import { authActions } from '../store/auth'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch} from 'react-redux';
+import { sortActions } from '../store/sort';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import {forwardRef} from 'react';
@@ -72,16 +73,18 @@ export default function EcommerceShop() {
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
   let token = useSelector(state => state.auth.token);
-  console.log(token)
   const navigate = useNavigate()
   let isAuth = useSelector(state => state.auth.isAuthenticated);
   let autoLogout = useSelector(state => state.auth.logout);
+  let termState = useSelector(state => state.sort.term)
+  let arrowState = useSelector(state => state.sort.arrow)
+  let sortState = useSelector(state => state.sort.sort)
   const [open, setOpen] = useState(null);
-  const [term, setTerm] = useState('');
+  const [term, setTerm] = useState(termState);
   const [styleAlert, setStyleAlert] = useState(false);
   const [addAlert, setAddAlert] = useState(false);
-  const [sort, setSort] = useState({ value: 'id', label: 'Newest' });
-  const [arrow, setArrow] = useState(false)
+  const [sort, setSort] = useState(sortState);
+  const [arrow, setArrow] = useState(arrowState)
 
   const handleCloseAlert = (event, reason) => {
     if(styleAlert){
@@ -95,10 +98,12 @@ export default function EcommerceShop() {
   };
 
   const SORT_BY_OPTIONS = [
-    { value: 'id', label: 'Newest' },
-    { value: 'avg_rating', label: 'Rate' },
+    { value: 'id', label: 'Order' },
     { value: 'title', label: 'Title' },
+    { value: 'avg_rating', label: 'Rate' },
     { value: 'difficulty', label: 'Difficulty' },
+    { value: 'avg_time', label: 'Workout Time' },
+    { value: 'sum_of_cb', label: 'Calories Burned' },
   ];
 
   const handleSort = (value, label) => {
@@ -159,6 +164,7 @@ export default function EcommerceShop() {
   useEffect(() => {
     try {
         fetchWorkout(sort.value, term)
+        dispatch(sortActions.getSortStats([term, arrow, sort]))
     } catch (error) {
       
     }
@@ -214,6 +220,7 @@ const fetchNextWorkout = () => {
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search…"
+              value={term}
               inputProps={{ 'aria-label': 'search' }}
               onInput={(e) => {
                 setTerm(e.target.value);

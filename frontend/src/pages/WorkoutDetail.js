@@ -1,5 +1,4 @@
 import { useState, useEffect, forwardRef } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 // material
 import {
   Container, Button, Box, Stack, Typography, Card, CardContent, CardMedia, CardHeader, CardActionArea,
@@ -110,6 +109,7 @@ export default function WorkoutDetail() {
   });
 
   const workoutId = useSelector(state => state.workout.workoutId);
+  dispatch(workoutActions.getWorkout(''))
   let is_staff = useSelector(state => state.auth.is_staff);
   const [workout, setWorkouts] = useState([]);
   const [open, setOpen] = useState(false);
