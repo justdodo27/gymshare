@@ -143,10 +143,10 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
     exercises = serializers.SerializerMethodField()
     author = SimpleAuthorSerializer()
     is_favorite = serializers.SerializerMethodField()
-    avg_rating = serializers.SerializerMethodField()
     avg_time = serializers.SerializerMethodField()
     difficulty = serializers.SerializerMethodField()
     sum_of_cb = serializers.SerializerMethodField()
+    avg_rating = serializers.SerializerMethodField()
 
     def get_exercises(self, workout):
         qs = models.ExcerciseInWorkout.objects.filter(workout=workout)
@@ -160,43 +160,17 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
         return models.FavoriteWorkout.objects.filter(
             workout=workout, user=context_user).exists()
 
-    def get_avg_rating(self, workout):
-        return models.Rating.objects.filter(
-            workout=workout
-        ).aggregate(Avg('rate')).get('rate__avg', 0)
+    def get_avg_rating(self, workout): # todo give this to singals
+        return workout.calc_rating
 
     def get_avg_time(self, workout):
-        exercises = models.ExcerciseInWorkout.objects.filter(
-            workout=workout
-        ).annotate(
-            calc_time=Coalesce('time', F('repeats') * 5, 0, output_field=FloatField())
-        )
-
-        if avg_time := exercises.aggregate(Sum('calc_time')).get('calc_time__sum', 0):
-            return round(avg_time, 2)
-        return 0
+        return workout.calc_time
 
     def get_difficulty(self, workout):
-        if difficulty := models.ExcerciseInWorkout.objects.filter(
-            workout=workout
-        ).aggregate(Avg('exercise__difficulty')).get('exercise__difficulty__avg', 1):
-            return round(difficulty, 2)
-        return 0
+        return workout.difficulty
 
     def get_sum_of_cb(self, workout):
-        context_user = self.context.get('user')
-        exercises = models.ExcerciseInWorkout.objects.filter(
-            workout=workout
-        ).annotate(
-            calc_calories=Coalesce(
-                F('time') / 60, F('repeats') * 5.0 / 60, 0, output_field=FloatField()
-            ) * get_user_weight(context_user) * F('exercise__calories_burn_rate')
-        )
-
-        if sum_of_cb := exercises.aggregate(
-                Sum('calc_calories')).get('calc_calories__sum', 0):
-            return round(sum_of_cb, 2)
-        return 0
+        return round(workout.calc_calories, 2)
 
     class Meta:
         model = models.Workout
