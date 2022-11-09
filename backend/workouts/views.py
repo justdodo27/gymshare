@@ -84,7 +84,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         qs = qs.annotate(difficulty=Subquery(difficulty_subq.values('calc_difficulty')[:1]))
         qs = qs.annotate(calc_time=Subquery(time_subq.values('calc_time')[:1]))
         qs = qs.annotate(calc_calories=Subquery(calories_subq.values('calc_calories')[:1]))
-        qs = qs.annotate(calc_rating=Subquery(rating_subq.values('calc_rating')[:1]))
+        qs = qs.annotate(calc_rating=Coalesce(Subquery(rating_subq.values('calc_rating')[:1]), Value(0.0), output_field=FloatField()))
 
 
         if self.action == 'list' and (ordering := self.request.query_params.get('ordering')) in \
