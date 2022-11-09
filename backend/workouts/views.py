@@ -64,6 +64,15 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         else:
             qs = self.queryset.filter(queryset_for_public | queryset_for_hidden)
 
+        qs = qs.annotate(difficulty=Avg(Coalesce('excerciseinworkout__exercise__difficulty', Value(0))))\
+            .annotate(calc_time=Coalesce('excerciseinworkout__time', F('excerciseinworkout__repeats') * 5, 0, output_field=FloatField()))\
+            .annotate(
+                calc_calories=Coalesce(Coalesce(
+                    F('excerciseinworkout__time') / Value(60.0), F('excerciseinworkout__repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
+                ) * get_user_weight(self.request.user) * F('excerciseinworkout__exercise__calories_burn_rate'), Value(0.0))
+            )\
+            .annotate(calc_rating=Avg(Coalesce('rating__rate', Value(0))))
+
 
         if self.action == 'list' and (ordering := self.request.query_params.get('ordering')) in \
             ['id', '-id', 'title', '-title', 'difficulty', '-difficulty', 'avg_time', '-avg_time',
@@ -71,7 +80,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             
             match ordering:
                 case 'id': # order by id ASC
-                    pass
+                    qs = qs.order_by('id')
                 case '-id': # order by id DESC
                     qs = qs.order_by('-id')
                 case 'title': # order by title ASC
@@ -79,31 +88,21 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 case '-title': # order by title DESC
                     qs = qs.order_by('-title')
                 case 'difficulty': # order by difficulty ASC
-                    qs = qs.annotate(difficulty=Avg(Coalesce('excerciseinworkout__exercise__difficulty', Value(0)))).order_by('difficulty')
+                    qs = qs.order_by('difficulty')
                 case '-difficulty': # order by difficulty DESC
-                    qs = qs.annotate(difficulty=Avg(Coalesce('excerciseinworkout__exercise__difficulty', Value(0)))).order_by('-difficulty')
+                    qs = qs.order_by('-difficulty')
                 case 'avg_time': # order by average time ASC
-                    qs = qs.annotate(calc_time=Coalesce('excerciseinworkout__time', F('excerciseinworkout__repeats') * 5, 0, output_field=FloatField()))\
-                        .order_by('calc_time')
+                    qs = qs.order_by('calc_time')
                 case '-avg_time': # order by average time ASC
-                    qs = qs.annotate(calc_time=Coalesce('excerciseinworkout__time', F('excerciseinworkout__repeats') * 5, 0, output_field=FloatField()))\
-                        .order_by('-calc_time')
+                    qs = qs.order_by('-calc_time')
                 case 'sum_of_cb': # order by sum of cbr ASC
-                    qs = qs.annotate(
-                        calc_calories=Coalesce(Coalesce(
-                            F('excerciseinworkout__time') / Value(60.0), F('excerciseinworkout__repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
-                        ) * get_user_weight(self.request.user) * F('excerciseinworkout__exercise__calories_burn_rate'), Value(0.0))
-                    ).order_by('calc_calories')
+                    qs = qs.order_by('calc_calories')
                 case '-sum_of_cb': # order by sum of cbr DESC
-                    qs = qs.annotate(
-                        calc_calories=Coalesce(Coalesce(
-                            F('excerciseinworkout__time') / Value(60.0), F('excerciseinworkout__repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
-                        ) * get_user_weight(self.request.user) * F('excerciseinworkout__exercise__calories_burn_rate'), Value(0.0))
-                    ).order_by('-calc_calories')
+                    qs = qs.order_by('-calc_calories')
                 case 'avg_rating': # order by average rating ASC
-                    qs = qs.annotate(calc_rating=Avg(Coalesce('rating__rate', Value(0)))).order_by('calc_rating')
+                    qs = qs.order_by('calc_rating')
                 case '-avg_rating': # order by average rating ASC
-                    qs = qs.annotate(calc_rating=Avg(Coalesce('rating__rate', Value(0)))).order_by('-calc_rating')
+                    qs = qs.order_by('-calc_rating')
                 case _:
                     pass
             
