@@ -27,7 +27,7 @@ export default function AppWidgetProfile({ name, last, height, weight, photo, co
     >
       <Grid container spacing={1} >
         <Grid item xs={2} sm={2} md={2}>
-      <Avatar  sx={{ margin: 4, width: '100%', height: 'auto' }} src={src} alt="photoURL" />
+      <Avatar  sx={{ margin: 1, width: '110%', height: '90%' }} src={src} alt="photoURL" />
         </Grid>
         <Grid item xs={10} sm={10} md={10}>
         <Typography padding={2} margin={2} variant="h3" sx={{ opacity: 0.72 }}>

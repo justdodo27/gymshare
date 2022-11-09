@@ -81,7 +81,7 @@ export default function EcommerceShop() {
   const [styleAlert, setStyleAlert] = useState(false);
   const [addAlert, setAddAlert] = useState(false);
   const [sort, setSort] = useState({ value: 'id', label: 'Newest' });
-  const [arrow, setArrow] = useState(true)
+  const [arrow, setArrow] = useState(false)
 
   const handleCloseAlert = (event, reason) => {
     if(styleAlert){
@@ -106,18 +106,9 @@ export default function EcommerceShop() {
     setSort({ value: value, label: label });
     if(sort.value === value){
       setArrow(!arrow)
-      console.log(arrow)
     }
 
   }
-
-  useEffect(() => {
-    try {
-        fetchWorkout(sort.value, term)
-    } catch (error) {
-      
-    }
-  }, [sort,arrow, term])
 
   useEffect(() => {
     if (autoLogout) {
@@ -171,8 +162,7 @@ export default function EcommerceShop() {
     } catch (error) {
       
     }
-  }, [])
-
+  }, [sort,arrow, term])
 
 const fetchNextWorkout = () => {
   if(next){
