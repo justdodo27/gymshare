@@ -68,7 +68,7 @@ const fetchData = () => {
     })
     .then(data => {
       console.log(data)
-      if(data.profile_picture){ setPhoto(data.profile_picture) }
+      if(data.profile_picture){ setPhoto('http://localhost:1337/'+data.profile_picture) }
       else {setPhoto(account.photoURL)}
       console.log(data.profile_picture)
     })
