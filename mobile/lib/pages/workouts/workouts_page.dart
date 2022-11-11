@@ -6,7 +6,6 @@ import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/pages/workouts/workout_detail_page.dart';
 import 'package:gymshare/settings/colors.dart';
-import 'package:gymshare/settings/settings.dart';
 
 class WorkoutsPage extends StatefulWidget {
   const WorkoutsPage({
@@ -23,7 +22,7 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
   @override
   void initState() {
     super.initState();
-    _futureWorkouts = getWorkouts();
+    _futureWorkouts = getWorkouts(context, mounted);
   }
 
   @override
@@ -94,10 +93,8 @@ class _WorkoutTileState extends State<WorkoutTile> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              buildImage(),
-              buildFooter(
-                widgetHeight,
-              ),
+              buildImage(widgetHeight),
+              buildFooter(widgetHeight),
             ],
           ),
         ),
@@ -215,16 +212,26 @@ class _WorkoutTileState extends State<WorkoutTile> {
         ),
       );
 
-  Widget buildImage() => Expanded(
+  Widget buildImage(double widgetHeight) => Expanded(
         child: Container(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            image: DecorationImage(
-              image: NetworkImage(
-                  '$serverUrlPrefix/media/thumbnails/admin_workout_0cl7vGl.png'),
-              fit: BoxFit.cover,
-            ),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            color: secondaryColor,
+            image: widget.workout.thumbnailUrl != null
+                ? DecorationImage(
+                    image: NetworkImage('${widget.workout.thumbnailUrl}'),
+                    fit: BoxFit.cover,
+                  )
+                : null,
           ),
+          child: widget.workout.thumbnailUrl == null
+              ? Center(
+                  child: Icon(
+                    Icons.hide_image,
+                    size: widgetHeight * 0.3,
+                  ),
+                )
+              : null,
         ),
       );
 }

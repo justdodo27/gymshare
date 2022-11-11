@@ -1,12 +1,9 @@
 from django.contrib.auth.models import User
-from django.db.models import Avg, FloatField, F, Sum
-from django.db.models.functions import Coalesce
 from rest_framework import serializers
 from accounts.models import Profile
 from accounts.serializers import ProfileSerializer
 
 from . import models
-from .utils import get_user_weight
 
 
 class ExerciseSerializer(serializers.ModelSerializer):
@@ -171,7 +168,7 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
         return models.FavoriteWorkout.objects.filter(
             workout=workout, user=context_user).exists()
 
-    def get_avg_rating(self, workout): # todo give this to singals
+    def get_avg_rating(self, workout):  # todo give this to singals
         return round(workout.avg_rating, 2)
 
     def get_ratings_count(self, workout):
