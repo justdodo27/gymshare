@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/settings/colors.dart';
 
 class StatisticsPage extends StatelessWidget {
@@ -8,14 +7,12 @@ class StatisticsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
-          child: SeamlessPattern(
-        child: Center(
-          child: Text(
-            'Statistics',
-            style: TextStyle(fontSize: 40, color: primaryTextColor),
-          ),
+          child: Center(
+        child: Text(
+          'Statistics',
+          style: TextStyle(fontSize: 40, color: primaryTextColor),
         ),
       )),
     );

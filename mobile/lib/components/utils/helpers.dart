@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/token.dart';
+import 'package:gymshare/components/utils/routes.dart';
+import 'package:gymshare/pages/accounts/login_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -67,3 +69,15 @@ SnackBar getInfoSnackBar({String text = 'Info'}) => SnackBar(
       ),
       backgroundColor: secondaryColor,
     );
+
+void deleteTokens() async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.remove('accessToken');
+  prefs.remove('refreshToken');
+  prefs.remove('isStaff');
+}
+
+void logOut(BuildContext context) {
+  deleteTokens();
+  Navigator.of(context).pushReplacement(createPageRoute(const LoginPage()));
+}

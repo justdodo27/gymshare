@@ -92,35 +92,33 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: SeamlessPattern(
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Search'),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  showSearch(context: context, delegate: MySearchDelegate());
-                },
-                icon: const Icon(Icons.search),
-              ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Search'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                showSearch(context: context, delegate: MySearchDelegate());
+              },
+              icon: const Icon(Icons.search),
+            ),
+          ],
+          backgroundColor: secondaryColor,
+          bottom: const TabBar(
+            indicatorColor: tertiaryColor,
+            tabs: [
+              Tab(text: 'Workouts'),
+              Tab(text: 'Exercises'),
             ],
-            backgroundColor: secondaryColor,
-            bottom: const TabBar(
-              indicatorColor: tertiaryColor,
-              tabs: [
-                Tab(text: 'Workouts'),
-                Tab(text: 'Exercises'),
-              ],
-            ),
           ),
-          backgroundColor: Colors.transparent,
-          body: const SafeArea(
-            child: TabBarView(
-              children: [
-                WorkoutsPage(),
-                ExercisesPage(),
-              ],
-            ),
+        ),
+        backgroundColor: Colors.transparent,
+        body: const SafeArea(
+          child: TabBarView(
+            children: [
+              WorkoutsPage(),
+              ExercisesPage(),
+            ],
           ),
         ),
       ),

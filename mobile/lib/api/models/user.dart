@@ -31,6 +31,7 @@ class Profile {
   final int? height;
   final double? weight;
   final int likes;
+  final String? profilePictureUrl;
 
   Profile({
     required this.id,
@@ -38,6 +39,7 @@ class Profile {
     required this.likes,
     this.height,
     this.weight,
+    this.profilePictureUrl,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
@@ -46,5 +48,6 @@ class Profile {
         likes: json['likes'],
         height: json['height'],
         weight: json['weight'],
+        profilePictureUrl: json['profile_picture'],
       );
 }
