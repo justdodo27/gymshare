@@ -2,6 +2,7 @@ from rest_framework import viewsets, permissions, filters, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Avg, Value, FloatField, F, Sum, OuterRef, Subquery, Func
 from django.db.models.functions import Coalesce
@@ -16,6 +17,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     """
     queryset = models.Exercise.objects.all()
     serializer_class = serializers.ExerciseSerializer
+    parser_classes = (MultiPartParser, FormParser)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', ]
     filterset_fields = ['exercise_type', ]
@@ -30,12 +32,19 @@ class ExerciseViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            return serializers.ExerciseCreateSerializer
+        return serializers.ExerciseSerializer
+
+
 class WorkoutViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows exercises to be viewed or edited.
     """
     queryset = models.Workout.objects.all()
     serializer_class = serializers.WorkoutSerializer
+    parser_classes = (MultiPartParser, FormParser)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['title', 'description', 'author__username']
     filterset_fields = ['visibility', ]

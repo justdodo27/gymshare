@@ -6,6 +6,13 @@ from drf_extra_fields.fields import Base64ImageField
 
 from . import models
 
+class ExerciseCreateSerializer(serializers.ModelSerializer):
+    thumbnail = serializers.ImageField()
+    video = serializers.FileField()
+
+    class Meta:
+        model = models.Exercise
+        fields = '__all__'
 
 class ExerciseSerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField()
@@ -47,7 +54,7 @@ class ExerciseInWorkoutSerializer(serializers.ModelSerializer):
 
 
 class WorkoutCreateSerializer(serializers.ModelSerializer):
-    thumbnail = Base64ImageField()
+    thumbnail = serializers.ImageField(required=False)
     def create(self, validated_data):
         context_user = self.context.get('user')
         return models.Workout.objects.create(author=context_user, **validated_data)
