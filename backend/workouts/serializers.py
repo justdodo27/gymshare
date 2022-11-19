@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from accounts.models import Profile
 from accounts.serializers import ProfileSerializer
+from drf_extra_fields.fields import Base64ImageField
 
 from . import models
 
@@ -46,6 +47,7 @@ class ExerciseInWorkoutSerializer(serializers.ModelSerializer):
 
 
 class WorkoutCreateSerializer(serializers.ModelSerializer):
+    thumbnail = Base64ImageField()
     def create(self, validated_data):
         context_user = self.context.get('user')
         return models.Workout.objects.create(author=context_user, **validated_data)
