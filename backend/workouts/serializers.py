@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from accounts.models import Profile
 from accounts.serializers import ProfileSerializer
-from drf_extra_fields.fields import Base64ImageField
 
 from . import models
 
