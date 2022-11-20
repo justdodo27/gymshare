@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymshare/api/models/api_response.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gymshare/api/models/workout.dart';
@@ -17,34 +18,56 @@ class WorkoutsPage extends StatefulWidget {
 }
 
 class _WorkoutsPageState extends State<WorkoutsPage> {
-  late Future<List<Workout>> _futureWorkouts;
+  final _controller = ScrollController();
+  ApiResponse _apiResponse = ApiResponse(count: 0, results: []);
+  List<Workout> workouts = [];
+
+  void fetchWorkouts({bool next = false}) async {
+    if (next && _apiResponse.next != null || !next) {
+      _apiResponse =
+          await getWorkouts(context, mounted, next ? _apiResponse.next : null);
+      setState(() => workouts.addAll(List<Workout>.from(
+          _apiResponse.results.map((w) => Workout.fromJson(w)))));
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _futureWorkouts = getWorkouts(context, mounted);
+    fetchWorkouts();
+    _controller.addListener(() {
+      if (_controller.position.maxScrollExtent == _controller.offset) {
+        fetchWorkouts(next: true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return ScrollConfig(
-      child: FutureBuilder<List<Workout>>(
-        future: _futureWorkouts,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final workouts = snapshot.data!;
-            return ListView.builder(
-              padding: const EdgeInsets.only(
-                  top: 20, bottom: 10, left: 20, right: 20),
-              itemCount: workouts.length,
-              itemBuilder: (context, index) {
-                return WorkoutTile(workout: workouts[index]);
-              },
-            );
+      child: ListView.builder(
+        controller: _controller,
+        padding:
+            const EdgeInsets.only(top: 20, bottom: 10, left: 20, right: 20),
+        itemCount: workouts.length + 1,
+        itemBuilder: (context, index) {
+          if (index < workouts.length) {
+            return WorkoutTile(workout: workouts[index]);
+          } else {
+            return index == _apiResponse.count
+                ? Container()
+                : const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                        child: CircularProgressIndicator(color: tertiaryColor)),
+                  );
           }
-          return const Center(
-            child: CircularProgressIndicator(color: tertiaryColor),
-          );
         },
       ),
     );
@@ -192,8 +215,25 @@ class _WorkoutTileState extends State<WorkoutTile> {
                           splashRadius: 1,
                         ),
                         IconButton(
-                          onPressed: () =>
-                              setState(() => isFavorite = !isFavorite),
+                          onPressed: () async {
+                            if (!isFavorite) {
+                              if (await addToFavorites(
+                                context,
+                                mounted: mounted,
+                                workoutId: widget.workout.id,
+                              )) {
+                                setState(() => isFavorite = true);
+                              }
+                            } else {
+                              if (await deleteFromFavorites(
+                                context,
+                                mounted: mounted,
+                                workoutId: widget.workout.id,
+                              )) {
+                                setState(() => isFavorite = false);
+                              }
+                            }
+                          },
                           icon: Icon(
                             isFavorite
                                 ? Icons.favorite

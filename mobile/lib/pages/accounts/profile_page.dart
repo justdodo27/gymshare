@@ -9,7 +9,6 @@ import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/pages/accounts/change_password.dart';
 import 'package:gymshare/pages/accounts/edit_profile.dart';
 import 'package:gymshare/settings/colors.dart';
-import 'package:gymshare/settings/settings.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -66,8 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: tertiaryColor,
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                    image: NetworkImage(
-                        '$serverUrlPrefix${profile.profilePictureUrl!}'),
+                    image: NetworkImage(profile.profilePictureUrl!),
                     fit: BoxFit.cover,
                   ),
                 ),

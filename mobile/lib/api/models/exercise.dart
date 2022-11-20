@@ -1,7 +1,7 @@
 class Exercise {
   final int id;
-  final String? thumbnailUrl;
-  final String? videoUrl;
+  final String thumbnailUrl;
+  final String videoUrl;
   final String title;
   final String? description;
   final num difficulty;
@@ -10,8 +10,8 @@ class Exercise {
 
   Exercise({
     required this.id,
-    this.thumbnailUrl,
-    this.videoUrl,
+    required this.thumbnailUrl,
+    required this.videoUrl,
     required this.title,
     this.description,
     required this.difficulty,
