@@ -168,11 +168,8 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
 
     def get_is_favorite(self, workout):
         context_user = self.context.get('user')
-        print(context_user)
         if context_user.is_anonymous:
             return False
-        print(models.FavoriteWorkout.objects.filter(
-            workout=workout, user=context_user).exists())
         return models.FavoriteWorkout.objects.filter(
             workout=workout, user=context_user).exists()
 
