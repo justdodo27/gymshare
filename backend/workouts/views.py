@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, Avg, Value, FloatField, F, Sum, OuterRef, Subquery, Func
+from django.db.models import Q, Avg, Value, FloatField, F, Sum, OuterRef, Subquery, Func, Prefetch
 from django.db.models.functions import Coalesce
 
 from . import serializers, models
@@ -136,7 +136,42 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
     pagination_class.page_size = 15
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        qs = self.queryset.filter(user=self.request.user)
+
+        difficulty_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_difficulty=Func(Coalesce('exercise__difficulty', Value(0.0), output_field=FloatField()), function="Avg")
+        ).order_by('calc_difficulty')
+        time_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_time=Func(Coalesce('time', F('repeats') * Value(5.0), Value(0.0), output_field=FloatField()), function="Sum")
+        ).order_by('calc_time')
+        calories_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_calories=Func(Coalesce(
+                Coalesce(
+                    F('time') / Value(60.0), F('repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
+                ) * get_user_weight(self.request.user) * F('exercise__calories_burn_rate'), Value(0.0)
+            ), function="Sum")
+        ).order_by('calc_calories')
+        rating_subq = models.Rating.objects.filter(workout=OuterRef('id')).annotate(
+            calc_rating=Func(Coalesce('rate', Value(0.0), output_field=FloatField()), function="Avg")
+        ).order_by('calc_rating')
+
+        qs = qs.all().prefetch_related(Prefetch('workout', 
+            models.Workout.objects\
+            .annotate(avg_time=Coalesce(Subquery(time_subq.values('calc_time')[:1]), Value(0.0), output_field=FloatField()))\
+            .annotate(difficulty=Coalesce(Subquery(difficulty_subq.values('calc_difficulty')[:1]), Value(0.0), output_field=FloatField()))\
+            .annotate(sum_of_cb=Coalesce(Subquery(calories_subq.values('calc_calories')[:1]), Value(0.0), output_field=FloatField()))\
+            .annotate(avg_rating=Coalesce(Subquery(rating_subq.values('calc_rating')[:1]), Value(0.0), output_field=FloatField()))
+        ))
+
+        print(qs.all()[0].workout.__dict__)
+
+        if self.action == 'list' and (ordering := self.request.query_params.get('ordering')) in \
+            ['id', '-id', 'title', '-title', 'difficulty', '-difficulty', 'avg_time', '-avg_time',
+            'sum_of_cb', '-sum_of_cb', 'avg_rating', '-avg_rating']:
+            
+            qs = qs.order_by(ordering)
+            
+        return qs
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
