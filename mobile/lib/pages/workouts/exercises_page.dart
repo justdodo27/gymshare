@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymshare/api/models/api_response.dart';
 import 'package:gymshare/api/models/exercise.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/utils/routes.dart';
@@ -22,7 +23,6 @@ class _ExerciseTileState extends State<ExerciseTile> {
   @override
   Widget build(BuildContext context) {
     const widgetHeight = 220.0;
-
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         createPageRoute(ExerciseDetailPage(exercise: widget.exercise)),
@@ -80,14 +80,14 @@ class _ExerciseTileState extends State<ExerciseTile> {
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(20)),
                 color: secondaryColor,
-                image: widget.exercise.thumbnailUrl != null
+                image: widget.exercise.thumbnailUrl.isNotEmpty
                     ? DecorationImage(
-                        image: NetworkImage(widget.exercise.thumbnailUrl!),
+                        image: NetworkImage(widget.exercise.thumbnailUrl),
                         fit: BoxFit.cover,
                       )
                     : null,
               ),
-              child: widget.exercise.thumbnailUrl == null
+              child: widget.exercise.thumbnailUrl.isEmpty
                   ? Center(
                       child: Icon(
                         Icons.hide_image,
@@ -147,36 +147,58 @@ class ExercisesPage extends StatefulWidget {
 }
 
 class _ExercisesPageState extends State<ExercisesPage> {
-  late Future<List<Exercise>> _futureExercises;
+  final _controller = ScrollController();
+  ApiResponse _apiResponse = ApiResponse(count: 0, results: []);
+  List<Exercise> exercises = [];
+
+  void fetchExercises({bool next = false}) async {
+    if (next && _apiResponse.next != null || !next) {
+      _apiResponse =
+          await getExercises(context, mounted, next ? _apiResponse.next : null);
+      setState(() => exercises.addAll(List<Exercise>.from(
+          _apiResponse.results.map((w) => Exercise.fromJson(w)))));
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _futureExercises = getExercises(context, mounted);
+    fetchExercises();
+    _controller.addListener(() {
+      if (_controller.position.maxScrollExtent == _controller.offset) {
+        fetchExercises(next: true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Exercise>>(
-      future: _futureExercises,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final exercises = snapshot.data!;
-          return ScrollConfig(
-            child: ListView.builder(
-              padding: const EdgeInsets.only(
-                  top: 20, bottom: 10, left: 20, right: 20),
-              itemCount: exercises.length,
-              itemBuilder: (context, index) {
-                return ExerciseTile(exercise: exercises[index]);
-              },
-            ),
-          );
-        }
-        return const Center(
-          child: CircularProgressIndicator(color: tertiaryColor),
-        );
-      },
+    return ScrollConfig(
+      child: ListView.builder(
+        controller: _controller,
+        padding:
+            const EdgeInsets.only(top: 20, bottom: 10, left: 20, right: 20),
+        itemCount: exercises.length + 1,
+        itemBuilder: (context, index) {
+          if (index < exercises.length) {
+            return ExerciseTile(exercise: exercises[index]);
+          } else {
+            return index == _apiResponse.count
+                ? Container()
+                : const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                        child: CircularProgressIndicator(color: tertiaryColor)),
+                  );
+          }
+        },
+      ),
     );
   }
 }

@@ -7,6 +7,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Value, FloatField, F, OuterRef, Subquery, Func, Prefetch
 from django.db.models.functions import Coalesce
 
+
+from gymshareapi.pagination import DefaultPagination
 from . import serializers, models
 from .utils import get_user_weight
 
@@ -23,6 +25,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     search_fields = ['title', ]
     filterset_fields = ['exercise_type', ]
     ordering_fields = ['title', 'calories_burn_rate', 'difficulty', ]
+    pagination_class = DefaultPagination
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -48,8 +51,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['title', 'description', 'author__username']
     filterset_fields = ['visibility', 'author__id']
-    pagination_class = PageNumberPagination
-    pagination_class.page_size = 15
+    pagination_class = DefaultPagination
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -141,8 +143,7 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
     queryset = models.FavoriteWorkout.objects.all()
     serializer_class = serializers.FavoriteWorkoutDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
-    pagination_class = PageNumberPagination
-    pagination_class.page_size = 15
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         qs = self.queryset.filter(user=self.request.user)

@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:gymshare/api/models/exercise.dart';
+import 'package:gymshare/api/models/api_response.dart';
 import 'package:gymshare/api/models/token.dart';
 import 'package:gymshare/api/models/user.dart';
-import 'package:gymshare/api/models/workout.dart';
 import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/settings/settings.dart';
 import 'package:http/http.dart' as http;
@@ -82,11 +81,11 @@ Future<Profile> fetchUserData(BuildContext context,
   }
 }
 
-Future<List<Workout>> getWorkouts(BuildContext context,
-    [bool mounted = true]) async {
+Future<ApiResponse> getWorkouts(BuildContext context,
+    [bool mounted = true, String? next]) async {
   final token = await getJWT();
   final response = await http.get(
-    Uri.parse(buildUrl('workouts/plans/')),
+    Uri.parse(next ?? buildUrl('workouts/plans/')),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer ${token.accessToken}',
@@ -94,8 +93,7 @@ Future<List<Workout>> getWorkouts(BuildContext context,
   );
 
   if (response.statusCode == 200) {
-    final results = jsonDecode(response.body)['results'];
-    return List.from(results.map((w) => Workout.fromJson(w)));
+    return ApiResponse.fromJson(jsonDecode(response.body));
   } else if (response.statusCode == 401) {
     if (await refreshToken(refresh: token.refreshToken)) {
       if (mounted) return getWorkouts(context, mounted);
@@ -109,11 +107,11 @@ Future<List<Workout>> getWorkouts(BuildContext context,
   }
 }
 
-Future<List<Exercise>> getExercises(BuildContext context,
-    [bool mounted = true]) async {
+Future<ApiResponse> getExercises(BuildContext context,
+    [bool mounted = true, String? next]) async {
   final token = await getJWT();
   final response = await http.get(
-    Uri.parse(buildUrl('workouts/exercises/')),
+    Uri.parse(next ?? buildUrl('workouts/exercises/')),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer ${token.accessToken}',
@@ -121,8 +119,7 @@ Future<List<Exercise>> getExercises(BuildContext context,
   );
 
   if (response.statusCode == 200) {
-    final results = jsonDecode(response.body);
-    return List.from(results.map((e) => Exercise.fromJson(e)));
+    return ApiResponse.fromJson(jsonDecode(response.body));
   } else if (response.statusCode == 401) {
     if (await refreshToken(refresh: token.refreshToken)) {
       if (mounted) return getExercises(context, mounted);
@@ -136,11 +133,11 @@ Future<List<Exercise>> getExercises(BuildContext context,
   }
 }
 
-Future<List<Workout>> getFavoriteWorkouts(BuildContext context,
-    [bool mounted = true]) async {
+Future<ApiResponse> getFavoriteWorkouts(BuildContext context,
+    [bool mounted = true, String? next]) async {
   final token = await getJWT();
   final response = await http.get(
-    Uri.parse(buildUrl('workouts/favorites/')),
+    Uri.parse(next ?? buildUrl('workouts/favorites/')),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer ${token.accessToken}',
@@ -148,8 +145,7 @@ Future<List<Workout>> getFavoriteWorkouts(BuildContext context,
   );
 
   if (response.statusCode == 200) {
-    final results = jsonDecode(response.body)['results'];
-    return List.from(results.map((w) => Workout.fromJson(w['workout'])));
+    return ApiResponse.fromJson(jsonDecode(response.body));
   } else if (response.statusCode == 401) {
     if (await refreshToken(refresh: token.refreshToken)) {
       if (mounted) return getFavoriteWorkouts(context, mounted);
@@ -163,12 +159,13 @@ Future<List<Workout>> getFavoriteWorkouts(BuildContext context,
   }
 }
 
-Future<List<Workout>> getCreatedWorkouts(BuildContext context,
-    [bool mounted = true]) async {
+Future<ApiResponse> getCreatedWorkouts(BuildContext context,
+    [bool mounted = true, String? next]) async {
   final token = await getJWT();
   final response = await http.get(
-    Uri.parse(buildUrl(
-        'workouts/plans/?search&author__id=${token.decodedAccessToken['user_id']}')),
+    Uri.parse(next ??
+        buildUrl(
+            'workouts/plans/?search&author__id=${token.decodedAccessToken['user_id']}')),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer ${token.accessToken}',
@@ -176,8 +173,7 @@ Future<List<Workout>> getCreatedWorkouts(BuildContext context,
   );
 
   if (response.statusCode == 200) {
-    final results = jsonDecode(response.body)['results'];
-    return List.from(results.map((w) => Workout.fromJson(w)));
+    return ApiResponse.fromJson(jsonDecode(response.body));
   } else if (response.statusCode == 401) {
     if (await refreshToken(refresh: token.refreshToken)) {
       if (mounted) return getCreatedWorkouts(context, mounted);
