@@ -5,7 +5,7 @@ import 'package:gymshare/pages/workouts/exercises_page.dart';
 import 'package:gymshare/pages/workouts/workouts_page.dart';
 import 'package:gymshare/settings/colors.dart';
 
-class MySearchDelegate extends SearchDelegate {
+class WorkoutSearchDelegate extends SearchDelegate {
   final searchResults = [
     'Turbo Admin Workout',
     'FBW',
@@ -98,7 +98,10 @@ class HomePage extends StatelessWidget {
           actions: [
             IconButton(
               onPressed: () {
-                showSearch(context: context, delegate: MySearchDelegate());
+                showSearch(
+                  context: context,
+                  delegate: WorkoutSearchDelegate(),
+                );
               },
               icon: const Icon(Icons.search),
             ),
