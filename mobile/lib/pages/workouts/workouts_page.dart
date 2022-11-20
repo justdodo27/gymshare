@@ -192,8 +192,25 @@ class _WorkoutTileState extends State<WorkoutTile> {
                           splashRadius: 1,
                         ),
                         IconButton(
-                          onPressed: () =>
-                              setState(() => isFavorite = !isFavorite),
+                          onPressed: () async {
+                            if (!isFavorite) {
+                              if (await addToFavorites(
+                                context,
+                                mounted: mounted,
+                                workoutId: widget.workout.id,
+                              )) {
+                                setState(() => isFavorite = true);
+                              }
+                            } else {
+                              if (await deleteFromFavorites(
+                                context,
+                                mounted: mounted,
+                                workoutId: widget.workout.id,
+                              )) {
+                                setState(() => isFavorite = false);
+                              }
+                            }
+                          },
                           icon: Icon(
                             isFavorite
                                 ? Icons.favorite

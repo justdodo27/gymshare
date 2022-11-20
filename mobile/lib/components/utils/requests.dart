@@ -135,3 +135,120 @@ Future<List<Exercise>> getExercises(BuildContext context,
     throw Exception('Exercises could not be fetched.');
   }
 }
+
+Future<List<Workout>> getFavoriteWorkouts(BuildContext context,
+    [bool mounted = true]) async {
+  final token = await getJWT();
+  final response = await http.get(
+    Uri.parse(buildUrl('workouts/favorites/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final results = jsonDecode(response.body)['results'];
+    return List.from(results.map((w) => Workout.fromJson(w['workout'])));
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return getFavoriteWorkouts(context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    throw Exception('Favorite workouts could not be fetched.');
+  }
+}
+
+Future<List<Workout>> getCreatedWorkouts(BuildContext context,
+    [bool mounted = true]) async {
+  final token = await getJWT();
+  final response = await http.get(
+    Uri.parse(buildUrl(
+        'workouts/plans/?search&author__id=${token.decodedAccessToken['user_id']}')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final results = jsonDecode(response.body)['results'];
+    return List.from(results.map((w) => Workout.fromJson(w)));
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return getCreatedWorkouts(context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    throw Exception('Created workouts could not be fetched.');
+  }
+}
+
+Future<bool> addToFavorites(BuildContext context,
+    {required int workoutId, bool mounted = true}) async {
+  final token = await getJWT();
+  final response = await http.post(
+    Uri.parse(buildUrl('workouts/favorites/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+    body: jsonEncode(<String, int>{
+      'workout': workoutId,
+    }),
+  );
+
+  if (response.statusCode == 201) {
+    return true;
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) {
+        return addToFavorites(context, mounted: mounted, workoutId: workoutId);
+      }
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    return false;
+  }
+}
+
+Future<bool> deleteFromFavorites(BuildContext context,
+    {required int workoutId, bool mounted = true}) async {
+  final token = await getJWT();
+  final response = await http.delete(
+    Uri.parse(buildUrl('workouts/favorites/delete/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+    body: jsonEncode(<String, int>{
+      'workout': workoutId,
+    }),
+  );
+
+  if (response.statusCode == 204) {
+    return true;
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) {
+        return addToFavorites(context, mounted: mounted, workoutId: workoutId);
+      }
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    return false;
+  }
+}
