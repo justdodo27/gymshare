@@ -5,6 +5,7 @@ from accounts.serializers import ProfileSerializer
 
 from . import models
 
+
 class ExerciseCreateSerializer(serializers.ModelSerializer):
     thumbnail = serializers.ImageField()
     video = serializers.FileField()
@@ -12,6 +13,7 @@ class ExerciseCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Exercise
         fields = '__all__'
+
 
 class ExerciseSerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField()
@@ -54,6 +56,7 @@ class ExerciseInWorkoutSerializer(serializers.ModelSerializer):
 
 class WorkoutCreateSerializer(serializers.ModelSerializer):
     thumbnail = serializers.ImageField(required=False)
+
     def create(self, validated_data):
         context_user = self.context.get('user')
         return models.Workout.objects.create(author=context_user, **validated_data)

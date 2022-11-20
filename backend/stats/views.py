@@ -28,7 +28,7 @@ class StatisticExerciseList(ListAPIView):
     serializer_class = StatisticExerciseGetSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['exercise', ]
-    ordering_fields = ['date', 'repeats', 'time', 'weight',]
+    ordering_fields = ['date', 'repeats', 'time', 'weight', ]
 
     def get_queryset(self):
         if self.request.user.is_anonymous:
@@ -50,7 +50,7 @@ class StatisticCaloriesList(ListAPIView):
     queryset = StatisticCalories.objects.all()
     serializer_class = StatisticCaloriesSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    ordering_fields = ['date',]
+    ordering_fields = ['date', ]
 
     def get_queryset(self):
         month = self.kwargs.get('month')
