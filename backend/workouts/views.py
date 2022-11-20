@@ -47,7 +47,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, FormParser)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['title', 'description', 'author__username']
-    filterset_fields = ['visibility', ]
+    filterset_fields = ['visibility', 'author__id']
     pagination_class = PageNumberPagination
     pagination_class.page_size = 15
 
