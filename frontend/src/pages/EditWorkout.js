@@ -53,7 +53,9 @@ const Input = styled(MuiInput)`
   width: 42px;
 `;
 
-export default function AddExerciseToWork() {
+export default function EditWorkout() {
+
+    const workoutId = useSelector(state => state.workout.workoutId);
 
   const navigate = useNavigate();
   const [repeats, setRepeats] = React.useState(5);
@@ -88,8 +90,8 @@ export default function AddExerciseToWork() {
 
   function handleDeleting(index) {
     for (let i = 0; i < table.length; i++) {
-      table[i].order = i+1;
-    }
+        table[i].order = i+1;
+      }
     console.log(table)
     setTable(table.filter(item => item.order !== index+1))
     setData(data.filter(item => item.order !== index+1))
@@ -118,6 +120,55 @@ export default function AddExerciseToWork() {
     () => array.filter((option) => containsText(option, searchText)),
     [searchText, array]
   );
+
+  const fetchWorkout = useCallback(async () => {
+    
+    try {
+      const response = await fetch("http://localhost:1337/workouts/plans/" +workoutId +"/" , {
+      method: 'GET',
+      headers: {
+      Authorization: "Bearer " +token
+      }
+    });
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+      const temp = await response.json();
+      
+      console.log(temp.exercises)
+
+      const exercisesDescribe = [...Array(temp.exercises.length)].map((_, index) => ({
+        "exercise": temp.exercises[index].exercise.title,
+        "order": temp.exercises[index].order,
+        "series": temp.exercises[index].series,
+        "repeats": temp.exercises[index].repeats,
+        "time": temp.exercises[index].time
+      }));
+
+      console.log(exercisesDescribe)
+      
+
+      const exercisesRead = [...Array(temp.exercises.length)].map((_, index) => ({
+        "exercise": temp.exercises[index].exercise.id,
+        "order": temp.exercises[index].order,
+        "series": temp.exercises[index].series,
+        "repeats": temp.exercises[index].repeats,
+        "time": temp.exercises[index].time
+      }));
+
+      console.log(exercisesRead)
+      setTable(exercisesDescribe)
+    setData(exercisesRead)
+
+    } catch (error) {
+      return<p>Error</p>;
+    }
+    ;
+  }, []);
+
+  useEffect(() => {
+    fetchWorkout();
+  }, [fetchWorkout]);
 
 
   const fetchMoviesHandler = useCallback(async () => {
@@ -232,12 +283,7 @@ export default function AddExerciseToWork() {
       fetch("http://localhost:1337/workouts/plans/upload/", {
         method: 'POST',
           body: JSON.stringify({
-            workout_to_create: {
-              title: workoutTitle,
-              description: workoutDescription,
-              visibility: workoutVisibility,
-              cycles: workoutCycles
-            },
+            workout_for_update_id: workoutId,
             exercises: data,
             
         }), 
@@ -340,170 +386,6 @@ export default function AddExerciseToWork() {
 
   return (
     <Grid container spacing={2} columns={16}>
-    {table.length===0 && <Grid item xs={7} padding={10} marginLeft={55} marginRight={55} marginTop={7} alignItems="center">
-          <Typography component="h1" variant="h5">
-            Add Exercise
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, minWidth: '100%' }}>
-          <div>
-      <FormControl fullWidth>
-        <InputLabel id="search-select-label">Options</InputLabel>
-        <Select
-          // Disables auto focus on MenuItems and allows TextField to be in focus
-          MenuProps={{ autoFocus: false }}
-          sx={{
-            marginBottom:2
-          }}
-          labelId="search-select-label"
-          id="search-select"
-          value={selectedOption}
-          label="Options"
-          onChange={(e) => setSelectedOption(e.target.value)}
-          // This prevents rendering empty string in Select's value
-          // if search text would exclude currently selected option.
-          renderValue={() => selectedOption}
-        >
-          {/* TextField is put into ListSubheader so that it doesn't
-              act as a selectable item in the menu
-              i.e. we can click the TextField without triggering any selection.*/}
-          <ListSubheader>
-            <TextField
-              size="small"
-              // Autofocus on textfield
-              autoFocus
-              placeholder="Type to search..."
-              fullWidth
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                  </InputAdornment>
-                )
-              }}
-              onChange={(e) => {e.target.value!=='' && setSearchText(e.target.value)}}
-              onKeyDown={(e) => {
-                if (e.key !== "Escape") {
-                  // Prevents autoselecting item while typing (default Select behaviour)
-                  e.stopPropagation();
-                }
-              }}
-            />
-          </ListSubheader>
-          {array.map((option, i) => (
-            <MenuItem key={i} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
-    <p>{selectedOption.length>1 && description}</p>
-    <Grid item marginTop={2} alignItems="center">
-    </Grid>
-      <Typography id="input-slider" gutterBottom marginTop={2}>
-        Series
-      </Typography>
-      <Grid container spacing={2} alignItems="center">
-      <Grid item xs>
-          <Slider
-            value={typeof series === 'number' ? series : 0}
-            onChange={handleSliderChange}
-            aria-labelledby="input-slider"
-            min={1}
-            max={20}
-          />
-        </Grid>
-        <Grid item>
-          <Input
-            value={series}
-            size="small"
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-            inputProps={{
-              step: 1,
-              min: 1,
-              max: 20,
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-          />
-        </Grid>
-      </Grid>
-      {(type==='With own body weight' || type==='With a weight') && <Typography id="input-slider" gutterBottom marginTop={2}>
-        Repeats
-      </Typography>}
-      {(type==='With own body weight' || type==='With a weight') && <Grid container spacing={2} alignItems="center">
-      <Grid item xs>
-          <Slider
-            value={typeof repeats === 'number' ? repeats : 0}
-            onChange={handleCaloriesSliderChange}
-            aria-labelledby="input-slider"
-            min={1}
-            max={50}
-          />
-        </Grid>
-        <Grid item marginBottom={3}>
-          <Input
-            value={repeats}
-            size="small"
-            onChange={handleCaloriesInputChange}
-            onBlur={handleCaloriesBlur}
-            inputProps={{
-              step: 1,
-              min: 1,
-              max: 50,
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-          />
-        </Grid>
-      </Grid>}
-      {type==='With time' && <Typography id="input-slider" gutterBottom marginTop={2}>
-        Time
-      </Typography>}
-      {type==='With time' && <Grid container spacing={2} alignItems="center">
-      <Grid item xs>
-          <Slider
-            value={typeof time === 'number' ? time : 0}
-            onChange={handleTimeSliderChange}
-            aria-labelledby="input-slider"
-            min={1}
-            max={60}
-          />
-        </Grid>
-        <Grid item marginBottom={3}>
-          <Input
-            value={time}
-            size="small"
-            onChange={handleTimeInputChange}
-            onBlur={handleTimeBlur}
-            inputProps={{
-              step: 1,
-              min: 1,
-              max: 60,
-              type: 'number',
-              'aria-labelledby': 'input-slider',
-            }}
-          />
-        </Grid>
-      </Grid>}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Add Exercise
-            </Button>
-            <Button
-              onClick={end}
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Done
-            </Button>
-          </Box>
-          </Grid>}
         {table.length>0 && <Grid item xs={7} padding={10} marginLeft={10} marginTop={7}>
           <Typography component="h1" variant="h5">
             Add Exercise
@@ -676,7 +558,7 @@ export default function AddExerciseToWork() {
         <TableHead>
           <TableRow>
             <TableCell align="center"></TableCell>
-            <TableCell align="center">Exercise</TableCell>
+            <TableCell>Exercise</TableCell>
             <TableCell align="center">Repeats/Time</TableCell>
             <TableCell align="center">Series</TableCell>
             <TableCell align="center"></TableCell>
@@ -715,7 +597,7 @@ export default function AddExerciseToWork() {
         <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'info'} sx={{ width: '100%' }}>
           {styleAlert && <Typography>
 
-            Successfully added workout.</Typography>}
+            Successfully updated workout.</Typography>}
         </Alert>
       </Snackbar>
       </Grid>

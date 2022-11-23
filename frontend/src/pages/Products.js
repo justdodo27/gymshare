@@ -15,9 +15,12 @@ import { useSelector} from 'react-redux';
 import { authActions } from '../store/auth'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch} from 'react-redux';
+import { sortActions } from '../store/sort';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import {forwardRef} from 'react';
+import SouthIcon from '@mui/icons-material/South';
+import NorthIcon from '@mui/icons-material/North';
 // ----------------------------------------------------------------------
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -70,15 +73,18 @@ export default function EcommerceShop() {
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
   let token = useSelector(state => state.auth.token);
-  console.log(token)
   const navigate = useNavigate()
   let isAuth = useSelector(state => state.auth.isAuthenticated);
   let autoLogout = useSelector(state => state.auth.logout);
+  let termState = useSelector(state => state.sort.term)
+  let arrowState = useSelector(state => state.sort.arrow)
+  let sortState = useSelector(state => state.sort.sort)
   const [open, setOpen] = useState(null);
-  const [term, setTerm] = useState('');
+  const [term, setTerm] = useState(termState);
   const [styleAlert, setStyleAlert] = useState(false);
   const [addAlert, setAddAlert] = useState(false);
-  const [sort, setSort] = useState({ value: 'newest', label: 'Newest' });
+  const [sort, setSort] = useState(sortState);
+  const [arrow, setArrow] = useState(arrowState)
 
   const handleCloseAlert = (event, reason) => {
     if(styleAlert){
@@ -92,10 +98,22 @@ export default function EcommerceShop() {
   };
 
   const SORT_BY_OPTIONS = [
-    { value: 'newest', label: 'Newest' },
-    { value: 'rate', label: 'Rate' },
+    { value: 'id', label: 'Order' },
     { value: 'title', label: 'Title' },
+    { value: 'avg_rating', label: 'Rate' },
+    { value: 'difficulty', label: 'Difficulty' },
+    { value: 'avg_time', label: 'Workout Time' },
+    { value: 'sum_of_cb', label: 'Calories Burned' },
   ];
+
+  const handleSort = (value, label) => {
+    handleClose();
+    setSort({ value: value, label: label });
+    if(sort.value === value){
+      setArrow(!arrow)
+    }
+
+  }
 
   useEffect(() => {
     if (autoLogout) {
@@ -119,16 +137,11 @@ export default function EcommerceShop() {
 
   const fetchWorkout = (s, term='') => {
     let option = ''
-    if (s === "rate"){
-      option = 'avg_rating'
+    if(!arrow){
+      option = '-'
     }
-    else if (s === 'title'){
-      option = 'title'
-    }
-    else{
-      option = '-id'
-    }
-
+    option = option + s
+    console.log(arrow, sort, option)
     fetch("http://localhost:1337/workouts/plans/?visibility=Public&page=1&ordering="+option+"&search="+term, {
     })
 
@@ -150,12 +163,12 @@ export default function EcommerceShop() {
 
   useEffect(() => {
     try {
-        fetchWorkout('newest')
+        fetchWorkout(sort.value, term)
+        dispatch(sortActions.getSortStats([term, arrow, sort]))
     } catch (error) {
       
     }
-  }, [])
-
+  }, [sort,arrow, term])
 
 const fetchNextWorkout = () => {
   if(next){
@@ -207,9 +220,10 @@ const fetchNextWorkout = () => {
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search…"
+              value={term}
               inputProps={{ 'aria-label': 'search' }}
               onInput={(e) => {
-                setTerm(e.target.value);fetchWorkout(sort.value, e.target.value);
+                setTerm(e.target.value);
               }}
             />
           </Search>
@@ -222,6 +236,8 @@ const fetchNextWorkout = () => {
         Sort By:&nbsp;
         <Typography component="span" variant="subtitle2" sx={{ color: 'text.secondary' }}>
           {sort.label}
+        {!arrow && <SouthIcon fontSize="inherit" />}
+        {arrow && <NorthIcon fontSize="inherit" />}
         </Typography>
       </Button>
       <Menu
@@ -236,7 +252,7 @@ const fetchNextWorkout = () => {
           <MenuItem
             key={option.value}
             selected={option.value === sort.value}
-            onClick={() => {handleClose();setSort({ value: option.value, label: option.label });fetchWorkout(option.value)}}
+            onClick={() => {handleSort(option.value, option.label)}}
             sx={{ typography: 'body2' }}
           >
             {option.label}
