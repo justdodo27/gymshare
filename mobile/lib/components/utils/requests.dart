@@ -107,6 +107,60 @@ Future<ApiResponse> getWorkouts(BuildContext context,
   }
 }
 
+Future<ApiResponse> searchWorkouts(BuildContext context, String query,
+    [bool mounted = true, String? next]) async {
+  final token = await getJWT();
+  final response = await http.get(
+    Uri.parse(next ?? buildUrl('workouts/plans/?search=$query')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return ApiResponse.fromJson(jsonDecode(response.body));
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return getWorkouts(context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    throw Exception('Workouts could not be fetched.');
+  }
+}
+
+Future<ApiResponse> searchCreated(BuildContext context, String query,
+    [bool mounted = true, String? next]) async {
+  final token = await getJWT();
+  final response = await http.get(
+    Uri.parse(next ??
+        buildUrl(
+            'workouts/plans/?search=$query&author__id=${token.decodedAccessToken['user_id']}')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return ApiResponse.fromJson(jsonDecode(response.body));
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return getWorkouts(context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    throw Exception('Workouts could not be fetched.');
+  }
+}
+
 Future<ApiResponse> getExercises(BuildContext context,
     [bool mounted = true, String? next]) async {
   final token = await getJWT();
@@ -118,6 +172,31 @@ Future<ApiResponse> getExercises(BuildContext context,
     },
   );
 
+  if (response.statusCode == 200) {
+    return ApiResponse.fromJson(jsonDecode(response.body));
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return getExercises(context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    throw Exception('Exercises could not be fetched.');
+  }
+}
+
+Future<ApiResponse> searchExercises(BuildContext context, String query,
+    [bool mounted = true, String? next]) async {
+  final token = await getJWT();
+  final response = await http.get(
+    Uri.parse(next ?? buildUrl('workouts/exercises/?search=$query')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+  );
   if (response.statusCode == 200) {
     return ApiResponse.fromJson(jsonDecode(response.body));
   } else if (response.statusCode == 401) {
