@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/pages/accounts/profile_page.dart';
 import 'package:gymshare/pages/statistics/statistics_page.dart';
 import 'package:gymshare/pages/workouts/favorites_page.dart';
@@ -56,9 +57,12 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        body: screens[currentPage],
-        bottomNavigationBar: buildBottomNavigationBar(),
+      child: SeamlessPattern(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: screens[currentPage],
+          bottomNavigationBar: buildBottomNavigationBar(),
+        ),
       ),
     );
   }

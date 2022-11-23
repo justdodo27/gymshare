@@ -98,11 +98,12 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: SeamlessPattern(
+    return SafeArea(
+      child: SeamlessPattern(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Form(
+            key: _formKey,
             child: ScrollConfig(
               child: SingleChildScrollView(
                 controller: _scrollController,

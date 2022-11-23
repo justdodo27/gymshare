@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import NotAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
@@ -36,6 +37,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     """
     queryset = models.Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_serializer_class(self):
         if self.action in ['update', 'partial_update']:
@@ -46,10 +48,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
         obj = self.request.user
         return obj
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
     def retrieve(self, request, pk=None):
         queryset = models.Profile.objects.all()
         profile = get_object_or_404(queryset, user__id=pk)
-        serializer = serializers.ProfileSerializer(profile)
+        serializer = serializers.ProfileSerializer(profile, context=self.get_serializer_context())
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
@@ -61,12 +68,13 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
         if serializer.is_valid():
             profile_object = models.Profile.objects.get(user__id=user_object.id)
-            profile_object.height = serializer.data.get('height')
-            profile_object.weight = serializer.data.get('weight')
+            profile_object.height = serializer.validated_data.get('height')
+            profile_object.weight = serializer.validated_data.get('weight')
+            profile_object.profile_picture = serializer.validated_data.get('profile_picture')
             profile_object.save()
 
-            user_object.first_name = serializer.data.get('first_name')
-            user_object.last_name = serializer.data.get('last_name')
+            user_object.first_name = serializer.validated_data.get('first_name')
+            user_object.last_name = serializer.validated_data.get('last_name')
             user_object.save()
 
             response = {
