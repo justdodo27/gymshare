@@ -143,6 +143,8 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
     queryset = models.FavoriteWorkout.objects.all()
     serializer_class = serializers.FavoriteWorkoutDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['workout__title', 'workout__description', 'workout__author__username']
     pagination_class = DefaultPagination
 
     def get_queryset(self):
