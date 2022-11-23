@@ -59,7 +59,6 @@ class WorkoutSearchDelegate extends SearchDelegate {
 
       setState(() => exercises.addAll(List<Exercise>.from(
           apiResponse.results.map((e) => Exercise.fromJson(e)))));
-      print(exercises);
     }
   }
 
@@ -89,6 +88,7 @@ class WorkoutSearchDelegate extends SearchDelegate {
       ),
       scaffoldBackgroundColor: primaryColor,
       primaryColor: secondaryColor,
+      iconTheme: const IconThemeData(color: primaryTextColor),
     );
   }
 
@@ -241,7 +241,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Search'),
+        title:
+            Text('Search ${_controller.index == 0 ? 'workouts' : 'exercises'}'),
         actions: [
           IconButton(
             onPressed: () {
@@ -259,6 +260,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
         backgroundColor: secondaryColor,
         bottom: TabBar(
+          onTap: (s) => setState(() {}),
           controller: _controller,
           indicatorColor: tertiaryColor,
           tabs: const [
