@@ -273,7 +273,7 @@ const handleClickDelete = (id) => {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Workouts
+            Exercises
           </Typography>
           {is_staff && <Button color="warning" variant="contained" component={RouterLink} to="/gymshare/addExercise" startIcon={<Iconify icon="eva:plus-fill" />}>
             New Exercise (admin)

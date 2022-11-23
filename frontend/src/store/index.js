@@ -5,13 +5,14 @@ import authReducer from './auth';
 import workoutReducer from './workout';
 import monthReducer from './month';
 import dayReducer from './day';
+import sortReducer from './sort';
 import { combineReducers } from 'redux';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer } from 'redux-persist';
 import thunk from 'redux-thunk';
 
 const reducers = combineReducers({
-  auth: authReducer, workout: workoutReducer, month: monthReducer, day: dayReducer
+  auth: authReducer, workout: workoutReducer, month: monthReducer, day: dayReducer, sort: sortReducer
 });
 
 const persistConfig = {

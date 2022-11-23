@@ -1,19 +1,20 @@
 import { useState, useEffect, forwardRef } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Container, Button, Box, Stack, Typography, Card, CardContent, CardMedia, CardHeader, CardActionArea,
-        DialogTitle, DialogContentText, DialogContent, DialogActions, Dialog, Backdrop, CircularProgress } from '@mui/material';
+import {
+  Container, Button, Box, Stack, Typography, Card, CardContent, CardMedia, CardHeader, CardActionArea,
+  DialogTitle, DialogContentText, DialogContent, DialogActions, Dialog, Backdrop, CircularProgress
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Slide from '@mui/material/Slide';
 // components
 import Page from '../components/Page';
 import Label from '../components/Label';
 // mock
-import { useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import icon from "../pictures/play.png"
 import nophoto from "../pictures/nophoto.jpg"
 import { useDispatch } from 'react-redux';
-import { useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Rating from '@mui/material/Rating';
@@ -53,7 +54,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
-    
+
   },
   "&:hover": {
     cursor: "pointer",
@@ -65,122 +66,167 @@ const Alert = forwardRef(function Alert(props, ref) {
 });
 
 const Transition = forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const StyledRating = styled(Rating)({
-    '& .MuiRating-iconFilled': {
-      color: '#ff6d75',
-    },
-    '& .MuiRating-iconHover': {
-      color: '#ff3d47',
-    },
-  });
+  '& .MuiRating-iconFilled': {
+    color: '#ff6d75',
+  },
+  '& .MuiRating-iconHover': {
+    color: '#ff3d47',
+  },
+});
 
 export default function WorkoutDetail() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let token = useSelector(state => state.auth.token);
   const userId = useSelector(state => state.auth.userId);
-  
 
-  
-    const ProductImgStyle = styled('img')({
-        top: 0,
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        position: 'absolute',
-        opacity: 0.7
-      });
-      const PlayImgStyle = styled('img')({
-        top: '15%',
-        left: '15%',
-        width: '70%',
-        height: '70%',
-        objectFit: 'cover',
-        position: 'absolute',
-        opacity: 0.4,
-        "&:hover": {
-          cursor: "pointer",
-          opacity: 0.6,
-        },
-      });
 
-    const workoutId = useSelector(state => state.workout.workoutId);
-    let is_staff = useSelector(state => state.auth.is_staff);
-    const [workout, setWorkouts] = useState([]);
-    const [open, setOpen] = useState(false);
-    const [exe, setExe] = useState([]);
-    const [addAlert, setAddAlert] = useState(false);
-    const [styleAlert, setStyleAlert] = useState(false);
-    const [saved, setSaved] = useState(false);
-    const [openVideo, setOpenVideo] = useState(false);
-    const [Video, setVideo] = useState('');
-    const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
-    
-    const handleCloseVideo = () => {
-      setVideo('');
-      setOpenVideo(false);
-    };
-    const handleToggleVideo = (src) => {
-      setVideo(src);
-      setOpenVideo(!openVideo);
-    };
-    
 
-    const handleClickOpen = (title, description, cbr, difficulty, type, thumbnail, video) => {
-        let array = []
-        array.push(title)
-        array.push(description)
-        array.push(cbr)
-        array.push(difficulty)
-        array.push(type)
-        if(thumbnail){
-          array.push(thumbnail)
-        }else{
-          array.push(nophotoicon)
-        }
-        array.push(video)
-        setExe(array);
-        setOpen(true);
-    };
+  const ProductImgStyle = styled('img')({
+    top: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    position: 'absolute',
+    opacity: 0.7
+  });
+  const PlayImgStyle = styled('img')({
+    top: '15%',
+    left: '15%',
+    width: '70%',
+    height: '70%',
+    objectFit: 'cover',
+    position: 'absolute',
+    opacity: 0.4,
+    "&:hover": {
+      cursor: "pointer",
+      opacity: 0.6,
+    },
+  });
 
-    const handleDeleteAlertClick = () => {
-      setOpenDeleteAlert(true);
-    };
-  
-    const handleDeleteAlertClose = () => {
-      setOpenDeleteAlert(false);
-    };
+  const workoutId = useSelector(state => state.workout.workoutId);
+  dispatch(workoutActions.getWorkout(''))
+  let is_staff = useSelector(state => state.auth.is_staff);
+  const [workout, setWorkouts] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [exe, setExe] = useState([]);
+  const [addAlert, setAddAlert] = useState(false);
+  const [styleAlert, setStyleAlert] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [openVideo, setOpenVideo] = useState(false);
+  const [Video, setVideo] = useState('');
+  const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+  const [rate, setRate] = useState(0);
+
+  const handleCloseVideo = () => {
+    setVideo('');
+    setOpenVideo(false);
+  };
+  const handleToggleVideo = (src) => {
+    setVideo(src);
+    setOpenVideo(!openVideo);
+  };
+
+
+  const handleClickOpen = (title, description, cbr, difficulty, type, thumbnail, video) => {
+    let array = []
+    array.push(title)
+    array.push(description)
+    array.push(cbr)
+    array.push(difficulty)
+    array.push(type)
+    if (thumbnail) {
+      array.push(thumbnail)
+    } else {
+      array.push(nophotoicon)
+    }
+    array.push(video)
+    setExe(array);
+    setOpen(true);
+  };
+
+  const handleDeleteAlertClick = () => {
+    setOpenDeleteAlert(true);
+  };
+
+  const handleDeleteAlertClose = () => {
+    setOpenDeleteAlert(false);
+  };
 
   const handleClickDelete = () => {
-    fetch('http://localhost:1337/workouts/plans/'+workoutId, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: "Bearer " +token,
-          },
-        })
-        .then(() => {navigate('/', { replace: true });})
-        
+    fetch('http://localhost:1337/workouts/plans/' + workoutId, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then(() => { navigate('/', { replace: true }); })
+
+  };
+
+  const handleClickRate = (newRate) => {
+    setRate(newRate)
+    console.log(newRate)
+    fetch('http://localhost:1337/workouts/ratings/', {
+      method: 'POST',
+      body: JSON.stringify({
+        rate: newRate,
+        workout: workoutId,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " + token
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            fetch('http://localhost:1337/workouts/ratings/update/', {
+              method: 'PUT',
+              body: JSON.stringify({
+                rate: newRate,
+                user: userId,
+                workout: workoutId,
+              }),
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: "Bearer " + token
+              },
+            })
+          });
+        }
+      })
+      .then((data) => {
+        console.log(data)
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
+
   };
 
   const handleClickEdit = () => {
     dispatch(workoutActions.getWorkout(workoutId))
     navigate('/gymshare/editWorkout', { replace: true });
   };
-  
-    const handleClose = () => {
-        setExe([]);
-        setOpen(false);
-    };
 
-    const fetchWorkout = () => {
-      let head = ''
-      if(token){
-        head = "Bearer " +token
-      }
+  const handleClose = () => {
+    setExe([]);
+    setOpen(false);
+  };
+
+  const fetchWorkout = () => {
+    let head = ''
+    if (token) {
+      head = "Bearer " + token
+    }
     fetch("http://localhost:1337/workouts/plans/" + workoutId, {
       headers: {
         'Content-Type': 'application/json',
@@ -193,6 +239,7 @@ export default function WorkoutDetail() {
       })
       .then(data => {
         setWorkouts(data);
+        setRate(data.avg_rating)
         setSaved(data.is_favorite);
       })
   }
@@ -200,12 +247,12 @@ export default function WorkoutDetail() {
   useEffect(() => {
     try {
       fetchWorkout()
-    } catch (error) {}
+    } catch (error) { }
   }, [])
-  const { 
-    author, 
-    avg_rating, 
-    avg_time, 
+  const {
+    author,
+    avg_rating,
+    avg_time,
     cycles,
     description,
     difficulty,
@@ -214,241 +261,243 @@ export default function WorkoutDetail() {
     is_favorite,
     sum_of_cb,
     title,
-    visibility ,
+    visibility,
     thumbnail
-    } = workout
-    let workoutThumbnail = ''
-    if(thumbnail){
-      workoutThumbnail = thumbnail
-    }else{
-      workoutThumbnail = nophoto
-    }
-    console.log()
+  } = workout
+  let workoutThumbnail = ''
+  if (thumbnail) {
+    workoutThumbnail = thumbnail
+  } else {
+    workoutThumbnail = nophoto
+  }
 
-    const handleClickSave = () => {
-      if(saved)
-      {
-        fetch('http://localhost:1337/workouts/favorites/delete/', {
-          method: 'DELETE',
-            body: JSON.stringify({
-              workout: workoutId
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: "Bearer " +token,
-          },
-        })
+  const handleClickSave = () => {
+    if (saved) {
+      fetch('http://localhost:1337/workouts/favorites/delete/', {
+        method: 'DELETE',
+        body: JSON.stringify({
+          workout: workoutId
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: "Bearer " + token,
+        },
+      })
         .then(() => this.setState({ status: 'Delete successful' }));
-        setSaved(false);
-        handleClickAlert(false);
+      setSaved(false);
+      handleClickAlert(false);
 
-      }
-      else{
+    }
+    else {
       fetch('http://localhost:1337/workouts/favorites/', {
-      method: 'POST',
+        method: 'POST',
         body: JSON.stringify({
           workout: workoutId,
           user: userId
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: "Bearer " +token
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          return res.json().then((data) => {
-            let errorMessage = 'Wrong username or password!';
-            throw new Error(errorMessage);
-          });
-        }
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: "Bearer " + token
+        },
       })
-      .then((data) => {
-        console.log(data)
-      })
-      .catch((err) => {
-        alert(err.message);
-      });
-        setSaved(true);
-        handleClickAlert(true);
-      }
-    };
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((data) => {
+              let errorMessage = 'Wrong username or password!';
+              throw new Error(errorMessage);
+            });
+          }
+        })
+        .then((data) => {
+          console.log(data)
+        })
+        .catch((err) => {
+          alert(err.message);
+        });
+      setSaved(true);
+      handleClickAlert(true);
+    }
+  };
 
-    const handleClickAlert = (variant) => {
-      if(variant){
-        setStyleAlert(true);
-        setAddAlert(true);
-        
-      }
-      else{
-        setStyleAlert(false);
-        setAddAlert(true);
-      }
-      
-    };
-  
-    const handleCloseAlert = (event, reason) => {
-      if (reason === 'clickaway') {
-        return;
-      }
-  
-      setAddAlert(false);
-    };
+  const handleClickAlert = (variant) => {
+    if (variant) {
+      setStyleAlert(true);
+      setAddAlert(true);
 
-    
+    }
+    else {
+      setStyleAlert(false);
+      setAddAlert(true);
+    }
+
+  };
+
+  const handleCloseAlert = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddAlert(false);
+  };
+
+
 
   return (
     <Page title="Workout Details">
       <Container>
-        <Card sx={{ maxWidth: "90%", minWidth: "90%"}}>
-        <Box sx={{ pt: '2', position: 'relative' }}>
-        {visibility && (
-          <Label
-            variant="filled"
-            color={(visibility === 'Hidden' && 'error') || 'info'}
-            sx={{
-              zIndex: 9,
-              top: 10,
-              right: 10,
-              position: 'absolute',
-              textTransform: 'uppercase',
-            }}
-          >
-            {visibility}
-          </Label>
-        )}
-        <IconButton variant="filled" aria-label="backarrow" size="large" color="secondary"             
-        sx={{
-              zIndex: 9,
-              top: 0,
-              left: 0,
-              position: 'absolute',
-              textTransform: 'uppercase',
-            }}onClick={() => navigate('/')}>
-        <ArrowBackIcon  fontSize="inherit" />
-      </IconButton>
-      
-        <CardMedia
-        component="img"
-        height="600vh"
-        weight="100%"
-        objectFit='cover'
-        position='absolute'
-        image={workoutThumbnail}
-        alt="workout thumbnail"
-      />
-        </Box>
-        <CardContent sx={{minHeigth:500}}>
-        <Stack margin='1%' direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-        <Stack direction="column" alignItems="left" justifyContent="space-between" mb={5}>
-        <Typography variant="h3" component="div">
-          {title}
-          </Typography>
-          {author && <Typography variant="subtitle1" gutterBottom>
-            @{author.username}
-          </Typography>}
-          <Typography variant="body2" color="text.secondary">
-            Calories Burn: {sum_of_cb}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Time: {avg_time}
-          </Typography>
-          <Typography padding='2%'variant="body2" color="text.secondary" sx={{
-                color: 'text.disabled',
-                wordBreak: "break-word"
-              }}>
-            {description}
-          </Typography>
-        </Stack>
-
-        <Stack direction="column" alignItems="center" justifyContent="space-between" mb={5}>
-          {author && userId && <Box>
-            <IconButton 
-              aria-label="favoriteicon" 
-              size="large" 
-              color={(saved === true && 'error') || 'secondary'} 
-              onClick={() => handleClickSave()}>
-        <FavoriteIcon fontSize="inherit" />
-      </IconButton>
-      {author.id === userId && <IconButton aria-label="edit" size="large" color="secondary" onClick={() => handleClickEdit()}>
-        <EditIcon  fontSize="inherit" />
-      </IconButton>}
-      {(author.id === userId || is_staff )  && <IconButton aria-label="delete" size="large" color={ is_staff && 'warning' ||"secondary"} onClick={() => handleDeleteAlertClick()} >
-        <DeleteIcon  fontSize="inherit" />
-      </IconButton>}
-
-      </Box>}
-      <Rating name="read-only" value={parseFloat(avg_rating)} precision={0.5} readOnly />
-        <Typography variant="subtitle1">
-            <Typography
-              component="span"
-              variant="body3"
+        <Card sx={{ maxWidth: "90%", minWidth: "90%" }}>
+          <Box sx={{ pt: '2', position: 'relative' }}>
+            {visibility && (
+              <Label
+                variant="filled"
+                color={(visibility === 'Hidden' && 'error') || 'info'}
+                sx={{
+                  zIndex: 9,
+                  top: 10,
+                  right: 10,
+                  position: 'absolute',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {visibility}
+              </Label>
+            )}
+            <IconButton variant="filled" aria-label="backarrow" size="large" color="secondary"
               sx={{
-                color: 'text.disabled',
-              }}
-            >
-              Rating
-            </Typography>
-          </Typography>
-          <StyledRating
-       
-       value={parseFloat(difficulty)/2}
-       readOnly
-       precision={0.5}
-       icon={<FavoriteIcon fontSize="inherit" />}
-       emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
-     />
-      <Typography variant="subtitle1">
-            <Typography
-              component="span"
-              variant="body3"
-              sx={{
-                color: 'text.disabled',
-              }}
-            >
-              Difficulty
-            </Typography>
-          </Typography>
-        </Stack>
-        </Stack>
-        </CardContent>
-        <Typography align="center" variant="body2" color="subtitle3">
+                zIndex: 9,
+                top: 0,
+                left: 0,
+                position: 'absolute',
+                textTransform: 'uppercase',
+              }} onClick={() => navigate('/')}>
+              <ArrowBackIcon fontSize="inherit" />
+            </IconButton>
+
+            <CardMedia
+              component="img"
+              height="600vh"
+              weight="100%"
+              objectFit='cover'
+              position='absolute'
+              image={workoutThumbnail}
+              alt="workout thumbnail"
+            />
+          </Box>
+          <CardContent sx={{ minHeigth: 500 }}>
+            <Stack margin='1%' direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+              <Stack direction="column" alignItems="left" justifyContent="space-between" mb={5}>
+                <Typography variant="h3" component="div">
+                  {title}
+                </Typography>
+                {author && <Typography variant="subtitle1" gutterBottom>
+                  @{author.username}
+                </Typography>}
+                <Typography variant="body2" color="text.secondary">
+                  Calories Burn: {sum_of_cb}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Time: {avg_time}
+                </Typography>
+                <Typography padding='2%' variant="body2" color="text.secondary" sx={{
+                  color: 'text.disabled',
+                  wordBreak: "break-word"
+                }}>
+                  {description}
+                </Typography>
+              </Stack>
+
+              <Stack direction="column" alignItems="center" justifyContent="space-between" mb={5}>
+                {author && userId && <Box>
+                  <IconButton
+                    aria-label="favoriteicon"
+                    size="large"
+                    color={(saved === true && 'error') || 'secondary'}
+                    onClick={() => handleClickSave()}>
+                    <FavoriteIcon fontSize="inherit" />
+                  </IconButton>
+                  {author.id === userId && <IconButton aria-label="edit" size="large" color="secondary" onClick={() => handleClickEdit()}>
+                    <EditIcon fontSize="inherit" />
+                  </IconButton>}
+                  {(author.id === userId || is_staff) && <IconButton aria-label="delete" size="large" color={is_staff && 'warning' || "secondary"} onClick={() => handleDeleteAlertClick()} >
+                    <DeleteIcon fontSize="inherit" />
+                  </IconButton>}
+
+                </Box>}
+                {userId && <Rating name="read-only" value={rate} onChange={(event, newValue) => {
+                  handleClickRate(newValue);
+                }} />}
+                {!userId && <Rating name="read-only" value={rate} precision={0.5} readOnly />}
+                <Typography variant="subtitle1">
+                  <Typography
+                    component="span"
+                    variant="body3"
+                    sx={{
+                      color: 'text.disabled',
+                    }}
+                  >
+                    Rating
+                  </Typography>
+                </Typography>
+                <StyledRating
+
+                  value={parseFloat(difficulty) / 2}
+                  readOnly
+                  precision={0.5}
+                  icon={<FavoriteIcon fontSize="inherit" />}
+                  emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+                />
+                <Typography variant="subtitle1">
+                  <Typography
+                    component="span"
+                    variant="body3"
+                    sx={{
+                      color: 'text.disabled',
+                    }}
+                  >
+                    Difficulty
+                  </Typography>
+                </Typography>
+              </Stack>
+            </Stack>
+          </CardContent>
+          <Typography align="center" variant="body2" color="subtitle3">
             Workout cycles: {cycles}
           </Typography>
 
           {exercises && <TableContainer component={Paper}>
-      <Table  sx={{ minWidth: 700 }} aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>Order</StyledTableCell>
-            <StyledTableCell align="left">Title</StyledTableCell>
-            <StyledTableCell align="left">Repeats/Time</StyledTableCell>
-            <StyledTableCell align="left">Series</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-        {exercises.map((exercise) => (
-            <StyledTableRow key={exercise.order} onClick={() => {
-              handleClickOpen(
-                exercise.exercise.title, exercise.exercise.description, exercise.exercise.calories_burn_rate, 
-                exercise.exercise.difficulty, exercise.exercise.exercise_type, exercise.exercise.thumbnail, exercise.exercise.video,
-          )}}>
-              <StyledTableCell component="th" scope="row">
-                {exercise.order}
-              </StyledTableCell>
-              <StyledTableCell align="left">{exercise.exercise.title}</StyledTableCell>
-              {exercise.time && <StyledTableCell align="left">{exercise.time} s</StyledTableCell>}
-              {exercise.repeats && <StyledTableCell align="left">x{exercise.repeats}</StyledTableCell>}
-              <StyledTableCell align="left">{exercise.series}</StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>}
+            <Table sx={{ minWidth: 700 }} aria-label="customized table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Order</StyledTableCell>
+                  <StyledTableCell align="left">Title</StyledTableCell>
+                  <StyledTableCell align="left">Repeats/Time</StyledTableCell>
+                  <StyledTableCell align="left">Series</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {exercises.map((exercise) => (
+                  <StyledTableRow key={exercise.order} onClick={() => {
+                    handleClickOpen(
+                      exercise.exercise.title, exercise.exercise.description, exercise.exercise.calories_burn_rate,
+                      exercise.exercise.difficulty, exercise.exercise.exercise_type, exercise.exercise.thumbnail, exercise.exercise.video,
+                    )
+                  }}>
+                    <StyledTableCell component="th" scope="row">
+                      {exercise.order}
+                    </StyledTableCell>
+                    <StyledTableCell align="left">{exercise.exercise.title}</StyledTableCell>
+                    {exercise.time && <StyledTableCell align="left">{exercise.time} s</StyledTableCell>}
+                    {exercise.repeats && <StyledTableCell align="left">x{exercise.repeats}</StyledTableCell>}
+                    <StyledTableCell align="left">{exercise.series}</StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>}
 
-    </Card>
+        </Card>
       </Container>
       <Dialog
         fullWidth
@@ -459,35 +508,35 @@ export default function WorkoutDetail() {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>        
+        <DialogTitle>
         </DialogTitle>
         <DialogContent>
-        <Box sx={{ pt: '90%', position: 'relative' }}>
-        <ProductImgStyle alt={title} src={exe[5]} />
-        <PlayImgStyle alt={title} src={icon} 
-        onClick={() => {handleToggleVideo(exe[6])}}  />
-        <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openVideo}
-        onClick={handleCloseVideo}
-      >
-      {Video && <video autoPlay loop width="60%">
-      <source src={Video} type="video/webm" />
-      <source src={Video} type="video/mp4"
-      />
-               <CircularProgress color="inherit" />
-    </video>}
-      </Backdrop>
-      </Box>
-      <Stack marginTop='2%' direction="row" alignItems="left" justifyContent="space-between" >
-        <Typography variant="h4">  
-          {exe[0]}
-          </Typography>
+          <Box sx={{ pt: '90%', position: 'relative' }}>
+            <ProductImgStyle alt={title} src={exe[5]} />
+            <PlayImgStyle alt={title} src={icon}
+              onClick={() => { handleToggleVideo(exe[6]) }} />
+            <Backdrop
+              sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              open={openVideo}
+              onClick={handleCloseVideo}
+            >
+              {Video && <video autoPlay loop width="60%">
+                <source src={Video} type="video/webm" />
+                <source src={Video} type="video/mp4"
+                />
+                <CircularProgress color="inherit" />
+              </video>}
+            </Backdrop>
+          </Box>
+          <Stack marginTop='2%' direction="row" alignItems="left" justifyContent="space-between" >
+            <Typography variant="h4">
+              {exe[0]}
+            </Typography>
           </Stack>
-        <Typography variant="body2" color="text.secondary">
-            {exe[4]} 
+          <Typography variant="body2" color="text.secondary">
+            {exe[4]}
           </Typography>
-        <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary">
             Calories Burn Rate: {exe[2]}
           </Typography>
           <Typography variant="subtitle1">
@@ -501,14 +550,14 @@ export default function WorkoutDetail() {
               Difficulty
             </Typography>
           </Typography>
-        <StyledRating
-       
-        value={parseFloat(exe[3])/2}
-        readOnly
-        precision={0.5}
-        icon={<FavoriteIcon fontSize="inherit" />}
-        emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
-      />
+          <StyledRating
+
+            value={parseFloat(exe[3]) / 2}
+            readOnly
+            precision={0.5}
+            icon={<FavoriteIcon fontSize="inherit" />}
+            emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+          />
           <DialogContentText margin="1vh" id="alert-dialog-slide-description">
             {exe[1]}
           </DialogContentText>
@@ -526,7 +575,7 @@ export default function WorkoutDetail() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-          This action will delete "{title}" forever. Are You sure?
+            This action will delete "{title}" forever. Are You sure?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -536,8 +585,8 @@ export default function WorkoutDetail() {
           </Button>
         </DialogActions>
       </Dialog>
-      
-      <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
+
+      <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
         <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'info'} sx={{ width: '100%' }}>
           {styleAlert && <Typography>Workout added to Favorites</Typography>}
           {!styleAlert && <Typography>Workout deleted from Favorites</Typography>}
