@@ -5,12 +5,18 @@ class CustomDatePickerFormField extends StatefulWidget {
   final EdgeInsets padding;
   final TextEditingController controller;
   final Function(String) onFieldSubmitted;
+  final Function([DateTime dateTime]) onDatePicked;
+  final bool day;
+  final bool month;
 
   const CustomDatePickerFormField({
     Key? key,
     required this.controller,
     required this.onFieldSubmitted,
+    this.day = true,
+    this.month = true,
     this.padding = const EdgeInsets.symmetric(vertical: 10.0),
+    required this.onDatePicked,
   }) : super(key: key);
 
   @override
@@ -21,8 +27,20 @@ class CustomDatePickerFormField extends StatefulWidget {
 class _CustomDatePickerFormFieldState extends State<CustomDatePickerFormField> {
   DateTime _selected = DateTime.now();
 
-  String formatDate(DateTime date) =>
-      '${date.month.toString().padLeft(2, '0')}/${date.year}';
+  String formatDate(DateTime date) {
+    final day = widget.day ? '${date.day.toString().padLeft(2, '0')}/' : '';
+    final month =
+        widget.month ? '${date.month.toString().padLeft(2, '0')}/' : '';
+    final year = date.year.toString();
+
+    return '$day$month$year';
+  }
+
+  int get length {
+    if (widget.day && widget.month) return 10;
+    if (widget.day || widget.month) return 7;
+    return 4;
+  }
 
   @override
   void initState() {
@@ -40,7 +58,7 @@ class _CustomDatePickerFormFieldState extends State<CustomDatePickerFormField> {
         validator: (value) {
           RegExp validDateRegExp = RegExp(r'^\d+(\/\d+)*$');
           if (value == null ||
-              value.length != 7 ||
+              value.length != length ||
               !validDateRegExp.hasMatch(value)) {
             return 'Enter valid date in MM/YYYY format.';
           }
@@ -66,6 +84,8 @@ class _CustomDatePickerFormFieldState extends State<CustomDatePickerFormField> {
                 _selected = newDate;
                 widget.controller.text = formatDate(_selected);
               });
+
+              widget.onDatePicked(_selected);
             },
           ),
           labelText: 'MM/YYYY',
