@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gymshare/components/widgets/date_picker_field.dart';
+import 'package:gymshare/components/widgets/colored_tab_bar.dart';
+import 'package:gymshare/pages/statistics/burned_calories_page.dart';
+import 'package:gymshare/pages/statistics/exercise_history_page.dart';
+import 'package:gymshare/settings/colors.dart';
 
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({super.key});
@@ -8,13 +11,19 @@ class StatisticsPage extends StatefulWidget {
   State<StatisticsPage> createState() => _StatisticsPageState();
 }
 
-class _StatisticsPageState extends State<StatisticsPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _controller = TextEditingController();
+class _StatisticsPageState extends State<StatisticsPage>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -22,29 +31,25 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                CustomDatePickerFormField(
-                  controller: _controller,
-                  onFieldSubmitted: (value) {
-                    final isValid = _formKey.currentState!.validate();
-                    if (isValid) {
-                      print('Valid');
-                    } else {
-                      print('Not valid');
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
+      appBar: ColoredTabBar(
+        color: secondaryColor,
+        tabBar: TabBar(
+          controller: _tabController,
+          indicatorColor: tertiaryColor,
+          tabs: const [
+            Tab(text: 'Workouts'),
+            Tab(text: 'Exercises'),
+          ],
         ),
       ),
+      body: SafeArea(
+          child: TabBarView(
+        controller: _tabController,
+        children: const [
+          BurnedCaloriesPage(),
+          ExerciseHistoryPage(),
+        ],
+      )),
     );
   }
 }
