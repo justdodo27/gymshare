@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:gymshare/api/models/api_response.dart';
+import 'package:gymshare/api/models/statistic_exercise.dart';
 import 'package:gymshare/api/models/token.dart';
 import 'package:gymshare/api/models/user.dart';
 import 'package:gymshare/components/utils/helpers.dart';
@@ -325,5 +326,34 @@ Future<bool> deleteFromFavorites(BuildContext context,
     }
   } else {
     return false;
+  }
+}
+
+Future<List<StatisticExercise>> getExerciseHistory(
+    DateTime dateTime, BuildContext context,
+    [bool mounted = true]) async {
+  final token = await getJWT();
+  final response = await http.get(
+    Uri.parse(buildUrl(
+        'stats/stats_exercise/${dateTime.day}/${dateTime.month}/${dateTime.year}/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return List<StatisticExercise>.from(
+        jsonDecode(response.body).map((s) => StatisticExercise.fromJson(s)));
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return getExerciseHistory(dateTime, context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    throw Exception('Created workouts could not be fetched.');
   }
 }

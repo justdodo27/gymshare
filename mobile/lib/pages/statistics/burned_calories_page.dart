@@ -18,7 +18,7 @@ class _BurnedCaloriesPageState extends State<BurnedCaloriesPage> {
   final _controller = TextEditingController();
   DateTime selectedDate = DateTime.now();
 
-  onDatePicked([DateTime? dateTime]) {
+  void onDatePicked([DateTime? dateTime]) {
     if (dateTime != null) {
       selectedDate = dateTime;
     }
@@ -44,14 +44,6 @@ class _BurnedCaloriesPageState extends State<BurnedCaloriesPage> {
                   day: false,
                   controller: _controller,
                   onDatePicked: onDatePicked,
-                  onFieldSubmitted: (value) {
-                    final isValid = _formKey.currentState!.validate();
-                    if (isValid) {
-                      print('Valid');
-                    } else {
-                      print('Not valid');
-                    }
-                  },
                 ),
               ),
               const BarChartSample(),
@@ -88,7 +80,7 @@ class BurnedCaloriesTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Container(
-        height: 100,
+        height: 60,
         width: double.infinity,
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(5)),

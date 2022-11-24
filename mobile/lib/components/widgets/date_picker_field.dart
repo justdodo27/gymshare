@@ -4,7 +4,6 @@ import 'package:gymshare/settings/colors.dart';
 class CustomDatePickerFormField extends StatefulWidget {
   final EdgeInsets padding;
   final TextEditingController controller;
-  final Function(String) onFieldSubmitted;
   final Function([DateTime dateTime]) onDatePicked;
   final bool day;
   final bool month;
@@ -12,7 +11,6 @@ class CustomDatePickerFormField extends StatefulWidget {
   const CustomDatePickerFormField({
     Key? key,
     required this.controller,
-    required this.onFieldSubmitted,
     this.day = true,
     this.month = true,
     this.padding = const EdgeInsets.symmetric(vertical: 10.0),
@@ -53,8 +51,8 @@ class _CustomDatePickerFormFieldState extends State<CustomDatePickerFormField> {
     return Padding(
       padding: widget.padding,
       child: TextFormField(
+        readOnly: true,
         controller: widget.controller,
-        onFieldSubmitted: widget.onFieldSubmitted,
         validator: (value) {
           RegExp validDateRegExp = RegExp(r'^\d+(\/\d+)*$');
           if (value == null ||
@@ -74,7 +72,7 @@ class _CustomDatePickerFormFieldState extends State<CustomDatePickerFormField> {
             onPressed: () async {
               DateTime? newDate = await showDatePicker(
                 context: context,
-                initialDate: DateTime.now(),
+                initialDate: _selected,
                 firstDate: DateTime(2022, 1, 1),
                 lastDate: DateTime.now(),
               );

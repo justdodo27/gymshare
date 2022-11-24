@@ -11,6 +11,7 @@ from .models import StatisticExercise, StatisticCalories
 from .serializers import ExerciseDataSerializer, StatisticCaloriesSerializer, StatisticExerciseGetSerializer, StatisticExerciseSerializer
 from workouts.models import Exercise
 
+
 class SyncStats(CreateAPIView):
     """
     Synchronize user statistics.
@@ -39,7 +40,7 @@ class StatisticExerciseList(ListAPIView):
             raise NotAuthenticated("No Token Provided")
         if year and month and day:
             qs = StatisticExercise.objects.all().filter(user=self.request.user, date__year=f"{year}", date__month=f"{month}", date__day=f"{day}")
-        else: 
+        else:
             qs = StatisticExercise.objects.all().filter(user=self.request.user)
 
         if (ordering := self.request.query_params.get('ordering')) in self.ordering_fields:
@@ -50,7 +51,6 @@ class StatisticExerciseList(ListAPIView):
             stats_subq = qs.filter(exercise__id=OuterRef('id')).values(
                 json=JSONObject(date='date', repeats='repeats', time='time', weight='weight')
             )
-
 
         final_qs = Exercise.objects.annotate(entries=ArraySubquery(stats_subq)).exclude(entries=[])
 
