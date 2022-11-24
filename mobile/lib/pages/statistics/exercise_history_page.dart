@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/statistic_exercise.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/widgets/date_picker_field.dart';
+import 'package:gymshare/components/widgets/logo.dart';
 import 'package:gymshare/settings/colors.dart';
 
 class ExerciseHistoryPage extends StatefulWidget {
@@ -57,13 +58,26 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
               controller: _controller,
               onDatePicked: onDatePicked,
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: stats.length,
-                itemBuilder: (context, index) =>
-                    ExerciseHistoryTile(item: stats[index]),
+            if (stats.isNotEmpty)
+              Expanded(
+                child: ListView.builder(
+                  itemCount: stats.length,
+                  itemBuilder: (context, index) =>
+                      ExerciseHistoryTile(item: stats[index]),
+                ),
               ),
-            ),
+            if (stats.isEmpty)
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  SizedBox(height: 80),
+                  GymShareLogo(),
+                  Text(
+                    'No data available',
+                    style: TextStyle(color: primaryTextColor, fontSize: 25),
+                  )
+                ],
+              ),
           ],
         ),
       ),
@@ -170,12 +184,12 @@ class EntryTile extends StatelessWidget {
             ),
           if (entry.weight != null)
             Text(
-              'Weight: ${entry.weight}',
+              'Weight: ${entry.weight}kg',
               style: const TextStyle(color: primaryTextColor),
             ),
           if (entry.time != null)
             Text(
-              'Time: ${entry.time}',
+              'Time: ${entry.time}s',
               style: const TextStyle(color: primaryTextColor),
             ),
           const Divider(thickness: 2),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gymshare/api/models/statistic_calories.dart';
+import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/widgets/date_picker_field.dart';
+import 'package:gymshare/components/widgets/logo.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/pages/statistics/bar_chart.dart';
 import 'package:gymshare/settings/colors.dart';
@@ -17,11 +20,31 @@ class _BurnedCaloriesPageState extends State<BurnedCaloriesPage> {
   final _formKey = GlobalKey<FormState>();
   final _controller = TextEditingController();
   DateTime selectedDate = DateTime.now();
+  List<StatisticCalories> stats = [];
+
+  void fetchBurnedCaloriesStats() async {
+    setState(() => stats.clear());
+    final data = await getBurnedCaloriesStats(selectedDate, context, mounted);
+    setState(() => stats.addAll(data));
+  }
 
   void onDatePicked([DateTime? dateTime]) {
     if (dateTime != null) {
       selectedDate = dateTime;
     }
+    final isValid = _formKey.currentState!.validate();
+    if (isValid) fetchBurnedCaloriesStats();
+  }
+
+  Iterable<Widget> buildTiles() {
+    return stats.map((entry) =>
+        BurnedCaloriesTile(date: entry.date, caloriesBurned: entry.calories));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBurnedCaloriesStats();
   }
 
   @override
@@ -46,17 +69,26 @@ class _BurnedCaloriesPageState extends State<BurnedCaloriesPage> {
                   onDatePicked: onDatePicked,
                 ),
               ),
-              const BarChartSample(),
+              if (stats.isNotEmpty) BarChartSample(stats: stats),
+              if (stats.isEmpty)
+                Column(
+                  children: const [
+                    SizedBox(height: 80),
+                    GymShareLogo(),
+                    Text(
+                      'No data available',
+                      style: TextStyle(color: primaryTextColor, fontSize: 25),
+                    )
+                  ],
+                ),
               const SizedBox(height: 20),
-              const Text(
-                'History',
-                style: TextStyle(color: primaryTextColor, fontSize: 22),
-              ),
+              if (stats.isNotEmpty)
+                const Text(
+                  'History',
+                  style: TextStyle(color: primaryTextColor, fontSize: 22),
+                ),
               const SizedBox(height: 10),
-              const BurnedCaloriesTile(date: '30-11-2022', caloriesBurned: 520),
-              const BurnedCaloriesTile(date: '29-11-2022', caloriesBurned: 435),
-              const BurnedCaloriesTile(date: '28-11-2022', caloriesBurned: 289),
-              const BurnedCaloriesTile(date: '27-11-2022', caloriesBurned: 552),
+              ...buildTiles()
             ],
           ),
         ),
@@ -87,15 +119,21 @@ class BurnedCaloriesTile extends StatelessWidget {
           color: quaternaryColor,
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              date,
-              style: const TextStyle(color: primaryTextColor, fontSize: 22),
+            Padding(
+              padding: const EdgeInsets.only(left: 24),
+              child: Text(
+                date,
+                style: const TextStyle(color: primaryTextColor, fontSize: 22),
+              ),
             ),
-            Text(
-              '$caloriesBurned kcal',
-              style: const TextStyle(color: primaryTextColor, fontSize: 22),
+            Padding(
+              padding: const EdgeInsets.only(right: 24),
+              child: Text(
+                '$caloriesBurned kcal',
+                style: const TextStyle(color: primaryTextColor, fontSize: 22),
+              ),
             ),
           ],
         ),
