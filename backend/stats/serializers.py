@@ -1,12 +1,13 @@
 from rest_framework import serializers
 
-from workouts.serializers import ExerciseSerializer
 from . import models
 from workouts.models import Exercise
 from accounts.models import Profile
 
 
 class StatisticCaloriesSerializer(serializers.ModelSerializer):
+    calories = serializers.SerializerMethodField()
+
     class Meta:
         model = models.StatisticCalories
         fields = '__all__'
@@ -15,6 +16,10 @@ class StatisticCaloriesSerializer(serializers.ModelSerializer):
         if value < 0:
             return serializers.ValidationError('Calories value must be a positive number')
         return value
+
+    def get_calories(self, obj):
+        print(obj)
+        return round(obj.calories)
 
 
 class StatisticExerciseSerializer(serializers.ModelSerializer):
@@ -83,14 +88,17 @@ class ExerciseDataSerializer(serializers.Serializer):
         match exercise.exercise_type:
             case exercise.WITH_OWN_BODY_WEIGHT:
                 if data.get('time', None):
-                    raise serializers.ValidationError('Exercise of type own body weight cannot have time attribute')
+                    raise serializers.ValidationError(
+                        'Exercise of type own body weight cannot have time attribute')
                 if not data.get('repeats', None) or data['repeats'] <= 0:
                     raise serializers.ValidationError('Repeats not provided')
                 if data.get('weight', None):
-                    raise serializers.ValidationError('Exercise of type own body weight cannot have weight attribute')
+                    raise serializers.ValidationError(
+                        'Exercise of type own body weight cannot have weight attribute')
             case exercise.WITH_A_WEIGHT:
                 if data.get('time', None):
-                    raise serializers.ValidationError('Exercise of type weight cannot have time attribute')
+                    raise serializers.ValidationError(
+                        'Exercise of type weight cannot have time attribute')
                 if not data.get('repeats', None) or data['repeats'] <= 0:
                     raise serializers.ValidationError('Repeats not provided')
                 if not data.get('weight', None) or data['weight'] <= 0:
@@ -99,9 +107,11 @@ class ExerciseDataSerializer(serializers.Serializer):
                 if not data.get('time', None) or data['time'] <= 0:
                     raise serializers.ValidationError('Time not provided')
                 if data.get('repeats', None):
-                    raise serializers.ValidationError('Exercise of type time cannot have repeats attribute')
+                    raise serializers.ValidationError(
+                        'Exercise of type time cannot have repeats attribute')
                 if data.get('weight', None):
-                    raise serializers.ValidationError('Exercise of type time cannot have weight attribute')
+                    raise serializers.ValidationError(
+                        'Exercise of type time cannot have weight attribute')
         if data['series'] is None or data['series'] <= 0:
             raise serializers.ValidationError('Series not provided')
         if data['date'] is None:
@@ -129,11 +139,14 @@ class ExerciseDataSerializer(serializers.Serializer):
         exerciseAttrs = None
 
         if exercise.exercise_type == Exercise.WITH_A_WEIGHT:
-            exerciseAttrs = {'weight': validated_data['weight'], 'repeats': validated_data['repeats'] * validated_data['series']}
+            exerciseAttrs = {
+                'weight': validated_data['weight'], 'repeats': validated_data['repeats'] * validated_data['series']}
         elif exercise.exercise_type == Exercise.WITH_OWN_BODY_WEIGHT:
-            exerciseAttrs = {'repeats': validated_data['repeats'] * validated_data['series']}
+            exerciseAttrs = {
+                'repeats': validated_data['repeats'] * validated_data['series']}
         elif exercise.exercise_type == Exercise.WITH_TIME:
-            exerciseAttrs = {'time': validated_data['time'] * validated_data['series']}
+            exerciseAttrs = {
+                'time': validated_data['time'] * validated_data['series']}
 
         exercise_stats = models.StatisticExercise(
             date=validated_data['date'],
@@ -145,12 +158,14 @@ class ExerciseDataSerializer(serializers.Serializer):
 
         workout_date = validated_data['date'].date()
         if calories_stats := models.StatisticCalories.objects.filter(user=validated_data['user'], date=workout_date).first():
-            calories_stats.calories += self.calc_calories(exerciseAttrs, exercise, validated_data['user'])
+            calories_stats.calories += self.calc_calories(
+                exerciseAttrs, exercise, validated_data['user'])
         else:
             calories_stats = models.StatisticCalories(
                 date=workout_date,
                 user=validated_data['user'],
-                calories=self.calc_calories(exerciseAttrs, exercise, validated_data['user'])
+                calories=self.calc_calories(
+                    exerciseAttrs, exercise, validated_data['user'])
             )
         calories_stats.save()
 
