@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gymshare/pages/workouts/active_workout_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:gymshare/api/models/workout.dart';
 import 'package:gymshare/api/models/api_response.dart';
 import 'package:gymshare/components/utils/requests.dart';
+import 'package:gymshare/components/utils/routes.dart';
 
 class TrainingPage extends StatefulWidget {
   const TrainingPage({super.key});
@@ -167,7 +169,6 @@ class _SearchTileState extends State<SearchTile> {
 }
 
 showMyDialog(BuildContext context, Workout workout){
-  print(workout.title);
   SimpleDialog dialog = SimpleDialog(
     title: Text('You are about to start ${workout.title}'),
     backgroundColor: surface3,
@@ -192,6 +193,10 @@ showMyDialog(BuildContext context, Workout workout){
   );
 
   dialogValue.then((value) => {
-    print(value)
+    if (value == true){
+      Navigator.of(context).push(createPageRoute(
+        ActivityPage(workout: workout),
+      ))
+    }
   });
 }
