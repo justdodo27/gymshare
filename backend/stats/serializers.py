@@ -59,10 +59,10 @@ class StatisticExerciseSerializer(serializers.ModelSerializer):
 
 
 class StatisticExerciseGetSerializer(serializers.ModelSerializer):
-    exercise = ExerciseSerializer()
+    entries = serializers.ListField()
 
     class Meta:
-        model = models.StatisticExercise
+        model = Exercise
         fields = '__all__'
 
 
