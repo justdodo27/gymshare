@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gymshare/pages/splash_screen.dart';
+import 'package:gymshare/pages/workouts/add_workout_page.dart';
+import 'package:gymshare/pages/workouts/edit_workout_page.dart';
 import 'package:gymshare/settings/colors.dart';
 
 void main() {
