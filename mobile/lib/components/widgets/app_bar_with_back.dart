@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gymshare/settings/colors.dart';
 
 class AppBarBack extends StatefulWidget {
   final String appBarTitle;
@@ -41,10 +40,8 @@ class _AppBarBackState extends State<AppBarBack> {
 
   @override
   Widget build(BuildContext context) {
-    return  AppBar(
-                      title: const Text('Next page'),
-                    );
+    return AppBar(
+      title: const Text('Next page'),
+    );
   }
 }
-
-

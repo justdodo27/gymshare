@@ -67,7 +67,7 @@ Future<Profile> fetchUserData(BuildContext context,
       'Authorization': 'Bearer ${token.accessToken}',
     },
   );
-
+  
   if (response.statusCode == 200) {
     return Profile.fromJson(jsonDecode(response.body));
   } else if (response.statusCode == 401) {
