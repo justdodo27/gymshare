@@ -13,11 +13,76 @@ class ExerciseDetailPage extends StatelessWidget {
     return SeamlessPattern(
       child: SafeArea(
         child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: Text(
+          appBar: AppBar(
+            title: Text(
               exercise.title,
-              style: const TextStyle(color: primaryTextColor, fontSize: 30),
+              style: const TextStyle(color: primaryTextColor, fontSize: 20),
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                Image.network(exercise.thumbnailUrl),
+                Container(
+                  margin: const EdgeInsets.all(10.0),
+                  child: const Text(
+                    'Description',
+                    style: TextStyle(
+                      color: primaryTextColor,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${(exercise.description)}',
+                  style: const TextStyle(color: primaryTextColor, fontSize: 15),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Divider(),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10.0),
+                  child: const Text(
+                    'Information',
+                    style: TextStyle(
+                      color: primaryTextColor,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10.0),
+                  child: Text(
+                    'Exercise Type ${(exercise.exerciseType)}',
+                    style:
+                        const TextStyle(color: primaryTextColor, fontSize: 15),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10.0),
+                  child: Text(
+                    'Difficulty ${(exercise.difficulty)}',
+                    style:
+                        const TextStyle(color: primaryTextColor, fontSize: 15),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10.0),
+                  child: Text(
+                    'Calories Burn Rate ${(exercise.caloriesBurnRate)} kcal',
+                    style:
+                        const TextStyle(color: primaryTextColor, fontSize: 15),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+              ],
             ),
           ),
         ),
