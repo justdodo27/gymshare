@@ -110,7 +110,7 @@ export default function SignUp() {
     console.log(emailError, setPasswordError)
 
     if (emailErrorCheck === true && passwordErrorCheck === true) {
-      fetch("http://localhost:1337/accounts/users/", {
+      fetch(global.config.url+ "accounts/users/", {
         method: 'POST',
         body: JSON.stringify({
           email: email,

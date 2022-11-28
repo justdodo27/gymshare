@@ -83,7 +83,7 @@ export default function AddExercise() {
     console.log(value)
     console.log(cbr)
 
-    fetch("http://localhost:1337/workouts/exercises/", {
+    fetch(global.config.url + "workouts/exercises/", {
       method: 'POST',
       body: JSON.stringify({
         title: title,
