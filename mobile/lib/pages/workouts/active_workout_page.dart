@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/workout.dart';
-import 'package:gymshare/settings/colors.dart';
-import 'package:gymshare/api/models/workout.dart';
 
 
 class ActivityPage extends StatefulWidget {

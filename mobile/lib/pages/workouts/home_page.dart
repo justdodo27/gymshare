@@ -40,6 +40,7 @@ class WorkoutSearchDelegate extends SearchDelegate {
   ApiResponse apiResponse = ApiResponse(count: 0, results: []);
   List<Workout> workouts = [];
   List<Exercise> exercises = [];
+  bool sent = false;
 
   void fetchWorkouts(String query, Function(void Function()) setState,
       {bool next = false}) async {
@@ -99,6 +100,7 @@ class WorkoutSearchDelegate extends SearchDelegate {
         workouts = [];
         exercises = [];
         apiResponse = ApiResponse(count: 0, results: []);
+        sent = false;
         close(context, null);
       },
       icon: const Icon(Icons.arrow_back));
@@ -111,14 +113,13 @@ class WorkoutSearchDelegate extends SearchDelegate {
               workouts = [];
               exercises = [];
               apiResponse = ApiResponse(count: 0, results: []);
+              sent = false;
             },
             icon: const Icon(Icons.clear)),
       ];
 
   @override
   Widget buildResults(BuildContext context) {
-    bool sent = false;
-
     return StatefulBuilder(
       builder: (context, setState) {
         if (!sent) {
@@ -152,7 +153,10 @@ class WorkoutSearchDelegate extends SearchDelegate {
               itemBuilder: (context, index) {
                 if (searchTypeWorkouts) {
                   if (index < workouts.length) {
-                    return WorkoutTile(workout: workouts[index]);
+                    return GestureDetector(
+                      onTap: () {},
+                      child: WorkoutTile(workout: workouts[index]),
+                    );
                   } else {
                     return index == apiResponse.count
                         ? Container()
@@ -197,6 +201,7 @@ class WorkoutSearchDelegate extends SearchDelegate {
     workouts = [];
     exercises = [];
     apiResponse = ApiResponse(count: 0, results: []);
+    sent = false;
 
     return SeamlessPattern(
       child: ListView.builder(

@@ -19,6 +19,7 @@ class WorkoutDetailPage extends StatelessWidget {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
+            backgroundColor: secondaryColor,
             title: Text(
               workout.title,
               style: const TextStyle(color: primaryTextColor, fontSize: 20),
@@ -28,7 +29,11 @@ class WorkoutDetailPage extends StatelessWidget {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                Image.network(workout.thumbnailUrl!),
+                if (workout.thumbnailUrl != null)
+                  Hero(
+                    tag: 'workout ${workout.id}',
+                    child: Image.network(workout.thumbnailUrl!),
+                  ),
                 Container(
                   padding: const EdgeInsets.all(10.0),
                   color: secondaryColor,
@@ -156,8 +161,9 @@ class WorkoutDetailPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${(workout.description)}',
+                  '${workout.description}',
                   style: const TextStyle(color: primaryTextColor, fontSize: 12),
+                  textAlign: TextAlign.justify,
                 ),
                 const SizedBox(
                   height: 10,

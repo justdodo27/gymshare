@@ -27,20 +27,23 @@ class _ExerciseTileState extends State<ExerciseTile> {
       onTap: () => Navigator.of(context).push(
         createPageRoute(ExerciseDetailPage(exercise: widget.exercise)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Container(
-          height: widgetHeight,
-          decoration: const BoxDecoration(
-            color: quaternaryColor,
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              buildImage(widgetHeight),
-              buildFooter(widgetHeight),
-            ],
+      child: Hero(
+        tag: 'exercise ${widget.exercise.id}',
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: Container(
+            height: widgetHeight,
+            decoration: const BoxDecoration(
+              color: quaternaryColor,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                buildImage(widgetHeight),
+                buildFooter(widgetHeight),
+              ],
+            ),
           ),
         ),
       ),
@@ -54,19 +57,24 @@ class _ExerciseTileState extends State<ExerciseTile> {
           child: Container(
             padding:
                 const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 15),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.exercise.title,
-                  style: const TextStyle(color: primaryTextColor, fontSize: 16),
-                ),
-                Text(
-                  'Difficulty: ${widget.exercise.difficulty}',
-                  style: const TextStyle(color: primaryTextColor, fontSize: 16),
-                )
-              ],
+            child: Scaffold(
+              backgroundColor: quaternaryColor,
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.exercise.title,
+                    style:
+                        const TextStyle(color: primaryTextColor, fontSize: 16),
+                  ),
+                  Text(
+                    'Difficulty: ${widget.exercise.difficulty}',
+                    style:
+                        const TextStyle(color: primaryTextColor, fontSize: 16),
+                  )
+                ],
+              ),
             ),
           ),
         ),

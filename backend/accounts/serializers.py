@@ -20,7 +20,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError('A user with that email already exists.')
+            raise serializers.ValidationError(
+                'A user with that email already exists.')
         return value
 
     def save(self):
@@ -48,7 +49,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_profile_picture(self, profile):
         request = self.context.get('request')
-        return request.build_absolute_uri(profile.profile_picture.url)
+        if profile.profile_picture:
+            return request.build_absolute_uri(profile.profile_picture.url)
 
     def get_likes(self, profile):
         return FavoriteWorkout.objects.filter(workout__author=profile.user).count()
@@ -61,11 +63,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-    profile_picture = serializers.ImageField()
+    profile_picture = serializers.ImageField(required=False)
 
     class Meta:
         model = models.Profile
-        fields = ['height', 'weight', 'first_name', 'last_name', 'profile_picture']
+        fields = ['height', 'weight', 'first_name',
+                  'last_name', 'profile_picture']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
