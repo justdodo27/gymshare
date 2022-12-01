@@ -44,7 +44,7 @@ export default function ChangePassword() {
     }
 
     if (passwordErrorCheck === true) {
-    fetch("http://localhost:1337/accounts/change-password/", {
+    fetch(global.config.url+ "accounts/change-password/", {
       method: 'PATCH',
         body: JSON.stringify({
           old_password: password,

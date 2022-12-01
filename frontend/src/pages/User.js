@@ -123,7 +123,7 @@ export default function User() {
   const fetchMoviesHandler = useCallback(async () => {
     
     try {
-      const response = await fetch("http://localhost:1337/workouts/plans/");
+      const response = await fetch(global.config.url+ "workouts/plans/");
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }

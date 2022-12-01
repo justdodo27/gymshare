@@ -37,7 +37,7 @@ export default function EditProfile() {
   let lastNameErrorCheck = false
 
   const fetchData = () => {
-  fetch("http://localhost:1337/accounts/profiles/" +userId, {
+  fetch(global.config.url + "accounts/profiles/" +userId, {
       headers: {
         Authorization: "Bearer " +token
       },
@@ -100,7 +100,7 @@ export default function EditProfile() {
     
     console.log(heightErrorCheck, weightErrorCheck, firstNameErrorCheck, lastNameErrorCheck)
     if (heightErrorCheck && weightErrorCheck && firstNameErrorCheck && lastNameErrorCheck) {
-      fetch("http://localhost:1337/accounts/profiles/" + userId +"/", {
+      fetch(global.config.url +  "accounts/profiles/" + userId +"/", {
         method: 'PATCH',
         body: JSON.stringify({
           first_name: first_Name,
