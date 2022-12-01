@@ -135,6 +135,32 @@ Future<ApiResponse> searchWorkouts(BuildContext context, String query,
   }
 }
 
+Future<ApiResponse> searchFavorites(BuildContext context, String query,
+    [bool mounted = true, String? next]) async {
+  final token = await getJWT();
+  final response = await http.get(
+    Uri.parse(next ?? buildUrl('workouts/favorites/?search=$query')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return ApiResponse.fromJson(jsonDecode(response.body));
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return getWorkouts(context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    throw Exception('Workouts could not be fetched.');
+  }
+}
+
 Future<ApiResponse> searchCreated(BuildContext context, String query,
     [bool mounted = true, String? next]) async {
   final token = await getJWT();
