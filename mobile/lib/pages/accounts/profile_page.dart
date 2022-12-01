@@ -34,7 +34,6 @@ class _ProfilePageState extends State<ProfilePage> {
     _futureProfile = fetchUserData(context, mounted);
     _profile = await _futureProfile;
     setState(() {});
-    print('sent');
   }
 
   Widget _buildTop() {
