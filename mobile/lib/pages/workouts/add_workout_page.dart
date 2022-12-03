@@ -124,9 +124,8 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
       'cycles': _cycles,
       'image_path': _image!.path,
     };
-    final es = await createWorkout(data, context, mounted);
-    print(es);
-    return es;
+    
+    return await createWorkout(data, context, mounted);
   }
 
   @override
