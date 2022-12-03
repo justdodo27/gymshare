@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gymshare/api/models/workout.dart';
 import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/widgets/custom_text_form_field.dart';
@@ -14,7 +15,9 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddWorkoutPage extends StatefulWidget {
-  const AddWorkoutPage({Key? key}) : super(key: key);
+  final Workout? workout;
+
+  const AddWorkoutPage({Key? key, this.workout}) : super(key: key);
 
   @override
   State<AddWorkoutPage> createState() => _AddWorkoutPageState();
@@ -30,6 +33,20 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
   bool _isPublic = true;
   int _cycles = 1;
   bool _isButtonDisabled = false;
+  bool _editMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.workout != null) {
+      final workout = widget.workout!;
+      _titleController.text = workout.title;
+      _descriptionController.text = workout.description ?? '';
+      _isPublic = workout.visibility == 'Public' ? true : false;
+      _cycles = workout.cycles.toInt();
+      _editMode = true;
+    }
+  }
 
   @override
   void dispose() {
@@ -37,6 +54,21 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  Map<String, dynamic> get data {
+    final data = <String, dynamic>{
+      'id': widget.workout!.id,
+      'title': _titleController.text,
+      'description': _descriptionController.text,
+      'visibility': _isPublic ? 'Public' : 'Hidden',
+      'cycles': _cycles,
+    };
+
+    if (_image != null) {
+      data['image_path'] = _image!.path;
+    }
+    return data;
   }
 
   String? _validateInput(String? value) {
@@ -124,7 +156,7 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
       'cycles': _cycles,
       'image_path': _image!.path,
     };
-    
+
     return await createWorkout(data, context, mounted);
   }
 
@@ -159,7 +191,10 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
                         labelText: 'Description',
                         validator: _validateInput,
                       ),
-                      _image == null
+                      ((!_editMode && _image == null) ||
+                              (_editMode &&
+                                  widget.workout!.thumbnailUrl == null &&
+                                  _image == null))
                           ? RoundedRectangleButton(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 16.0),
@@ -169,30 +204,58 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
                             )
                           : buildThumbnail(),
                       buildSwitches(),
-                      RoundedRectangleButton(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        isButtonDisabled: _isButtonDisabled,
-                        child: const Text(
-                          'Save workout',
-                          style:
-                              TextStyle(color: primaryTextColor, fontSize: 16),
-                        ),
-                        onPress: () async {
-                          final isValid = _formKey.currentState!.validate();
-                          if (isValid) {
-                            setState(() => _isButtonDisabled = true);
-                            if (await _createWorkout()) {
-                              Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                getInfoSnackBar(
-                                    text: 'Workout has been created.'),
-                              );
-                            } else {
-                              setState(() => _isButtonDisabled = false);
+                      if (!_editMode)
+                        RoundedRectangleButton(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          isButtonDisabled: _isButtonDisabled,
+                          child: const Text(
+                            'Save workout',
+                            style: TextStyle(
+                                color: primaryTextColor, fontSize: 16),
+                          ),
+                          onPress: () async {
+                            final isValid = _formKey.currentState!.validate();
+                            if (isValid) {
+                              setState(() => _isButtonDisabled = true);
+                              if (await _createWorkout()) {
+                                Navigator.of(context).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  getInfoSnackBar(
+                                    text: 'Workout has been created.',
+                                  ),
+                                );
+                              } else {
+                                setState(() => _isButtonDisabled = false);
+                              }
                             }
-                          }
-                        },
-                      ),
+                          },
+                        ),
+                      if (_editMode)
+                        RoundedRectangleButton(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          isButtonDisabled: _isButtonDisabled,
+                          child: const Text(
+                            'Edit workout',
+                            style: TextStyle(
+                                color: primaryTextColor, fontSize: 16),
+                          ),
+                          onPress: () async {
+                            final isValid = _formKey.currentState!.validate();
+                            if (isValid) {
+                              setState(() => _isButtonDisabled = true);
+                              if (await editWorkout(data, context, mounted)) {
+                                Navigator.of(context).pop(data);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  getInfoSnackBar(
+                                    text: 'Workout has been edited.',
+                                  ),
+                                );
+                              } else {
+                                setState(() => _isButtonDisabled = false);
+                              }
+                            }
+                          },
+                        ),
                       const SizedBox(height: 30),
                     ],
                   ),
@@ -259,6 +322,13 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
   }
 
   Widget buildThumbnail() {
+    late ImageProvider<Object> img;
+    if (_image != null) {
+      img = FileImage(_image!);
+    } else if (_editMode) {
+      img = NetworkImage(widget.workout!.thumbnailUrl!);
+    }
+
     return GestureDetector(
       onTap: () => _chooseImageSource(),
       child: Padding(
@@ -269,8 +339,10 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               border: Border.all(color: tertiaryColor),
-              image:
-                  DecorationImage(image: FileImage(_image!), fit: BoxFit.cover),
+              image: DecorationImage(
+                image: img,
+                fit: BoxFit.cover,
+              ),
               borderRadius: BorderRadius.circular(10),
             ),
           ),

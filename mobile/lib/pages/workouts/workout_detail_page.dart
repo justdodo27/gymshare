@@ -1,41 +1,140 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/exercise_in_workout.dart';
 import 'package:gymshare/api/models/workout.dart';
+import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
+import 'package:gymshare/pages/workouts/add_workout_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/pages/workouts/exercise_detail_page.dart';
 
-class WorkoutDetailPage extends StatelessWidget {
+class WorkoutDetailPage extends StatefulWidget {
+  final bool editable;
+  final bool isFavorite;
   final Workout workout;
 
-  const WorkoutDetailPage({super.key, required this.workout});
+  const WorkoutDetailPage({
+    super.key,
+    required this.workout,
+    required this.editable,
+    required this.isFavorite,
+  });
+
+  @override
+  State<WorkoutDetailPage> createState() => _WorkoutDetailPageState();
+}
+
+class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
+  late bool isFavorite;
+  late Widget image;
+  late String title;
+  late String? description;
+  late int cycles;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.isFavorite;
+    title = widget.workout.title;
+    description = widget.workout.description;
+    cycles = widget.workout.cycles.toInt();
+    if (widget.workout.thumbnailUrl != null) {
+      image = Image.network(widget.workout.thumbnailUrl!);
+    } else {
+      image = Container();
+    }
+  }
+
+  Map<String, dynamic> get data => <String, dynamic>{
+        'title': title,
+        'image': image,
+        'isFavorite': isFavorite,
+      };
+
+  void _setNewData(data) {
+    if (data == null) return;
+    setState(() {
+      title = data['title'];
+      description = data['description'];
+      cycles = data['cycles'];
+
+      if (data['image_path'] != null) {
+        image = Image.file(File(data['image_path']));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<ExerciseInWorkout>? exercises = workout.exercises;
+    final List<ExerciseInWorkout>? exercises = widget.workout.exercises;
     return SeamlessPattern(
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: secondaryColor,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(data),
+            ),
             title: Text(
-              workout.title,
+              title,
               style: const TextStyle(color: primaryTextColor, fontSize: 20),
             ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.play_arrow),
+                onPressed: () {},
+              ),
+              if (!widget.editable)
+                IconButton(
+                  icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_outline),
+                  onPressed: () async {
+                    if (!isFavorite) {
+                      if (await addToFavorites(
+                        context,
+                        mounted: mounted,
+                        workoutId: widget.workout.id,
+                      )) {
+                        setState(() => isFavorite = true);
+                      }
+                    } else {
+                      if (await deleteFromFavorites(
+                        context,
+                        mounted: mounted,
+                        workoutId: widget.workout.id,
+                      )) {
+                        setState(() => isFavorite = false);
+                      }
+                    }
+                  },
+                ),
+              if (widget.editable)
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => Navigator.of(context)
+                      .push(createPageRoute(
+                        AddWorkoutPage(
+                          workout: widget.workout,
+                        ),
+                      ))
+                      .then((data) => _setNewData(data)),
+                )
+            ],
           ),
           backgroundColor: Colors.transparent,
           body: ScrollConfig(
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  if (workout.thumbnailUrl != null)
-                    Hero(
-                      tag: 'workout image ${workout.id}',
-                      child: Image.network(workout.thumbnailUrl!),
-                    ),
+                  Hero(
+                    tag: 'workout image ${widget.workout.id}',
+                    child: image,
+                  ),
                   Container(
                     padding: const EdgeInsets.all(10.0),
                     color: secondaryColor,
@@ -44,24 +143,24 @@ class WorkoutDetailPage extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            workout.author.profilePictureUrl != null
+                            widget.workout.author.profilePictureUrl != null
                                 ? Row(
                                     children: [
                                       Container(
-                                        height: 50,
-                                        width: 50,
+                                        height: 35,
+                                        width: 35,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           image: DecorationImage(
-                                            image: NetworkImage(workout
+                                            image: NetworkImage(widget.workout
                                                 .author.profilePictureUrl!),
                                             fit: BoxFit.cover,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 6),
+                                      const SizedBox(width: 10),
                                       Text(
-                                        workout.author.username,
+                                        widget.workout.author.username,
                                         style: const TextStyle(
                                           color: primaryTextColor,
                                           fontSize: 20,
@@ -86,7 +185,7 @@ class WorkoutDetailPage extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        workout.author.username,
+                                        widget.workout.author.username,
                                         style: const TextStyle(
                                           color: primaryTextColor,
                                           fontSize: 20,
@@ -94,61 +193,37 @@ class WorkoutDetailPage extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon:
-                                          const Icon(Icons.play_arrow_outlined),
-                                      iconSize: 25,
-                                      splashRadius: 1,
+                            Container(
+                              margin: const EdgeInsets.all(10.0),
+                              child: Row(
+                                children: [
+                                  RatingBar.builder(
+                                    ignoreGestures: true,
+                                    itemSize: 20,
+                                    initialRating:
+                                        widget.workout.avgRating.toDouble(),
+                                    minRating: 1,
+                                    direction: Axis.horizontal,
+                                    allowHalfRating: true,
+                                    itemCount: 5,
+                                    itemPadding:
+                                        const EdgeInsets.only(right: 5),
+                                    itemBuilder: (context, _) => const Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
                                     ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.favorite),
-                                      iconSize: 25,
-                                      splashRadius: 1,
-                                    ),
-                                  ],
-                                )
-                              ],
+                                    onRatingUpdate: (rating) {},
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    '(${widget.workout.ratingsCount})',
+                                    style: const TextStyle(
+                                        color: primaryTextColor, fontSize: 15),
+                                  )
+                                ],
+                              ),
                             ),
                           ],
-                        ),
-                        Container(
-                          margin: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: [
-                              RatingBar.builder(
-                                ignoreGestures: true,
-                                itemSize: 20,
-                                initialRating: workout.avgRating.toDouble(),
-                                minRating: 1,
-                                direction: Axis.horizontal,
-                                allowHalfRating: true,
-                                itemCount: 5,
-                                itemPadding: EdgeInsets.zero,
-                                itemBuilder: (context, _) => const Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                ),
-                                onRatingUpdate: (rating) {},
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                '(${workout.ratingsCount})',
-                                style: const TextStyle(
-                                    color: primaryTextColor, fontSize: 15),
-                              )
-                            ],
-                          ),
                         ),
                       ],
                     ),
@@ -165,7 +240,7 @@ class WorkoutDetailPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${workout.description}',
+                    description ?? '',
                     style:
                         const TextStyle(color: primaryTextColor, fontSize: 16),
                     textAlign: TextAlign.justify,
@@ -239,27 +314,27 @@ class WorkoutDetailPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${(workout.exercises?.length)}',
+                                '${(widget.workout.exercises?.length)}',
                                 style: const TextStyle(
                                     color: primaryTextColor, fontSize: 16),
                               ),
                               Text(
-                                '${((workout.avgTime! / 60).round())} min',
+                                '${((widget.workout.avgTime! / 60).round())} min',
                                 style: const TextStyle(
                                     color: primaryTextColor, fontSize: 16),
                               ),
                               Text(
-                                '${(workout.difficulty)}',
+                                '${(widget.workout.difficulty)}',
                                 style: const TextStyle(
                                     color: primaryTextColor, fontSize: 16),
                               ),
                               Text(
-                                '${(workout.sumOfCb)} kcal',
+                                '${(widget.workout.sumOfCb)} kcal',
                                 style: const TextStyle(
                                     color: primaryTextColor, fontSize: 16),
                               ),
                               Text(
-                                '${(workout.cycles)}',
+                                '$cycles',
                                 style: const TextStyle(
                                     color: primaryTextColor, fontSize: 16),
                               ),

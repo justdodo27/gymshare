@@ -75,11 +75,13 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
 }
 
 class WorkoutTile extends StatefulWidget {
+  final bool createdByCurrentUser;
   final Workout workout;
 
   const WorkoutTile({
     Key? key,
     required this.workout,
+    this.createdByCurrentUser = false,
   }) : super(key: key);
 
   @override
@@ -88,21 +90,58 @@ class WorkoutTile extends StatefulWidget {
 
 class _WorkoutTileState extends State<WorkoutTile> {
   late bool isFavorite;
+  late String title;
+  late Widget image;
+
+  void _setNewData(data) {
+    setState(() {
+      isFavorite = data['isFavorite'];
+      title = data['title'];
+      image = data['image'];
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    title = widget.workout.title;
     isFavorite = widget.workout.isFavorite;
+    image = Container(
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        color: secondaryColor,
+        image: widget.workout.thumbnailUrl != null
+            ? DecorationImage(
+                image: NetworkImage('${widget.workout.thumbnailUrl}'),
+                fit: BoxFit.fill,
+              )
+            : null,
+      ),
+      child: widget.workout.thumbnailUrl == null
+          ? const Center(
+              child: Icon(
+                Icons.hide_image,
+                size: 50,
+              ),
+            )
+          : null,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).push(
-        createPageRoute(
-          WorkoutDetailPage(workout: widget.workout),
-        ),
-      ),
+      onTap: () => Navigator.of(context)
+          .push(
+            createPageRoute(
+              WorkoutDetailPage(
+                workout: widget.workout,
+                editable: widget.createdByCurrentUser,
+                isFavorite: isFavorite,
+              ),
+            ),
+          )
+          .then((data) => _setNewData(data)),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20),
         child: Container(
@@ -257,27 +296,7 @@ class _WorkoutTileState extends State<WorkoutTile> {
         tag: 'workout image ${widget.workout.id}',
         child: AspectRatio(
           aspectRatio: 16 / 9,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
-              color: secondaryColor,
-              image: widget.workout.thumbnailUrl != null
-                  ? DecorationImage(
-                      image: NetworkImage('${widget.workout.thumbnailUrl}'),
-                      fit: BoxFit.fill,
-                    )
-                  : null,
-            ),
-            child: widget.workout.thumbnailUrl == null
-                ? const Center(
-                    child: Icon(
-                      Icons.hide_image,
-                      size: 50,
-                    ),
-                  )
-                : null,
-          ),
+          child: image,
         ),
       );
 }
