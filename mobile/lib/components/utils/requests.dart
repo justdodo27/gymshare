@@ -67,7 +67,7 @@ Future<Profile> fetchUserData(BuildContext context,
       'Authorization': 'Bearer ${token.accessToken}',
     },
   );
-  
+
   if (response.statusCode == 200) {
     return Profile.fromJson(jsonDecode(response.body));
   } else if (response.statusCode == 401) {
@@ -411,5 +411,72 @@ Future<List<StatisticCalories>> getBurnedCaloriesStats(
     }
   } else {
     throw Exception('Created workouts could not be fetched.');
+  }
+}
+
+Future<bool> createWorkout(Map<String, dynamic> data, BuildContext context,
+    [bool mounted = true]) async {
+  final token = await getJWT();
+  http.MultipartRequest request = http.MultipartRequest(
+    'POST',
+    Uri.parse(buildUrl('workouts/plans/')),
+  );
+  request.headers['Authorization'] = 'Bearer ${token.accessToken}';
+  request.fields['title'] = data['title'];
+  request.fields['description'] = data['description'];
+  request.fields['visibility'] = data['visibility'];
+  request.fields['cycles'] = data['cycles'].toString();
+  request.files
+      .add(await http.MultipartFile.fromPath('thumbnail', data['image_path']));
+
+  final response = await request.send();
+
+  if (response.statusCode == 201) {
+    return true;
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return createWorkout(data, context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    return false;
+  }
+}
+
+Future<bool> editWorkout(Map<String, dynamic> data, BuildContext context,
+    [bool mounted = true]) async {
+  final token = await getJWT();
+  http.MultipartRequest request = http.MultipartRequest(
+    'PATCH',
+    Uri.parse(buildUrl('workouts/plans/${data['id']}/')),
+  );
+  request.headers['Authorization'] = 'Bearer ${token.accessToken}';
+  request.fields['title'] = data['title'];
+  request.fields['description'] = data['description'];
+  request.fields['visibility'] = data['visibility'];
+  request.fields['cycles'] = data['cycles'].toString();
+
+  if (data['image_path'] != null) {
+    request.files.add(
+        await http.MultipartFile.fromPath('thumbnail', data['image_path']));
+  }
+
+  final response = await request.send();
+
+  if (response.statusCode == 200) {
+    return true;
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return editWorkout(data, context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    return false;
   }
 }
