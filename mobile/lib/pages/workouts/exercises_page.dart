@@ -130,14 +130,14 @@ class _ExerciseTileState extends State<ExerciseTile> {
                   child: Container(
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: tertiaryColor,
+                      color: quaternaryColor,
                     ),
                     height: 40,
                     width: 40,
                     child: Icon(
                       getActivityIcon(widget.exercise.exerciseType),
-                      color: primaryColor,
-                      size: 30,
+                      color: primaryTextColor,
+                      size: 25,
                     ),
                   ),
                 ),
