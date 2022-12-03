@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gymshare/api/models/api_response.dart';
 import 'package:gymshare/api/models/exercise.dart';
 import 'package:gymshare/components/utils/requests.dart';
@@ -22,36 +23,31 @@ class ExerciseTile extends StatefulWidget {
 class _ExerciseTileState extends State<ExerciseTile> {
   @override
   Widget build(BuildContext context) {
-    const widgetHeight = 220.0;
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         createPageRoute(ExerciseDetailPage(exercise: widget.exercise)),
       ),
-      child: Hero(
-        tag: 'exercise ${widget.exercise.id}',
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: Container(
-            height: widgetHeight,
-            decoration: const BoxDecoration(
-              color: quaternaryColor,
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                buildImage(widgetHeight),
-                buildFooter(widgetHeight),
-              ],
-            ),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: quaternaryColor,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              buildImage(),
+              buildFooter(),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget buildFooter(double widgetHeight) => SizedBox(
-        height: widgetHeight * 0.35,
+  Widget buildFooter() => SizedBox(
+        height: 100,
         child: Align(
           alignment: Alignment.topLeft,
           child: Container(
@@ -60,19 +56,38 @@ class _ExerciseTileState extends State<ExerciseTile> {
             child: Scaffold(
               backgroundColor: quaternaryColor,
               body: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     widget.exercise.title,
                     style:
-                        const TextStyle(color: primaryTextColor, fontSize: 16),
+                        const TextStyle(color: primaryTextColor, fontSize: 20),
                   ),
-                  Text(
-                    'Difficulty: ${widget.exercise.difficulty}',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 16),
-                  )
+                  Row(
+                    children: [
+                      const Text(
+                        'Difficulty: ',
+                        style: TextStyle(color: primaryTextColor, fontSize: 16),
+                      ),
+                      RatingBar.builder(
+                        ignoreGestures: true,
+                        itemSize: 20,
+                        initialRating: widget.exercise.difficulty.toDouble(),
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemPadding: EdgeInsets.zero,
+                        itemBuilder: (context, _) => const Icon(
+                          Icons.heart_broken,
+                          color: Colors.red,
+                        ),
+                        onRatingUpdate: (rating) {},
+                      ),
+                      const SizedBox(width: 5),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -80,51 +95,55 @@ class _ExerciseTileState extends State<ExerciseTile> {
         ),
       );
 
-  Widget buildImage(double widgetHeight) => Expanded(
-        child: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
-                color: secondaryColor,
-                image: widget.exercise.thumbnailUrl.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(widget.exercise.thumbnailUrl),
-                        fit: BoxFit.cover,
+  Widget buildImage() => Hero(
+        tag: 'exercise ${widget.exercise.id}',
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(20)),
+                  color: secondaryColor,
+                  image: widget.exercise.thumbnailUrl.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(widget.exercise.thumbnailUrl),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: widget.exercise.thumbnailUrl.isEmpty
+                    ? const Center(
+                        child: Icon(
+                          Icons.hide_image,
+                          size: 50,
+                        ),
                       )
                     : null,
               ),
-              child: widget.exercise.thumbnailUrl.isEmpty
-                  ? Center(
-                      child: Icon(
-                        Icons.hide_image,
-                        size: widgetHeight * 0.3,
-                      ),
-                    )
-                  : null,
-            ),
-            Positioned.fill(
-                child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: tertiaryColor,
-                  ),
-                  height: 40,
-                  width: 40,
-                  child: Icon(
-                    getActivityIcon(widget.exercise.exerciseType),
-                    color: primaryColor,
-                    size: 30,
+              Positioned.fill(
+                  child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: tertiaryColor,
+                    ),
+                    height: 40,
+                    width: 40,
+                    child: Icon(
+                      getActivityIcon(widget.exercise.exerciseType),
+                      color: primaryColor,
+                      size: 30,
+                    ),
                   ),
                 ),
-              ),
-            )),
-          ],
+              )),
+            ],
+          ),
         ),
       );
 

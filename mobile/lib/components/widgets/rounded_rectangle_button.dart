@@ -31,6 +31,7 @@ class RoundedRectangleButton extends StatelessWidget {
       padding: padding,
       child: MaterialButton(
         color: backgroundColor,
+        splashColor: borderColor,
         minWidth: width.toDouble(),
         height: height.toDouble(),
         onPressed: () {

@@ -31,7 +31,7 @@ class WorkoutDetailPage extends StatelessWidget {
               children: [
                 if (workout.thumbnailUrl != null)
                   Hero(
-                    tag: 'workout ${workout.id}',
+                    tag: 'workout image ${workout.id}',
                     child: Image.network(workout.thumbnailUrl!),
                   ),
                 Container(

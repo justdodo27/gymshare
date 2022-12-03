@@ -97,48 +97,42 @@ class _WorkoutTileState extends State<WorkoutTile> {
 
   @override
   Widget build(BuildContext context) {
-    const widgetHeight = 220.0;
-
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         createPageRoute(
           WorkoutDetailPage(workout: widget.workout),
         ),
       ),
-      child: Hero(
-        tag: 'workout ${widget.workout.id}',
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: Container(
-            height: widgetHeight,
-            decoration: const BoxDecoration(
-              color: quaternaryColor,
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                buildImage(widgetHeight),
-                buildFooter(widgetHeight),
-              ],
-            ),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: quaternaryColor,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              buildImage(),
+              buildFooter(),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget buildFooter(double widgetHeight) => SizedBox(
-        height: widgetHeight * 0.45,
+  Widget buildFooter() => SizedBox(
+        height: 110,
         child: Align(
           alignment: Alignment.topLeft,
           child: Container(
             padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
             child: Scaffold(
-              backgroundColor: quaternaryColor,
+              backgroundColor: Colors.transparent,
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
                     widget.workout.title,
@@ -259,26 +253,31 @@ class _WorkoutTileState extends State<WorkoutTile> {
         ),
       );
 
-  Widget buildImage(double widgetHeight) => Expanded(
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            color: secondaryColor,
-            image: widget.workout.thumbnailUrl != null
-                ? DecorationImage(
-                    image: NetworkImage('${widget.workout.thumbnailUrl}'),
-                    fit: BoxFit.fitWidth,
+  Widget buildImage() => Hero(
+        tag: 'workout image ${widget.workout.id}',
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+              color: secondaryColor,
+              image: widget.workout.thumbnailUrl != null
+                  ? DecorationImage(
+                      image: NetworkImage('${widget.workout.thumbnailUrl}'),
+                      fit: BoxFit.fill,
+                    )
+                  : null,
+            ),
+            child: widget.workout.thumbnailUrl == null
+                ? const Center(
+                    child: Icon(
+                      Icons.hide_image,
+                      size: 50,
+                    ),
                   )
                 : null,
           ),
-          child: widget.workout.thumbnailUrl == null
-              ? Center(
-                  child: Icon(
-                    Icons.hide_image,
-                    size: widgetHeight * 0.3,
-                  ),
-                )
-              : null,
         ),
       );
 }
