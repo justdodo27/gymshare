@@ -92,8 +92,10 @@ class _WorkoutTileState extends State<WorkoutTile> {
   late bool isFavorite;
   late String title;
   late Widget image;
+  bool edited = false;
 
   void _setNewData(data) {
+    if (data == null) return;
     setState(() {
       isFavorite = data['isFavorite'];
       title = data['title'];

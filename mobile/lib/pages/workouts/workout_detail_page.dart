@@ -35,6 +35,8 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
   late String? description;
   late int cycles;
 
+  bool edited = false;
+
   @override
   void initState() {
     super.initState();
@@ -56,11 +58,15 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
       };
 
   void _setNewData(data) {
-    if (data == null) return;
+    if (data == null) {
+      edited = false;
+      return;
+    }
     setState(() {
       title = data['title'];
       description = data['description'];
       cycles = data['cycles'];
+      edited = true;
 
       if (data['image_path'] != null) {
         image = Image.file(File(data['image_path']));
@@ -78,7 +84,9 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
             backgroundColor: secondaryColor,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(data),
+              onPressed: () => edited
+                  ? Navigator.of(context).pop(data)
+                  : Navigator.of(context).pop(),
             ),
             title: Text(
               title,
