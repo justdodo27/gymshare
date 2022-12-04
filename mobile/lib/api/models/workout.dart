@@ -18,6 +18,12 @@ class Author {
       profilePictureUrl: json['profile_picture'],
     );
   }
+
+  Map<String, dynamic> toJSON() => {
+    'id': id,
+    'username': username,
+    'profile_picutre': profilePictureUrl
+  };
 }
 
 class Workout {
@@ -72,4 +78,21 @@ class Workout {
       thumbnailUrl: json['thumbnail'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'exercises': exercises?.map((element) => element.toJSON()).toList(),
+    'author': author.toJSON(),
+    'is_favorite': isFavorite,
+    'avg_rating': avgRating,
+    'ratings_count': ratingsCount,
+    'avg_time': avgTime,
+    'difficulty': difficulty,
+    'sum_of_cb': sumOfCb,
+    'title': title,
+    'description': description,
+    'visibility': visibility,
+    'cycles': cycles,
+    'thumbnail': thumbnailUrl
+  };
 }

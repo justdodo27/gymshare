@@ -1,13 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:gymshare/pages/workouts/active_workout_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:gymshare/api/models/workout.dart';
 import 'package:gymshare/api/models/api_response.dart';
 import 'package:gymshare/components/utils/requests.dart';
-import 'package:gymshare/components/utils/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TrainingPage extends StatefulWidget {
-  const TrainingPage({super.key});
+  final Function callback;
+  const TrainingPage({super.key, required this.callback});
 
   @override
   State<TrainingPage> createState() => _TrainingPageState();
@@ -112,7 +114,7 @@ class _TrainingPageState extends State<TrainingPage> {
                       controller: scrollController,
                       itemCount: workouts.length,
                       itemBuilder: (context, index){
-                        return SearchTile(workout: workouts[index]);
+                        return SearchTile(workout: workouts[index], callback: widget.callback);
                       },
                     ),
                   )
@@ -129,10 +131,12 @@ class _TrainingPageState extends State<TrainingPage> {
 
 class SearchTile extends StatefulWidget {
   final Workout workout;
+  final Function callback;
 
   const SearchTile({
     Key? key,
     required this.workout,
+    required this.callback,
   }) : super(key: key);
 
   @override
@@ -149,7 +153,7 @@ class _SearchTileState extends State<SearchTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
           onTap: () {
-            showMyDialog(context, widget.workout);
+            showMyDialog(context, widget.workout, widget.callback);
           },
           child: Container(
             color: surface2,
@@ -168,7 +172,7 @@ class _SearchTileState extends State<SearchTile> {
   }
 }
 
-showMyDialog(BuildContext context, Workout workout){
+showMyDialog(BuildContext context, Workout workout, Function callback) {
   SimpleDialog dialog = SimpleDialog(
     title: Text('You are about to start ${workout.title}'),
     backgroundColor: surface3,
@@ -192,11 +196,18 @@ showMyDialog(BuildContext context, Workout workout){
     }
   );
 
+  void saveWorkout(Workout workout) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, dynamic> workoutJSON = workout.toJson(); 
+    String workoutJSONString = jsonEncode(workoutJSON);
+    await prefs.setString('active_workout', workoutJSONString);
+  }
+
   dialogValue.then((value) => {
     if (value == true){
-      Navigator.of(context).push(createPageRoute(
-        ActivityPage(workout: workout),
-      ))
+      saveWorkout(workout),
+      callback()
+      // callback function to change page
     }
   });
 }

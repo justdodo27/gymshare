@@ -27,4 +27,13 @@ class ExerciseInWorkout {
       series: json['series'],
     );
   }
+
+  Map<String, dynamic> toJSON() => {
+    'id': id,
+    'exercise': exercise.toJSON(),
+    'order': order,
+    'repeats': repeats,
+    'time': time,
+    'series': series,
+  };
 }

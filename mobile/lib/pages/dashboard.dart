@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:gymshare/api/models/workout.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/pages/accounts/profile_page.dart';
 import 'package:gymshare/pages/statistics/statistics_page.dart';
+import 'package:gymshare/pages/workouts/active_workout_page.dart';
 import 'package:gymshare/pages/workouts/favorites_page.dart';
 import 'package:gymshare/pages/workouts/home_page.dart';
 import 'package:gymshare/pages/workouts/training_page.dart';
 import 'package:gymshare/settings/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -16,15 +21,58 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  int currentPageIdx = 0;
   int currentPage = 0;
 
-  static List<Widget> screens = [
-    const HomePage(),
-    const FavoritesPage(),
-    const TrainingPage(),
-    const StatisticsPage(),
-    const ProfilePage(),
-  ];
+  void runTraining() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? workoutJSONString = prefs.getString('active_workout');
+    if (workoutJSONString is String) {
+      setState(() => {
+        currentPageIdx = 5,
+        currentPage = 2
+      });
+    }
+  }
+
+  void changeScreen(int screenIdx) async {
+    if (screenIdx == 2) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? workoutJSONString = prefs.getString('active_workout');
+      if (workoutJSONString is String) {
+        setState(() => {
+          currentPageIdx = 5,
+          currentPage = screenIdx
+        });
+      } else {
+        setState(() => {
+          currentPageIdx = screenIdx,
+          currentPage = screenIdx
+        });  
+      }
+    } else {
+      setState(() => {
+        currentPageIdx = screenIdx,
+        currentPage = screenIdx
+      });
+    }
+  }
+
+  static List<Widget> screens = [];
+
+  @override
+  void initState() {
+    runTraining();
+    screens = [
+      const HomePage(),
+      const FavoritesPage(),
+      TrainingPage(callback: () => runTraining()),
+      const StatisticsPage(),
+      const ProfilePage(),
+      const ActivityPage(),
+    ];
+    super.initState();
+  }
 
   Widget buildBottomNavigationBar() {
     return Theme(
@@ -40,7 +88,7 @@ class _DashboardPageState extends State<DashboardPage> {
         color: secondaryColor,
         buttonBackgroundColor: const Color(0xFF3252CF),
         index: currentPage,
-        onTap: (clicked) => setState(() => currentPage = clicked),
+        onTap: (clicked) => changeScreen(clicked),
         animationCurve: Curves.linearToEaseOut,
         animationDuration: const Duration(milliseconds: 400),
         items: const [
@@ -60,7 +108,7 @@ class _DashboardPageState extends State<DashboardPage> {
       child: SeamlessPattern(
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: screens[currentPage],
+          body: screens[currentPageIdx],
           bottomNavigationBar: buildBottomNavigationBar(),
         ),
       ),
