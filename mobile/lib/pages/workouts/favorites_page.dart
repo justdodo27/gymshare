@@ -7,6 +7,7 @@ import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/pages/workouts/created_workouts_page.dart';
 import 'package:gymshare/pages/workouts/favorite_workouts_page.dart';
+import 'package:gymshare/pages/workouts/home_page.dart';
 import 'package:gymshare/pages/workouts/workouts_page.dart';
 import 'package:gymshare/settings/colors.dart';
 
@@ -261,6 +262,7 @@ class _FavoritesPageState extends State<FavoritesPage>
         ),
       ),
       backgroundColor: Colors.transparent,
+      floatingActionButton: const AddWorkoutButton(),
       body: SafeArea(
         child: TabBarView(
           controller: _controller,

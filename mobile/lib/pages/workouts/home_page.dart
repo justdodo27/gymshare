@@ -4,8 +4,11 @@ import 'package:gymshare/api/models/api_response.dart';
 import 'package:gymshare/api/models/exercise.dart';
 import 'package:gymshare/api/models/workout.dart';
 import 'package:gymshare/components/utils/requests.dart';
+import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
+import 'package:gymshare/pages/dashboard.dart';
+import 'package:gymshare/pages/workouts/add_workout_page.dart';
 import 'package:gymshare/pages/workouts/exercises_page.dart';
 import 'package:gymshare/pages/workouts/workouts_page.dart';
 import 'package:gymshare/settings/colors.dart';
@@ -270,6 +273,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       backgroundColor: Colors.transparent,
+      floatingActionButton: const AddWorkoutButton(),
       body: SafeArea(
         child: TabBarView(
           controller: _controller,
@@ -279,6 +283,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ],
         ),
       ),
+    );
+  }
+}
+
+class AddWorkoutButton extends StatelessWidget {
+  const AddWorkoutButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      backgroundColor: quaternaryColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      onPressed: () => Navigator.of(context)
+          .push(createBottomToTopPageRouteAnimation(const AddWorkoutPage()))
+          .then((value) => Navigator.of(context)
+              .pushReplacement(createPageRoute(const DashboardPage()))),
+      child: const Icon(Icons.add, color: primaryTextColor),
     );
   }
 }

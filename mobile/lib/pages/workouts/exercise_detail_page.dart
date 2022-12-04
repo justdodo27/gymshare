@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/exercise.dart';
+import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/settings/colors.dart';
 
@@ -20,69 +21,118 @@ class ExerciseDetailPage extends StatelessWidget {
             ),
           ),
           backgroundColor: Colors.transparent,
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Image.network(exercise.thumbnailUrl),
-                Container(
-                  margin: const EdgeInsets.all(10.0),
-                  child: const Text(
-                    'Description',
-                    style: TextStyle(
-                      color: primaryTextColor,
-                      fontSize: 20,
+          body: ScrollConfig(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Hero(
+                    tag: 'exercise ${exercise.id}',
+                    child: Image.network(exercise.thumbnailUrl),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20.0),
+                    child: const Text(
+                      'Description',
+                      style: TextStyle(
+                        color: primaryTextColor,
+                        fontSize: 22,
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  '${(exercise.description)}',
-                  style: const TextStyle(color: primaryTextColor, fontSize: 15),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Divider(),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  margin: const EdgeInsets.all(10.0),
-                  child: const Text(
-                    'Information',
-                    style: TextStyle(
-                      color: primaryTextColor,
-                      fontSize: 20,
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      '${exercise.description}',
+                      style: const TextStyle(
+                          color: primaryTextColor, fontSize: 16),
+                      textAlign: TextAlign.justify,
                     ),
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.all(10.0),
-                  child: Text(
-                    'Exercise Type ${(exercise.exerciseType)}',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 15),
+                  const SizedBox(
+                    height: 10,
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.all(10.0),
-                  child: Text(
-                    'Difficulty ${(exercise.difficulty)}',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 15),
+                  const Divider(thickness: 2, color: secondaryColor),
+                  const SizedBox(height: 10),
+                  Container(
+                    margin: const EdgeInsets.all(10.0),
+                    child: const Text(
+                      'Information',
+                      style: TextStyle(
+                        color: primaryTextColor,
+                        fontSize: 22,
+                      ),
+                    ),
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.all(10.0),
-                  child: Text(
-                    'Calories Burn Rate ${(exercise.caloriesBurnRate)} kcal',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 15),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 100,
+                    child: Row(children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: const [
+                            Text(
+                              'Exercise type',
+                              style: TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              'Difficulty',
+                              style: TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              'Calories Burn Rate',
+                              style: TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (exercise.exerciseType),
+                              style: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              '${(exercise.difficulty)}',
+                              style: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              '${(exercise.caloriesBurnRate)}',
+                              style: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ]),
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-              ],
+                  const SizedBox(
+                    height: 40,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

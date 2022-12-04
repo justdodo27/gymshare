@@ -48,7 +48,10 @@ class _CreatedWorkoutsPageState extends State<CreatedWorkoutsPage> {
         itemCount: workouts.length + 1,
         itemBuilder: (context, index) {
           if (index < workouts.length) {
-            return WorkoutTile(workout: workouts[index]);
+            return WorkoutTile(
+              workout: workouts[index],
+              createdByCurrentUser: true,
+            );
           } else {
             return index == _apiResponse.count
                 ? Container()
