@@ -13,4 +13,5 @@ router.register(r'favorites', views.FavoriteWorkoutViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('upload/', views.WorkoutUpload.as_view()),
 ]

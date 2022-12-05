@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:gymshare/api/models/api_response.dart';
+import 'package:gymshare/api/models/exercise_in_workout.dart';
 import 'package:gymshare/api/models/statistic_calories.dart';
 import 'package:gymshare/api/models/statistic_exercise.dart';
 import 'package:gymshare/api/models/token.dart';
@@ -471,6 +472,51 @@ Future<bool> editWorkout(Map<String, dynamic> data, BuildContext context,
   } else if (response.statusCode == 401) {
     if (await refreshToken(refresh: token.refreshToken)) {
       if (mounted) return editWorkout(data, context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    return false;
+  }
+}
+
+Future<bool> editWorkoutExercises(
+  BuildContext context, {
+  required int workoutId,
+  required List<ExerciseInWorkout> exercises,
+  bool mounted = true,
+}) async {
+  final token = await getJWT();
+  final response = await http.post(Uri.parse(buildUrl('workouts/upload/')),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ${token.accessToken}',
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'workout_for_update_id': workoutId,
+          'exercises': exercises
+              .map((entry) => {
+                    'exercise': entry.exercise.id,
+                    'order': entry.order,
+                    'repeats': entry.repeats,
+                    'time': entry.time,
+                    'series': entry.series,
+                  })
+              .toList()
+        },
+      ));
+
+  if (response.statusCode == 200) {
+    return true;
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) {
+        return editWorkoutExercises(context,
+            workoutId: workoutId, exercises: exercises, mounted: mounted);
+      }
       throw Exception('Widget not mounted.');
     } else {
       if (mounted) logOut(context);
