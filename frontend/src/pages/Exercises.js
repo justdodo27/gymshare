@@ -48,7 +48,7 @@ const TABLE_HEAD = [
   { id: 'title', label: 'Title', alignRight: false },
   { id: 'type', label: 'Type', alignRight: false },
   { id: 'difficulty', label: 'Difficulty', alignRight: false },
-  { id: 'cbr', label: 'Calories Burn Rate', alignRight: false },
+  { id: 'calories_burn_rate', label: 'Calories Burn Rate', alignRight: false },
 
 ];
 
@@ -91,7 +91,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.title.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -121,7 +121,7 @@ export default function Exercises() {
 
   const [selected, setSelected] = useState([]);
 
-  const [orderBy, setOrderBy] = useState('name');
+  const [orderBy, setOrderBy] = useState('title');
 
   const [filterName, setFilterName] = useState('');
 
@@ -162,18 +162,17 @@ export default function Exercises() {
         throw new Error('Something went wrong!');
       }
       const data = await response.json();
-      console.log('Hello')
-      console.log(data)
+      console.log(data.results[0].id)
 
-      const users = [...Array(data.length)].map((_, index) => ({
-        id: data[index].id,
-        avatarUrl: data[index].thumbnail ? data[index].thumbnail : "/pictures/nophoto.jpg",
-        name: data[index].title,
-        company: data[index].exercise_type,
-        isVerified: data[index].calories_burn_rate!=null ? data[index].calories_burn_rate : 0,
-        role: data[index].difficulty!=null ? data[index].difficulty : 0,
-        description: data[index].description,
-        video: data[index].video,
+      const users = [...Array(data.results.length)].map((_, index) => ({
+        id: data.results[index].id,
+        avatarUrl: data.results[index].thumbnail ,
+        title: data.results[index].title,
+        type: data.results[index].exercise_type,
+        calories_burn_rate: data.results[index].calories_burn_rate,
+        difficulty: data.results[index].difficulty,
+        description: data.results[index].description,
+        video: data.results[index].video,
       }));
 
       console.log(users)
@@ -199,7 +198,7 @@ export default function Exercises() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = array.map((n) => n.name);
+      const newSelecteds = array.map((n) => n.title);
       setSelected(newSelecteds);
       return;
     }
@@ -297,43 +296,43 @@ const handleClickDelete = (id) => {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, company, avatarUrl, isVerified, description, video } = row;
-                    const isItemSelected = selected.indexOf(name) !== -1;
+                    const { id, title, difficulty, type, avatarUrl, calories_burn_rate, description, video } = row;
+                    const isItemSelected = selected.indexOf(title) !== -1;
 
                     return (
                       <TableRow
                         hover
                         key={id}
                         tabIndex={-1}
-                        role="checkbox"
+                        difficulty="checkbox"
                         selected={isItemSelected}
                         aria-checked={isItemSelected}
-                        onClick={() => handleClick([name, description, isVerified, role, company, avatarUrl, video, id] )}
+                        onClick={() => handleClick([title, description, calories_burn_rate, difficulty, type, avatarUrl, video, id] )}
                       >
                         
                         <TableCell padding="checkbox">
-                          {/* <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} /> */}
+                          {/* <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, title)} /> */}
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
+                            <Avatar alt={title} src={avatarUrl} />
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {title}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell align="left">{company}</TableCell>
+                        <TableCell align="left">{type}</TableCell>
                         <TableCell align="left">
                         <StyledRating
        
-        value={role/2}
+        value={difficulty/2}
         readOnly
         precision={0.5}
         icon={<FavoriteIcon fontSize="inherit" />}
         emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
       />
                         </TableCell>
-                        <TableCell align="left">{isVerified}</TableCell>
+                        <TableCell align="left">{calories_burn_rate}</TableCell>
                       </TableRow>
                     );
                   })}
