@@ -453,6 +453,7 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
                           .then((exercise) {
                         if (exercise != null) {
                           setState(() => exercisesToSave.add(exercise));
+                          scrollToBottom(_controller);
                         }
                       }),
                       title: const Center(child: Icon(Icons.add)),
