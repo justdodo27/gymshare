@@ -7,7 +7,8 @@ const initialWorkoutState = {
   title: '',
   description: '',
   visibility: '',
-  cycles: ''
+  cycles: '',
+  image: ''
 };
 
 const workoutSlice = createSlice({
@@ -22,6 +23,7 @@ const workoutSlice = createSlice({
       state.description= action.payload[1];
       state.visibility= action.payload[2];
       state.cycles= action.payload[3];
+      state.image= action.payload[4];
     },
   },
 });
