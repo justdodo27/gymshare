@@ -19,7 +19,6 @@ class AddExercisePage extends StatefulWidget {
 
 class _AddExercisePageState extends State<AddExercisePage> {
   late TextEditingController _controller;
-  final _weightController = TextEditingController();
   final _timesController = TextEditingController();
   final _repeatsController = TextEditingController();
   final _seriesController = TextEditingController();
@@ -44,7 +43,6 @@ class _AddExercisePageState extends State<AddExercisePage> {
   void clearFields() {
     _controller.clear();
     _timesController.clear();
-    _weightController.clear();
     _repeatsController.clear();
     _seriesController.clear();
   }
@@ -69,7 +67,6 @@ class _AddExercisePageState extends State<AddExercisePage> {
     _repeatsController.dispose();
     _seriesController.dispose();
     _timesController.dispose();
-    _weightController.dispose();
     scrollController.dispose();
     super.dispose();
   }
@@ -177,7 +174,6 @@ class _AddExercisePageState extends State<AddExercisePage> {
                           repeats: _getFieldValue(_repeatsController),
                           series: _getFieldValue(_seriesController),
                           time: _getFieldValue(_timesController),
-                          weight: _getFieldValue(_weightController),
                         );
                         Navigator.of(context).pop(entry);
                       },
