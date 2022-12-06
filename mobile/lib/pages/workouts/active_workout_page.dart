@@ -4,7 +4,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/exercise.dart';
 import 'package:gymshare/api/models/exercise_in_workout.dart';
+import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
+import 'package:gymshare/pages/workouts/active_exercise_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:gymshare/api/models/workout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,7 +61,7 @@ class _ActivityPageState extends State<ActivityPage> {
             body: SafeArea(
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start, 
                     children: [
@@ -168,12 +170,16 @@ class _ExerciseTileState extends State<ExerciseTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-      
+        Navigator.of(context).push(
+          createPageRoute(
+            ActiveExercisePage(exerciseInWorkout: widget.exercise)
+          )
+        );
       },
       child: Container(
-        color: surface,
+        color: surface2,
         child: Padding(
-          padding: const EdgeInsets.only(left: 0.0, right: 0.0, top: 10.0, bottom: 10.0),
+          padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0, bottom: 10.0),
           child: Row(
             children: [
               Container(

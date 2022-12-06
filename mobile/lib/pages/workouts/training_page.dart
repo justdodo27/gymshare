@@ -203,11 +203,10 @@ showMyDialog(BuildContext context, Workout workout, Function callback) {
     await prefs.setString('active_workout', workoutJSONString);
   }
 
-  dialogValue.then((value) => {
+  dialogValue.then((value) {
     if (value == true){
-      saveWorkout(workout),
-      callback()
-      // callback function to change page
+      saveWorkout(workout);
+      callback();
     }
   });
 }
