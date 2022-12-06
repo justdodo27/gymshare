@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, TextField, Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
+import { Avatar, TextField, Box, Grid, Button, Container, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import icon from "../pictures/icon.jpg"
 import { useNavigate} from 'react-router-dom';
@@ -12,8 +12,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { useDispatch } from 'react-redux';
-import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import { PhotoCamera } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
@@ -26,10 +24,8 @@ let photo = {};
 let videoNew = {};
 
 export default function AddExercise() {
-  const theme = useTheme();
 
   const navigate= useNavigate();
-  const [passwordError, setPasswordError] = useState(false)
   const [value, setValue] = React.useState(1);
   const [cbr, setCbr] = React.useState(0);
   const [file,setFile]=useState('')
@@ -37,10 +33,7 @@ export default function AddExercise() {
   const [text,setText]=useState('Upload exercise logo')
   const [videoText,setVideoText]=useState('Upload video')
   const [type, setType] = React.useState('With own body weight');
-  let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
-  let author = useSelector(state => state.auth.userId);
-  const dispatch = useDispatch();
 
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
@@ -56,7 +49,8 @@ export default function AddExercise() {
      setFile(data)
      photo = data
      setText(data.name)
-     console.log(photo)
+     console.log(file)
+     console.log(video)
 }
 
 const handleVideo=(e)=>{
@@ -119,7 +113,7 @@ const handleVideo=(e)=>{
       if(videoNew){
         form_data.append("video", videoNew, videoNew.name);
       }
-    let response = axios
+    axios
     .post(global.config.url +  "workouts/exercises/", form_data, {
                 method: 'POST',
                 headers: {

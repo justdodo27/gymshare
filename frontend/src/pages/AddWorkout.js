@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, TextField, Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
+import { Avatar, TextField, Box, Grid, Button, Container, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import icon from "../pictures/icon.jpg"
 import { useNavigate} from 'react-router-dom';
@@ -14,7 +14,6 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useDispatch } from 'react-redux';
 import { workoutActions } from '../store/workout';
-import { useTheme } from '@mui/material/styles';
 import { authActions } from '../store/auth';
 import { useEffect } from 'react';
 import { PhotoCamera } from '@mui/icons-material';
@@ -28,16 +27,11 @@ const Input = styled(MuiInput)`
 let photo = {};
 
 export default function AddWorkout() {
-  const theme = useTheme();
   const navigate= useNavigate();
   const [file,setFile]=useState('')
   const [text,setText]=useState('Upload your image')
-  const [passwordError, setPasswordError] = useState(false)
   const [value, setValue] = React.useState(1);
   const [visibility, setVisibility] = React.useState('Public');
-  let passwordErrorCheck = false
-  let token = useSelector(state => state.auth.token);
-  let author = useSelector(state => state.auth.userId);
   const dispatch = useDispatch();
 
   
@@ -48,7 +42,7 @@ export default function AddWorkout() {
      setFile(data)
      photo = data
      setText(data.name)
-     console.log(photo)
+     console.log(file)
 }
 
   useEffect(() => {

@@ -1,13 +1,9 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { Link as RouterLink } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import icon from "../pictures/icon.jpg"
 import { useNavigate} from 'react-router-dom';
 import { useState } from 'react';
 import { useSelector} from 'react-redux';
@@ -22,7 +18,6 @@ import {
   ListSubheader,
   InputAdornment
 } from "@mui/material";
-import { useMemo } from 'react';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
 import Table from '@mui/material/Table';
@@ -61,7 +56,6 @@ export default function AddExerciseToWork() {
   const [type, setType] = React.useState('With a weight');
   const [series, setSeries] = React.useState(5);
   const [time, setTime] = React.useState(30);
-  const [alignment, setAlignment] = React.useState('repeats');
   const [array, setArray] = React.useState([''])
   const [indexes, setIndexes] = React.useState([''])
   const [description, setDescription] = React.useState([''])
@@ -105,18 +99,9 @@ export default function AddExerciseToWork() {
     setAddAlert(false);
   };
 
- 
-
-  const containsText = (text, searchText) =>
-  text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
-
   const [selectedOption, setSelectedOption] = useState(array[0]);
 
   const [searchText, setSearchText] = useState("zzzzzzz");
-  const displayedOptions = useMemo(
-    () => array.filter((option) => containsText(option, searchText)),
-    [searchText, array]
-  );
 
 
   const fetchMoviesHandler = useCallback(async () => {
@@ -173,12 +158,6 @@ export default function AddExerciseToWork() {
     const index = indexes[temp]
     console.log(index)
    
-
-  const descriptionData= description[temp]
-
-  const handleChange1 = (event, newAlignment) => {
-    setAlignment(newAlignment);
-  };
 
   let token = useSelector(state => state.auth.token)
 
@@ -241,7 +220,7 @@ export default function AddExerciseToWork() {
       if(workoutImage){
         form_data.append("thumbnail", workoutImage, workoutImage.name);
       }
-      let response = axios
+      axios
       .post(global.config.url +  "workouts/plans/", form_data, {
                   method: 'POST',
                   headers: {

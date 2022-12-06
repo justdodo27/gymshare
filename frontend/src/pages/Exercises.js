@@ -29,7 +29,6 @@ import { useCallback } from 'react';
 import { useEffect } from 'react';
 import { useNavigate} from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { workoutActions } from '../store/workout';
 import Rating from '@mui/material/Rating';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -401,7 +400,7 @@ const handleClickDelete = (id) => {
         <Typography variant="h4">  
           {exe[0]}
           </Typography>
-          {is_staff  && <IconButton aria-label="delete" size="large" color={ is_staff && 'warning' ||"secondary"} onClick={() => handleDeleteAlertClick()} >
+          {is_staff  && <IconButton aria-label="delete" size="large" color={ is_staff && ('warning' ||"secondary")} onClick={() => handleDeleteAlertClick()} >
             <DeleteIcon  fontSize="inherit" />
               </IconButton>}
         </Stack>
