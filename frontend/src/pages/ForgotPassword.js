@@ -1,15 +1,9 @@
-import { Link as RouterLink } from 'react-router-dom';
-// @mui
 import { styled } from '@mui/material/styles';
-import { Card, Link, Container, Typography } from '@mui/material';
-// hooks
-import useResponsive from '../hooks/useResponsive';
+import { Container} from '@mui/material';
 // components
 import Page from '../components/Page';
-import Logo from '../components/Logo';
 // sections
 import { ForgotForm } from 'src/sections/auth/forgot';
-import AuthSocial from '../sections/auth/AuthSocial';
 
 // ----------------------------------------------------------------------
 
@@ -27,9 +21,6 @@ const ContentStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function Forgot() {
-  const smUp = useResponsive('up', 'sm');
-
-  const mdUp = useResponsive('up', 'md');
 
   return (
     <Page title="Login">

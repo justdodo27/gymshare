@@ -1,8 +1,7 @@
 
 import * as React from 'react';
-import { Avatar, TextField, Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
+import { Avatar, TextField, Box, Grid, Button, Container, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { useTheme } from '@mui/material/styles';
 import icon from "../pictures/icon.jpg"
 import { useNavigate} from 'react-router-dom';
 import { useState } from 'react';
@@ -14,7 +13,6 @@ function validatePassword (password) {
 }
 
 export default function ChangePassword() {
-    const theme = useTheme();
 
   const navigate = useNavigate();
   const [passwordError, setPasswordError] = useState(false)

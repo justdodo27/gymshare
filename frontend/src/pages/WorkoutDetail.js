@@ -82,7 +82,7 @@ export default function WorkoutDetail() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let token = useSelector(state => state.auth.token);
-  const userId = useSelector(state => state.auth.userId);
+  let userId = useSelector(state => state.auth.userId);
 
 
 
@@ -108,8 +108,8 @@ export default function WorkoutDetail() {
     },
   });
 
-  const workoutId = useSelector(state => state.workout.workoutId);
-  dispatch(workoutActions.getWorkout(''))
+  let workoutId = useSelector(state => state.workout.workoutId);
+  console.log(workoutId + '---TEST');
   let is_staff = useSelector(state => state.auth.is_staff);
   const [workout, setWorkouts] = useState([]);
   const [open, setOpen] = useState(false);

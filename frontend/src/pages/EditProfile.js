@@ -2,8 +2,7 @@
 import * as React from 'react';
 import Page from '../components/Page';
 import { Link as RouterLink } from 'react-router-dom';
-import { Avatar, TextField, Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Avatar, TextField, Box, Grid, Button, Container, Typography } from '@mui/material';
 import icon from "../pictures/icon.jpg"
 import { useState, useEffect } from "react";
 import { useSelector} from 'react-redux';
@@ -15,7 +14,6 @@ function validateNumber (number) {
 
 
 export default function EditProfile() {
-    const theme = useTheme();
 
   const userId = useSelector(state => state.auth.userId);
   const navigate = useNavigate();
@@ -57,7 +55,7 @@ export default function EditProfile() {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, )
 
   const handleSubmit = (event) => {
     event.preventDefault();

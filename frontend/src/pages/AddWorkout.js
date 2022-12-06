@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, TextField, Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
+import { Avatar, TextField, Box, Grid, Button, Container, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import icon from "../pictures/icon.jpg"
 import { useNavigate} from 'react-router-dom';
@@ -14,29 +14,36 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useDispatch } from 'react-redux';
 import { workoutActions } from '../store/workout';
-import { useTheme } from '@mui/material/styles';
 import { authActions } from '../store/auth';
 import { useEffect } from 'react';
+import { PhotoCamera } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
+
 
 const Input = styled(MuiInput)`
   width: 42px;
 `;
 
-export default function AddWorkout() {
-  const theme = useTheme();
+let photo = {};
 
+export default function AddWorkout() {
   const navigate= useNavigate();
-  const [passwordError, setPasswordError] = useState(false)
+  const [file,setFile]=useState('')
+  const [text,setText]=useState('Upload your image')
   const [value, setValue] = React.useState(1);
   const [visibility, setVisibility] = React.useState('Public');
-  let passwordErrorCheck = false
-  let token = useSelector(state => state.auth.token);
-  let author = useSelector(state => state.auth.userId);
   const dispatch = useDispatch();
 
   
   let exp = useSelector(state => state.auth.exp);
- 
+  
+  const handleChange=(e)=>{
+    const data=e.target.files[0]
+     setFile(data)
+     photo = data
+     setText(data.name)
+     console.log(file)
+}
 
   useEffect(() => {
     if (exp<parseInt(Date.now()/1000)) {
@@ -74,14 +81,11 @@ export default function AddWorkout() {
     const data = new FormData(event.currentTarget);
     const title = data.get('title')
     const description = data.get('description')
+    console.log(photo)
 
-    console.log(title)
-    console.log(description)
-    console.log(visibility)
-    console.log(value)
-    console.log(author)
 
-    dispatch(workoutActions.getWorkoutStats([title, description, visibility, value]))
+
+    dispatch(workoutActions.getWorkoutStats([title, description, visibility, value, photo]))
     navigate('/gymshare/addExerciseToWork', { replace: true });
   };
 
@@ -115,6 +119,25 @@ export default function AddWorkout() {
               name='title'
               autoComplete='off'
             />
+            <Typography id="logo" gutterBottom marginTop={1}>
+      </Typography>
+    <div>
+             <input style={{ display: 'none', }} id="icon-button-photo" type="file" onChange={handleChange}/>          
+        </div>
+                <Grid container spacing={0} justifyContent="center">
+      <Grid item>
+      <label htmlFor="icon-button-photo">
+                    <IconButton color="primary" component="span">
+                        <PhotoCamera fontSize='30'/>
+                    </IconButton>
+                </label>
+        </Grid>
+        <Grid item>
+        <Typography id="text" variant='caption'>
+        {text}
+      </Typography>
+        </Grid>
+      </Grid>
             <Grid item xs={12} marginTop={2} marginBottom={3}>
                 <TextField
                 inputProps={{ style: { color: "white" } }}
@@ -132,7 +155,7 @@ export default function AddWorkout() {
               
             
           <FormControl>
-          <Grid item xs={12}>
+          <Grid item xs={12} marginBottom={3}>
         <InputLabel id="demo-simple-select-autowidth-label">Visibility</InputLabel>
         <Select
           labelId="demo-simple-select-autowidth-label"
@@ -147,7 +170,6 @@ export default function AddWorkout() {
         </Select>
     </Grid>
     </FormControl>
-
     <Typography id="input-slider" gutterBottom marginTop={2}>
         Cycles
       </Typography>

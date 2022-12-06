@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, TextField, Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
+import { Avatar, TextField, Box, Grid, Button, Container, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import icon from "../pictures/icon.jpg"
 import { useNavigate} from 'react-router-dom';
@@ -12,25 +12,28 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { useDispatch } from 'react-redux';
-import { useTheme } from '@mui/material/styles';
+import axios from 'axios';
+import { PhotoCamera } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 
 const Input = styled(MuiInput)`
   width: 42px;
 `;
 
+let photo = {};
+let videoNew = {};
+
 export default function AddExercise() {
-  const theme = useTheme();
 
   const navigate= useNavigate();
-  const [passwordError, setPasswordError] = useState(false)
   const [value, setValue] = React.useState(1);
   const [cbr, setCbr] = React.useState(0);
+  const [file,setFile]=useState('')
+  const [video,setVideo]=useState('')
+  const [text,setText]=useState('Upload exercise logo')
+  const [videoText,setVideoText]=useState('Upload video')
   const [type, setType] = React.useState('With own body weight');
-  let passwordErrorCheck = false
   let token = useSelector(state => state.auth.token);
-  let author = useSelector(state => state.auth.userId);
-  const dispatch = useDispatch();
 
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
@@ -40,6 +43,22 @@ export default function AddExercise() {
     setCbr(newValue/100);
     console.log(typeof cbr)
   };
+
+  const handleChange=(e)=>{
+    const data=e.target.files[0]
+     setFile(data)
+     photo = data
+     setText(data.name)
+     console.log(file)
+     console.log(video)
+}
+
+const handleVideo=(e)=>{
+  const data=e.target.files[0]
+   setVideo(data)
+   videoNew = data
+   setVideoText(data.name)
+}
 
   const handleVisibilityChange = (event) => {
     setType(event.target.value);
@@ -82,32 +101,27 @@ export default function AddExercise() {
     console.log(type)
     console.log(value)
     console.log(cbr)
-
-    fetch(global.config.url + "workouts/exercises/", {
-      method: 'POST',
-      body: JSON.stringify({
-        title: title,
-        description: description,
-        difficulty: value,
-        calories_burn_rate: cbr,
-        exercise_type: type,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: "Bearer " +token
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          return res.json().then((data) => {
-            console.log(data)
-            let errorMessage = 'Enter correct data!';
-            throw new Error(errorMessage);
-          });
-        }
-      })
+    let form_data = new FormData();
+      form_data.append("title", title);
+      form_data.append("description", description);
+      form_data.append("exercise_type", type);
+      form_data.append("calories_burn_rate", cbr);
+      form_data.append("difficulty", value);
+      if(photo){
+        form_data.append("thumbnail", photo, photo.name);
+      }
+      if(videoNew){
+        form_data.append("video", videoNew, videoNew.name);
+      }
+    axios
+    .post(global.config.url +  "workouts/exercises/", form_data, {
+                method: 'POST',
+                headers: {
+                "Content-Type": "multipart/form-data",
+                'Authorization': "Bearer " +token
+                },
+            })
+      
       .then((data) => {
         console.log(data)
         navigate('/gymshare/exercises', {replace: true})
@@ -147,7 +161,26 @@ export default function AddExercise() {
               name='title'
               autoComplete='off'
             />
-            <Grid item xs={12} marginTop={2} marginBottom={3}>
+             <Typography id="logo" gutterBottom marginTop={1}>
+      </Typography>
+    <div>
+             <input style={{ display: 'none', }} id="icon-button-photo" type="file" onChange={handleChange}/>          
+        </div>
+                <Grid container spacing={0} justifyContent="center">
+      <Grid item>
+      <label htmlFor="icon-button-photo">
+                    <IconButton color="primary" component="span">
+                        <PhotoCamera fontSize='30'/>
+                    </IconButton>
+                </label>
+        </Grid>
+        <Grid item>
+        <Typography id="text" variant='caption'>
+        {text}
+      </Typography>
+        </Grid>
+      </Grid>
+            <Grid item xs={12} marginTop={2} marginBottom={2}>
                 <TextField
                 inputProps={{ style: { color: "white" } }}
                 InputLabelProps={{ style: { color: '#fff' }}}
@@ -162,9 +195,29 @@ export default function AddExercise() {
                 />
               </Grid>
               
-            
+              <Typography id="logo" gutterBottom>
+      </Typography>
+    <div>
+             <input style={{ display: 'none', }} id="icon-button-video" type="file" onChange={handleVideo}/>          
+        </div>
+                <Grid container spacing={0} justifyContent="center">
+      <Grid item>
+      <label htmlFor="icon-button-video">
+                    <IconButton color="primary" component="span">
+                        <PhotoCamera fontSize='30'/>
+                    </IconButton>
+                </label>
+        </Grid>
+        <Grid item>
+        <Typography id="text" variant='caption'>
+        {videoText}
+      </Typography>
+        </Grid>
+      </Grid>
+      <Typography id="logo" gutterBottom>
+      </Typography>
           <FormControl>
-          <Grid item xs={12}>
+          <Grid  item xs={12}>
         <InputLabel id="demo-simple-select-autowidth-label">Type</InputLabel>
         <Select
           labelId="demo-simple-select-autowidth-label"
@@ -248,7 +301,7 @@ export default function AddExercise() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Add Workout
+              Add Exercise
             </Button>
             <Grid container>
               <Grid item>

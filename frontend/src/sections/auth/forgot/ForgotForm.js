@@ -27,11 +27,6 @@ function Copyright(props) {
   );
 }
 
-function validatePassword (password) {
-  const regexp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/;
-  return regexp.test(password);
-}
-
 const theme = createTheme({
   palette: {
     mode: "dark",
