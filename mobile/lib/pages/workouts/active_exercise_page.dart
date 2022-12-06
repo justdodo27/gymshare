@@ -176,9 +176,16 @@ class _TimerWidgetState extends State<TimerWidget> with SingleTickerProviderStat
   void initState() {
     super.initState();
     _ticker = createTicker((elapsed) {
-      setState(() {
-        _elapsed = -elapsed;
-      });
+      if (elapsed.inSeconds >= _requested.inSeconds){
+        _ticker.stop();
+        setState(() {
+          _elapsed = -Duration(seconds: _requested.inSeconds);
+        });
+      } else {
+        setState(() {
+          _elapsed = -elapsed;
+        });
+      }
     });
     _requested = Duration(seconds: timeToCount);
   }
@@ -205,11 +212,11 @@ class _TimerWidgetState extends State<TimerWidget> with SingleTickerProviderStat
           time: DateTime(2022, 1, 1, 0, 0, 0),
           isForce2Digits: true,
           isShowSeconds: true,
-          normalTextStyle: TextStyle(
+          normalTextStyle: const TextStyle(
             fontSize: 24,
             color: onSurfaceVariant
           ),
-          highlightedTextStyle: TextStyle(
+          highlightedTextStyle: const TextStyle(
             fontSize: 28,
             color: onSurface
           ),
@@ -236,7 +243,6 @@ class _TimerWidgetState extends State<TimerWidget> with SingleTickerProviderStat
               icon: const Icon(Icons.play_arrow),
               tooltip: 'Start timer',
               onPressed: () {
-                print(_elapsed);
                 _ticker.start();
               },
             ),
