@@ -55,7 +55,7 @@ export default function EditProfile() {
 
   useEffect(() => {
     fetchData()
-  }, )
+  }, [])
 
   const handleSubmit = (event) => {
     event.preventDefault();

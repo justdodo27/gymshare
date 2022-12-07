@@ -24,7 +24,7 @@ const Input = styled(MuiInput)`
   width: 42px;
 `;
 
-let photo = {};
+let photo = '';
 
 export default function AddWorkout() {
   const navigate= useNavigate();

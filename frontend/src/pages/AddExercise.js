@@ -20,8 +20,8 @@ const Input = styled(MuiInput)`
   width: 42px;
 `;
 
-let photo = {};
-let videoNew = {};
+let photo = '';
+let videoNew = '';
 
 export default function AddExercise() {
 
@@ -107,10 +107,10 @@ const handleVideo=(e)=>{
       form_data.append("exercise_type", type);
       form_data.append("calories_burn_rate", cbr);
       form_data.append("difficulty", value);
-      if(photo){
+      if(photo!=''){
         form_data.append("thumbnail", photo, photo.name);
       }
-      if(videoNew){
+      if(videoNew!=''){
         form_data.append("video", videoNew, videoNew.name);
       }
     axios
