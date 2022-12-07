@@ -102,7 +102,7 @@ export default function Profile() {
   useEffect(() => {
     fetchData()
     fetchWorkout()
-  }, )
+  }, [])
 
 
 const fetchNextWorkout = () => {

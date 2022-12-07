@@ -217,7 +217,7 @@ export default function AddExerciseToWork() {
       form_data.append("visibility", workoutVisibility);
       form_data.append("cycles", workoutCycles);
       console.log(data)
-      if(workoutImage){
+      if(workoutImage!=''){
         form_data.append("thumbnail", workoutImage, workoutImage.name);
       }
       axios
