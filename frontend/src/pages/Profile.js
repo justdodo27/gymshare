@@ -133,6 +133,8 @@ const fetchNextWorkout = () => {
       })
     }
   }
+
+  console.log(myWorkouts)
   return (
     <Page title="Profile">
       <Container component="main" maxWidth="lg">
@@ -171,17 +173,17 @@ const fetchNextWorkout = () => {
     {alignment==='your' && <Box>
     <ProductList products={myWorkouts} />
      <Box m={3} pt={5}>
-        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+        {myWorkouts.length>14 && <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
             See more
-          </Button>
+          </Button>}
           </Box>
           </Box>}
     {alignment==='liked' && <Box>
     <ProductList products={favWorkouts} />
      <Box m={3} pt={5}>
-        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+     {favWorkouts.length>14 &&<Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
             See more
-          </Button>
+          </Button>}
           </Box>
           </Box>}
       </Container>

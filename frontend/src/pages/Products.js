@@ -263,9 +263,9 @@ const fetchNextWorkout = () => {
         </Stack>
         {workouts && <ProductList products={workouts} />}
         <Box m={3} pt={5}>
-        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+        {workouts.length>14 && <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
             See more
-          </Button>
+          </Button>}
           </Box>
           <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
         <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'warning'} sx={{ width: '100%' }}>

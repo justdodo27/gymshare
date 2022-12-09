@@ -7,10 +7,15 @@ import icon from "../pictures/icon.jpg"
 import { useState, useEffect } from "react";
 import { useSelector} from 'react-redux';
 import { useNavigate} from 'react-router-dom';
+import axios from 'axios';
+import { PhotoCamera } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 
 function validateNumber (number) {
   return !isNaN(number);
 }
+
+let photo = '';
 
 
 export default function EditProfile() {
@@ -24,6 +29,8 @@ export default function EditProfile() {
   const [weightError, setWeightError] = useState(false)
   const [firstNameError, setFirstNameError] = useState(false)
   const [lastNameError, setLastNameError] = useState(false)
+  const [file,setFile]=useState('')
+  const [text,setText]=useState('Upload exercise logo')
   const [heightGet, setHeight] = useState("")
   const [weightGet, setWeight] = useState("")
   const [firstName, setFirstName] = useState("")
@@ -33,6 +40,15 @@ export default function EditProfile() {
   let heightErrorCheck = false
   let firstNameErrorCheck = false
   let lastNameErrorCheck = false
+
+  const handleChange=(e)=>{
+    const data=e.target.files[0]
+     setFile(data)
+     photo = data
+     setText(data.name)
+     console.log(file)
+}
+  
 
   const fetchData = () => {
   fetch(global.config.url + "accounts/profiles/" +userId, {
@@ -66,7 +82,7 @@ export default function EditProfile() {
     let last_Name = data.get('last_name')
   
 
-    if (validateNumber(weight) && weight.length !== 0) {
+    if (validateNumber(weight)) {
       setWeightError(false)
       weightErrorCheck = true
     } else {
@@ -74,53 +90,32 @@ export default function EditProfile() {
       weightErrorCheck = false
     }
 
-    if (validateNumber(height) && height.length !== 0) {
+    if (validateNumber(height)) {
       setHeightError(false)
       heightErrorCheck = true
     } else {
       setHeightError(true)
       heightErrorCheck = false
     }
-    if(first_Name.length !== 0){
-      setFirstNameError(false)
-      firstNameErrorCheck = true
-    }else {
-      setFirstNameError(true)
-      firstNameErrorCheck = false
-    }
-    if(last_Name.length !== 0){
-      setLastNameError(false)
-      lastNameErrorCheck = true
-    }else {
-      setLastNameError(true)
-      lastNameErrorCheck = false
-    }
-    
-    console.log(heightErrorCheck, weightErrorCheck, firstNameErrorCheck, lastNameErrorCheck)
-    if (heightErrorCheck && weightErrorCheck && firstNameErrorCheck && lastNameErrorCheck) {
-      fetch(global.config.url +  "accounts/profiles/" + userId +"/", {
-        method: 'PATCH',
-        body: JSON.stringify({
-          first_name: first_Name,
-          last_name: last_Name,
-          height: height,
-          weight: weight,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " +token
-        },
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            return res.json().then((data) => {
-              let errorMessage = 'Enter correct data!';
-              throw new Error(errorMessage);
-            });
-          }
-        })
+    if (heightErrorCheck || weightErrorCheck || firstNameErrorCheck || lastNameErrorCheck) {
+
+      let form_data = new FormData();
+      form_data.append("first_name", first_Name);
+      form_data.append("last_name", last_Name);
+      form_data.append("height", height);
+      form_data.append("weight", weight);
+      form_data.append('_method', 'PATCH');
+      if(photo!=''){
+        form_data.append("profile_picture", photo, photo.name);
+      }
+
+      axios
+    .patch(global.config.url +  "accounts/profiles/" + userId +"/", form_data, {
+                headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                'Authorization': "Bearer " +token
+                },
+            })
         .then((data) => {
           console.log(data)
           navigate('/gymshare/profile', {replace: true})
@@ -205,6 +200,23 @@ export default function EditProfile() {
               onChange={event => setLastName(event.target.value)}
               autoFocus
             />}
+            <div>
+             <input style={{ display: 'none', }} id="icon-button-photo" type="file" onChange={handleChange}/>          
+        </div>
+                <Grid container spacing={0} justifyContent="center">
+      <Grid item>
+      <label htmlFor="icon-button-photo">
+                    <IconButton color="primary" component="span">
+                        <PhotoCamera fontSize='30'/>
+                    </IconButton>
+                </label>
+        </Grid>
+        <Grid item>
+        <Typography id="text" variant='caption'>
+        {text}
+      </Typography>
+        </Grid>
+      </Grid>
             {!heightError && <TextField
             inputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: '#fff' }} }
