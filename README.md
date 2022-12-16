@@ -32,7 +32,7 @@ User can download workout to phone and edit it (changes will be local).
 - [ ] Friends list
 - [x] Rating public workouts
 
-![Database Model](https://github.com/justdodo27/gymshare/blob/main/db_model.png)
+![Database Model](https://github.com/justdodo27/gymshare/blob/main/schemat_bazy_danych.png)
 
 ### Exercises
 - Title
