@@ -283,11 +283,14 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
                       ),
                     ),
                   ),
-                  Text(
-                    description ?? '',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 16),
-                    textAlign: TextAlign.justify,
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      description ?? '',
+                      style: const TextStyle(
+                          color: primaryTextColor, fontSize: 16),
+                      textAlign: TextAlign.justify,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   const Divider(
