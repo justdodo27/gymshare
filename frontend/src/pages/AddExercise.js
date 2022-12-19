@@ -15,6 +15,9 @@ import Select from '@mui/material/Select';
 import axios from 'axios';
 import { PhotoCamera } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import {forwardRef} from 'react';
 
 const Input = styled(MuiInput)`
   width: 42px;
@@ -23,17 +26,34 @@ const Input = styled(MuiInput)`
 let photo = '';
 let videoNew = '';
 
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={5} ref={ref} variant="filled" {...props} />;
+});
+
 export default function AddExercise() {
 
   const navigate= useNavigate();
-  const [value, setValue] = React.useState(1);
-  const [cbr, setCbr] = React.useState(0);
+  const [styleAlert, setStyleAlert] = useState(false);
+  const [addAlert, setAddAlert] = useState(false);
+  const [value, setValue] = useState(1);
+  const [cbr, setCbr] = useState(0);
   const [file,setFile]=useState('')
   const [video,setVideo]=useState('')
   const [text,setText]=useState('Upload exercise logo')
   const [videoText,setVideoText]=useState('Upload video')
-  const [type, setType] = React.useState('With own body weight');
+  const [type, setType] = useState('With own body weight');
   let token = useSelector(state => state.auth.token);
+
+  const handleCloseAlert = (event, reason) => {
+    if(styleAlert){
+      navigate('/gymshare/app', { replace: true });
+    }
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddAlert(false);
+  };
 
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
@@ -127,7 +147,7 @@ const handleVideo=(e)=>{
         navigate('/gymshare/exercises', {replace: true})
       })
       .catch((err) => {
-        alert(err.message);
+        setAddAlert(true);
       });
   };
 
@@ -312,6 +332,11 @@ const handleVideo=(e)=>{
             </Grid>
           </Box>
         </Box>
+        <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal:'center' }} open={addAlert} autoHideDuration={2000} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity={(styleAlert === true && 'success') || 'error'} sx={{ width: '100%' }}>
+          <Typography>Error! Empty or wrong data.</Typography>
+        </Alert>
+      </Snackbar>
       </Container>
   );
 }
