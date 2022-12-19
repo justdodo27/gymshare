@@ -7,6 +7,7 @@ import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
+import 'package:gymshare/pages/workouts/add_exercise.dart';
 import 'package:gymshare/pages/workouts/add_workout_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -43,29 +44,6 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
   bool edited = false;
   bool editExercises = false;
 
-  @override
-  void initState() {
-    super.initState();
-    exercisesSaved = widget.workout.exercises!;
-    exercisesToSave.addAll(widget.workout.exercises ?? []);
-
-    isFavorite = widget.isFavorite;
-    title = widget.workout.title;
-    description = widget.workout.description;
-    cycles = widget.workout.cycles.toInt();
-    if (widget.workout.thumbnailUrl != null) {
-      image = Image.network(widget.workout.thumbnailUrl!);
-    } else {
-      image = Container();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   Map<String, dynamic> get data => <String, dynamic>{
         'title': title,
         'image': image,
@@ -87,6 +65,49 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
         image = Image.file(File(data['image_path']));
       }
     });
+  }
+
+  void _saveWorkout() async {
+    exercisesSaved.clear();
+    exercisesSaved.addAll(exercisesToSave);
+    if (await editWorkoutExercises(
+      context,
+      mounted: mounted,
+      workoutId: widget.workout.id,
+      exercises: exercisesSaved,
+    )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        getInfoSnackBar(
+          text: 'Workout exercises has been edited.',
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          getErrorSnackBar(text: 'Could not edit the workout\'s exercises.'));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    exercisesSaved = widget.workout.exercises!;
+    exercisesToSave.addAll(widget.workout.exercises ?? []);
+
+    isFavorite = widget.isFavorite;
+    title = widget.workout.title;
+    description = widget.workout.description;
+    cycles = widget.workout.cycles.toInt();
+    if (widget.workout.thumbnailUrl != null) {
+      image = Image.network(widget.workout.thumbnailUrl!);
+    } else {
+      image = Container();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -262,11 +283,14 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
                       ),
                     ),
                   ),
-                  Text(
-                    description ?? '',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 16),
-                    textAlign: TextAlign.justify,
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      description ?? '',
+                      style: const TextStyle(
+                          color: primaryTextColor, fontSize: 16),
+                      textAlign: TextAlign.justify,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   const Divider(
@@ -384,19 +408,20 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
                             fontSize: 22,
                           ),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            if (editExercises) {
-                              _saveWorkout();
-                            } else {
-                              scrollToBottom(_controller);
-                            }
-                            setState(() => editExercises = !editExercises);
-                          },
-                          icon: Icon(
-                            editExercises ? Icons.check : Icons.edit_note,
+                        if (widget.editable)
+                          IconButton(
+                            onPressed: () {
+                              if (editExercises) {
+                                _saveWorkout();
+                              } else {
+                                scrollToBottom(_controller);
+                              }
+                              setState(() => editExercises = !editExercises);
+                            },
+                            icon: Icon(
+                              editExercises ? Icons.check : Icons.edit_note,
+                            ),
                           ),
-                        ),
                         if (editExercises)
                           IconButton(
                             onPressed: () {
@@ -423,7 +448,17 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
                   ),
                   if (editExercises)
                     ListTile(
-                      onTap: () {},
+                      onTap: () => Navigator.of(context)
+                          .push(createBottomToTopPageRouteAnimation(
+                              AddExercisePage(
+                        count: exercisesToSave.length,
+                      )))
+                          .then((exercise) {
+                        if (exercise != null) {
+                          setState(() => exercisesToSave.add(exercise));
+                          scrollToBottom(_controller);
+                        }
+                      }),
                       title: const Center(child: Icon(Icons.add)),
                     )
                 ],
@@ -444,30 +479,25 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
         entry.exercise.title,
         style: const TextStyle(color: primaryTextColor, fontSize: 20),
       ),
-      subtitle: Text(
-        (entry.exercise.exerciseType),
-        style: const TextStyle(color: primaryTextColor, fontSize: 10),
-      ),
       leading: CircleAvatar(
         backgroundColor: secondaryColor,
         child: Text('$order'),
       ),
       trailing: SizedBox(
-        width: editExercises ? 160 : 100,
+        width: editExercises ? 190 : 100,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            (entry.repeats == null || entry.repeats == 0)
-                ? Text(
-                    '${(entry.time! / 60).round()} min',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 15),
-                  )
-                : Text(
-                    '${(entry.series)}x${(entry.repeats)}',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 15),
-                  ),
+            if (entry.exercise.exerciseType == 'With time')
+              Text(
+                '${(entry.time! / 60).round()} min',
+                style: const TextStyle(color: primaryTextColor, fontSize: 15),
+              )
+            else
+              Text(
+                '${entry.series}x${entry.repeats}',
+                style: const TextStyle(color: primaryTextColor, fontSize: 15),
+              ),
             if (editExercises) ...{
               const SizedBox(width: 10),
               IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
@@ -483,25 +513,5 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
         createPageRoute(ExerciseDetailPage(exercise: entry.exercise)),
       ),
     );
-  }
-
-  void _saveWorkout() async {
-    exercisesSaved.clear();
-    exercisesSaved.addAll(exercisesToSave);
-    if (await editWorkoutExercises(
-      context,
-      mounted: mounted,
-      workoutId: widget.workout.id,
-      exercises: exercisesSaved,
-    )) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        getInfoSnackBar(
-          text: 'Workout exercises has been edited.',
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          getErrorSnackBar(text: 'Could not edit the workout\'s exercises.'));
-    }
   }
 }
