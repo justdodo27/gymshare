@@ -30,7 +30,7 @@ export default function EditProfile() {
   const [firstNameError, setFirstNameError] = useState(false)
   const [lastNameError, setLastNameError] = useState(false)
   const [file,setFile]=useState('')
-  const [text,setText]=useState('Upload exercise logo')
+  const [text,setText]=useState('Upload profile photo')
   const [heightGet, setHeight] = useState("")
   const [weightGet, setWeight] = useState("")
   const [firstName, setFirstName] = useState("")
