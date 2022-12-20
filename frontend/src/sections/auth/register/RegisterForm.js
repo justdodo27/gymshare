@@ -28,7 +28,10 @@ function Copyright(props) {
         Gymshare
       </Link>{' '}
       {new Date().getFullYear()}
-      {'.'}
+      {'. '}
+      <Link component={RouterLink} to='/privacy-policy' color="inherit">
+        Privacy Policy.
+      </Link>{' '}
     </Typography>
   );
 }
