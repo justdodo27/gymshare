@@ -87,7 +87,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.title.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -114,7 +114,7 @@ export default function User() {
 
   const [selected, setSelected] = useState([]);
 
-  const [orderBy, setOrderBy] = useState('name');
+  const [orderBy, setOrderBy] = useState('title');
 
   const [filterName, setFilterName] = useState('');
 
@@ -137,11 +137,11 @@ export default function User() {
       const users = [...Array(temp.length)].map((_, index) => ({
         id: temp[index].id,
         avatarUrl: temp[index].thumbnail ? temp[index].thumbnail : ".../pictures/nophoto.jpg",
-        name: temp[index].title,
-        company: temp[index].author.username,
-        isVerified: temp[index].avg_time<60 ? temp[index].avg_time.toString()+ " seconds" : temp[index].avg_time<3600&&temp[index].avg_time>=60 ?  (temp[index].avg_time/60).toFixed(2).toString()+ " minutes" : temp[index].avg_time>=3600 ? (temp[index].avg_time/3600).toFixed(2).toString()+ " hours" : "no data",
-        status: temp[index].avg_rating!=null ? temp[index].avg_rating : 0,
-        role: temp[index].difficulty!=null ? temp[index].difficulty : 0,
+        title: temp[index].title,
+        author: temp[index].author.username,
+        avg_time: temp[index].avg_time<60 ? temp[index].avg_time.toString()+ " seconds" : temp[index].avg_time<3600&&temp[index].avg_time>=60 ?  (temp[index].avg_time/60).toFixed(2).toString()+ " minutes" : temp[index].avg_time>=3600 ? (temp[index].avg_time/3600).toFixed(2).toString()+ " hours" : "no data",
+        rating: temp[index].avg_rating!=null ? temp[index].avg_rating : 0,
+        difficulty: temp[index].difficulty!=null ? temp[index].difficulty : 0,
       }));
 
       console.log(users)
@@ -167,7 +167,7 @@ export default function User() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = array.map((n) => n.name);
+      const newSelecteds = array.map((n) => n.title);
       setSelected(newSelecteds);
       return;
     }
@@ -242,15 +242,15 @@ export default function User() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                    const isItemSelected = selected.indexOf(name) !== -1;
+                    const { id, title, difficulty, rating, author, avatarUrl, avg_time } = row;
+                    const isItemSelected = selected.indexOf(title) !== -1;
 
                     return (
                       <TableRow
                         hover
                         key={id}
                         tabIndex={-1}
-                        role="checkbox"
+                        difficulty="checkbox"
                         selected={isItemSelected}
                         aria-checked={isItemSelected}
                         onClick={() => handleClick(id)}
@@ -260,26 +260,26 @@ export default function User() {
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
+                            <Avatar alt={title} src={avatarUrl} />
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {title}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell align="left">{company}</TableCell>
+                        <TableCell align="left">{author}</TableCell>
                         <TableCell align="left">
                         <StyledRating
        
-        value={role/2}
+        value={difficulty/2}
         readOnly
         precision={0.5}
         icon={<FavoriteIcon fontSize="inherit" />}
         emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
       />
                         </TableCell>
-                        <TableCell align="left">{isVerified}</TableCell>
+                        <TableCell align="left">{avg_time}</TableCell>
                         <TableCell align="left">
-                          <Rating name="read-only" value={status} precision={0.5} readOnly />
+                          <Rating name="read-only" value={rating} precision={0.5} readOnly />
                         </TableCell>
 
                         <TableCell align="right">

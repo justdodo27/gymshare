@@ -1,13 +1,9 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { Link as RouterLink } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import icon from "../pictures/icon.jpg"
 import { useNavigate} from 'react-router-dom';
 import { useState } from 'react';
 import { useSelector} from 'react-redux';
@@ -22,7 +18,6 @@ import {
   ListSubheader,
   InputAdornment
 } from "@mui/material";
-import { useMemo } from 'react';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
 import Table from '@mui/material/Table';
@@ -56,13 +51,13 @@ const Input = styled(MuiInput)`
 export default function EditWorkout() {
 
     const workoutId = useSelector(state => state.workout.workoutId);
+    let token = useSelector(state => state.auth.token)
 
   const navigate = useNavigate();
   const [repeats, setRepeats] = React.useState(5);
   const [type, setType] = React.useState('With a weight');
   const [series, setSeries] = React.useState(5);
   const [time, setTime] = React.useState(30);
-  const [alignment, setAlignment] = React.useState('repeats');
   const [array, setArray] = React.useState([''])
   const [indexes, setIndexes] = React.useState([''])
   const [description, setDescription] = React.useState([''])
@@ -73,9 +68,6 @@ export default function EditWorkout() {
   const [addAlert, setAddAlert] = useState(false);
   const [flag, setFlag] = useState(true);
   let workoutTitle = useSelector(state => state.workout.title);
-  let workoutDescription = useSelector(state => state.workout.description);
-  let workoutVisibility = useSelector(state => state.workout.visibility);
-  let workoutCycles = useSelector(state => state.workout.cycles);
   console.log(workoutTitle)
 
   const dispatch = useDispatch()
@@ -108,18 +100,12 @@ export default function EditWorkout() {
 
  
 
-  const containsText = (text, searchText) =>
-  text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
 
   const [selectedOption, setSelectedOption] = useState(array[0]);
   console.log(selectedOption + '--Selected')
 
   const [searchText, setSearchText] = useState("zzzzzzz");
-  const displayedOptions = useMemo(
-    () => array.filter((option) => containsText(option, searchText)),
-    [searchText, array]
-  );
 
   const fetchWorkout = useCallback(async () => {
     
@@ -164,7 +150,7 @@ export default function EditWorkout() {
       return<p>Error</p>;
     }
     ;
-  }, []);
+  }, [token, workoutId]);
 
   useEffect(() => {
     fetchWorkout();
@@ -222,13 +208,6 @@ export default function EditWorkout() {
     console.log(index)
    
 
-  const descriptionData= description[temp]
-
-  const handleChange1 = (event, newAlignment) => {
-    setAlignment(newAlignment);
-  };
-
-  let token = useSelector(state => state.auth.token)
 
   const handleSliderChange = (event, newValue) => {
     setSeries(newValue);

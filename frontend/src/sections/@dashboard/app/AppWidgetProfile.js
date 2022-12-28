@@ -8,7 +8,8 @@ import account from '../../../_mock/account';
 export default function AppWidgetProfile({ name, last, height, weight, photo, color = 'primary', sx, ...other }) {
   let src = 'http://localhost:1337/'
   if(photo){
-    src = src + photo
+    src = photo
+    console.log(src)
   }else{
     src = account.photoURL
   }

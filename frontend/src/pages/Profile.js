@@ -1,12 +1,10 @@
 import * as React from 'react';
 import Page from '../components/Page';
-import { Link as RouterLink } from 'react-router-dom';
-import { Box, Grid, Button, Container, Stack, Typography } from '@mui/material';
+import { Box, Grid, Button, Container, Typography } from '@mui/material';
 import Iconify from '../components/Iconify';
 import {
   AppWidgetProfile,
 } from '../sections/@dashboard/app';
-import { useTheme } from '@mui/material/styles';
 
 import { useState, useEffect } from "react";
 import { useSelector} from 'react-redux';
@@ -31,9 +29,7 @@ export default function Profile() {
     }
   }, [dispatch, exp, navigate]);
 
-  const theme = useTheme();
    const userId = useSelector(state => state.auth.userId);
-   const username = useSelector(state => state.auth.username);
    let token = useSelector(state => state.auth.token)
 
   const [height, setHeight] = useState(null)
@@ -89,10 +85,10 @@ export default function Profile() {
         const workouts = []
         const fav = []
         for (let i = 0; i < data.results.length; i++){
-          if(data.results[i].author.id == userId){
+          if(data.results[i].author.id === userId){
             workouts.push(data.results[i])
           }
-          if(data.results[i].is_favorite == true){
+          if(data.results[i].is_favorite === true){
             fav.push(data.results[i])
           }
         }
@@ -124,10 +120,10 @@ const fetchNextWorkout = () => {
         const workouts = myWorkouts
         const fav = favWorkouts
         for (let i = 0; i < data.results.length; i++){
-          if(data.results[i].author.id == userId){
+          if(data.results[i].author.id === userId){
             workouts.push(data.results[i])
           }
-            if(data.results[i].is_favorite == true){
+            if(data.results[i].is_favorite === true){
               fav.push(data.results[i])
             }
         }
@@ -137,6 +133,8 @@ const fetchNextWorkout = () => {
       })
     }
   }
+
+  console.log(myWorkouts)
   return (
     <Page title="Profile">
       <Container component="main" maxWidth="lg">
@@ -175,17 +173,17 @@ const fetchNextWorkout = () => {
     {alignment==='your' && <Box>
     <ProductList products={myWorkouts} />
      <Box m={3} pt={5}>
-        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+        {myWorkouts.length>14 && <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
             See more
-          </Button>
+          </Button>}
           </Box>
           </Box>}
     {alignment==='liked' && <Box>
     <ProductList products={favWorkouts} />
      <Box m={3} pt={5}>
-        <Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
+     {favWorkouts.length>14 &&<Button style={{margin: '0 auto', display: "flex"}} variant="contained" onClick={fetchNextWorkout} startIcon={<Iconify icon="eva:plus-fill" />}>
             See more
-          </Button>
+          </Button>}
           </Box>
           </Box>}
       </Container>

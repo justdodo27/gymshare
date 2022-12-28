@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gymshare/api/models/exercise_in_workout.dart';
 import 'package:gymshare/api/models/workout.dart';
+import 'package:gymshare/components/utils/helpers.dart';
 import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/widgets/scroll_configuration.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
+import 'package:gymshare/pages/workouts/add_exercise.dart';
 import 'package:gymshare/pages/workouts/add_workout_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -29,27 +31,18 @@ class WorkoutDetailPage extends StatefulWidget {
 }
 
 class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
+  final _controller = ScrollController();
   late bool isFavorite;
   late Widget image;
   late String title;
   late String? description;
   late int cycles;
 
-  bool edited = false;
+  List<ExerciseInWorkout> exercisesSaved = [];
+  List<ExerciseInWorkout> exercisesToSave = [];
 
-  @override
-  void initState() {
-    super.initState();
-    isFavorite = widget.isFavorite;
-    title = widget.workout.title;
-    description = widget.workout.description;
-    cycles = widget.workout.cycles.toInt();
-    if (widget.workout.thumbnailUrl != null) {
-      image = Image.network(widget.workout.thumbnailUrl!);
-    } else {
-      image = Container();
-    }
-  }
+  bool edited = false;
+  bool editExercises = false;
 
   Map<String, dynamic> get data => <String, dynamic>{
         'title': title,
@@ -74,9 +67,51 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
     });
   }
 
+  void _saveWorkout() async {
+    exercisesSaved.clear();
+    exercisesSaved.addAll(exercisesToSave);
+    if (await editWorkoutExercises(
+      context,
+      mounted: mounted,
+      workoutId: widget.workout.id,
+      exercises: exercisesSaved,
+    )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        getInfoSnackBar(
+          text: 'Workout exercises has been edited.',
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          getErrorSnackBar(text: 'Could not edit the workout\'s exercises.'));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    exercisesSaved = widget.workout.exercises!;
+    exercisesToSave.addAll(widget.workout.exercises ?? []);
+
+    isFavorite = widget.isFavorite;
+    title = widget.workout.title;
+    description = widget.workout.description;
+    cycles = widget.workout.cycles.toInt();
+    if (widget.workout.thumbnailUrl != null) {
+      image = Image.network(widget.workout.thumbnailUrl!);
+    } else {
+      image = Container();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<ExerciseInWorkout>? exercises = widget.workout.exercises;
     return SeamlessPattern(
       child: SafeArea(
         child: Scaffold(
@@ -137,6 +172,7 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
           backgroundColor: Colors.transparent,
           body: ScrollConfig(
             child: SingleChildScrollView(
+              controller: _controller,
               child: Column(
                 children: [
                   Hero(
@@ -247,11 +283,14 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
                       ),
                     ),
                   ),
-                  Text(
-                    description ?? '',
-                    style:
-                        const TextStyle(color: primaryTextColor, fontSize: 16),
-                    textAlign: TextAlign.justify,
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      description ?? '',
+                      style: const TextStyle(
+                          color: primaryTextColor, fontSize: 16),
+                      textAlign: TextAlign.justify,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   const Divider(
@@ -359,59 +398,119 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
                   ),
                   Container(
                     margin: const EdgeInsets.all(10.0),
-                    child: const Text(
-                      'Exercises',
-                      style: TextStyle(
-                        color: primaryTextColor,
-                        fontSize: 22,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const Text(
+                          'Exercises',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: 22,
+                          ),
+                        ),
+                        if (widget.editable)
+                          IconButton(
+                            onPressed: () {
+                              if (editExercises) {
+                                _saveWorkout();
+                              } else {
+                                scrollToBottom(_controller);
+                              }
+                              setState(() => editExercises = !editExercises);
+                            },
+                            icon: Icon(
+                              editExercises ? Icons.check : Icons.edit_note,
+                            ),
+                          ),
+                        if (editExercises)
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                editExercises = !editExercises;
+                                exercisesToSave.clear();
+                                exercisesToSave.addAll(exercisesSaved);
+                              });
+                            },
+                            icon: const Icon(Icons.close),
+                          )
+                      ],
                     ),
                   ),
                   const SizedBox(height: 10),
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: exercises?.length,
+                    itemCount: exercisesToSave.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          exercises![index].exercise.title,
-                          style: const TextStyle(
-                              color: primaryTextColor, fontSize: 20),
-                        ),
-                        subtitle: Text(
-                          (exercises[index].exercise.exerciseType),
-                          style: const TextStyle(
-                              color: primaryTextColor, fontSize: 10),
-                        ),
-                        leading: CircleAvatar(
-                          backgroundColor: secondaryColor,
-                          child: Text('${index + 1}'),
-                        ),
-                        trailing: exercises[index].repeats == null ||
-                                exercises[index].repeats == 0
-                            ? Text(
-                                '${(exercises[index].time! / 60).round()} min',
-                                style: const TextStyle(
-                                    color: primaryTextColor, fontSize: 15),
-                              )
-                            : Text(
-                                '${(exercises[index].series)}x${(exercises[index].repeats)}',
-                                style: const TextStyle(
-                                    color: primaryTextColor, fontSize: 15),
-                              ),
-                        onTap: () => Navigator.of(context).push(
-                          createPageRoute(ExerciseDetailPage(
-                              exercise: exercises[index].exercise)),
-                        ),
-                      );
+                      return buildExerciseTile(
+                          entry: exercisesToSave[index], order: index + 1);
                     },
                   ),
+                  if (editExercises)
+                    ListTile(
+                      onTap: () => Navigator.of(context)
+                          .push(createBottomToTopPageRouteAnimation(
+                              AddExercisePage(
+                        count: exercisesToSave.length,
+                      )))
+                          .then((exercise) {
+                        if (exercise != null) {
+                          setState(() => exercisesToSave.add(exercise));
+                          scrollToBottom(_controller);
+                        }
+                      }),
+                      title: const Center(child: Icon(Icons.add)),
+                    )
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildExerciseTile({
+    required ExerciseInWorkout entry,
+    required int order,
+  }) {
+    return ListTile(
+      title: Text(
+        entry.exercise.title,
+        style: const TextStyle(color: primaryTextColor, fontSize: 20),
+      ),
+      leading: CircleAvatar(
+        backgroundColor: secondaryColor,
+        child: Text('$order'),
+      ),
+      trailing: SizedBox(
+        width: editExercises ? 190 : 100,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (entry.exercise.exerciseType == 'With time')
+              Text(
+                '${(entry.time! / 60).round()} min',
+                style: const TextStyle(color: primaryTextColor, fontSize: 15),
+              )
+            else
+              Text(
+                '${entry.series}x${entry.repeats}',
+                style: const TextStyle(color: primaryTextColor, fontSize: 15),
+              ),
+            if (editExercises) ...{
+              const SizedBox(width: 10),
+              IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+              IconButton(
+                  onPressed: () =>
+                      setState(() => exercisesToSave.removeAt(order - 1)),
+                  icon: const Icon(Icons.close)),
+            },
+          ],
+        ),
+      ),
+      onTap: () => Navigator.of(context).push(
+        createPageRoute(ExerciseDetailPage(exercise: entry.exercise)),
       ),
     );
   }

@@ -1,13 +1,9 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { Link as RouterLink } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import icon from "../pictures/icon.jpg"
 import { useNavigate} from 'react-router-dom';
 import { useState } from 'react';
 import { useSelector} from 'react-redux';
@@ -22,7 +18,6 @@ import {
   ListSubheader,
   InputAdornment
 } from "@mui/material";
-import { useMemo } from 'react';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
 import Table from '@mui/material/Table';
@@ -39,6 +34,7 @@ import MuiAlert from '@mui/material/Alert';
 import {forwardRef} from 'react';
 import { authActions } from '../store/auth';
 import { useDispatch} from 'react-redux';
+import axios from 'axios';
 
 
 
@@ -47,7 +43,7 @@ const Alert = forwardRef(function Alert(props, ref) {
 });
 
 
-
+let workoutId = ''
 
 const Input = styled(MuiInput)`
   width: 42px;
@@ -60,7 +56,6 @@ export default function AddExerciseToWork() {
   const [type, setType] = React.useState('With a weight');
   const [series, setSeries] = React.useState(5);
   const [time, setTime] = React.useState(30);
-  const [alignment, setAlignment] = React.useState('repeats');
   const [array, setArray] = React.useState([''])
   const [indexes, setIndexes] = React.useState([''])
   const [description, setDescription] = React.useState([''])
@@ -74,7 +69,8 @@ export default function AddExerciseToWork() {
   let workoutDescription = useSelector(state => state.workout.description);
   let workoutVisibility = useSelector(state => state.workout.visibility);
   let workoutCycles = useSelector(state => state.workout.cycles);
-  console.log(workoutTitle)
+  let workoutImage = useSelector(state => state.workout.image);
+
 
   const dispatch = useDispatch()
   let exp = useSelector(state => state.auth.exp);
@@ -90,7 +86,6 @@ export default function AddExerciseToWork() {
     for (let i = 0; i < table.length; i++) {
       table[i].order = i+1;
     }
-    console.log(table)
     setTable(table.filter(item => item.order !== index+1))
     setData(data.filter(item => item.order !== index+1))
   };
@@ -104,20 +99,9 @@ export default function AddExerciseToWork() {
     setAddAlert(false);
   };
 
- 
-
-  const containsText = (text, searchText) =>
-  text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
-
-
   const [selectedOption, setSelectedOption] = useState(array[0]);
-  console.log(selectedOption + '--Selected')
 
   const [searchText, setSearchText] = useState("zzzzzzz");
-  const displayedOptions = useMemo(
-    () => array.filter((option) => containsText(option, searchText)),
-    [searchText, array]
-  );
 
 
   const fetchMoviesHandler = useCallback(async () => {
@@ -126,9 +110,11 @@ export default function AddExerciseToWork() {
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
-      const data = await response.json();
+      let data = await response.json();
+      data = data.results
       const arrayInput = data.map(data => data.title);
       const arrayIndex = data.map(data => data.id);
+      console.log(arrayInput)
       setArray(arrayInput)
       setIndexes(arrayIndex)
       
@@ -145,11 +131,13 @@ export default function AddExerciseToWork() {
 
   const test = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:1337/workouts/exercises/?search=" + selectedOption);
+      console.log(selectedOption)
+      const response = await fetch(global.config.url +  "workouts/exercises/?search=" + selectedOption);
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
-      const data = await response.json();
+      let data = await response.json();
+      data = data.results
       const descriptions = data.map(data => data.description)
       const exerciseType = data.map(data => data.exercise_type)
 
@@ -170,12 +158,6 @@ export default function AddExerciseToWork() {
     const index = indexes[temp]
     console.log(index)
    
-
-  const descriptionData= description[temp]
-
-  const handleChange1 = (event, newAlignment) => {
-    setAlignment(newAlignment);
-  };
 
   let token = useSelector(state => state.auth.token)
 
@@ -229,7 +211,71 @@ export default function AddExerciseToWork() {
 
   const end = (event) => {
     if(flag){
-      fetch("http://localhost:1337/workouts/plans/upload/", {
+      let form_data = new FormData();
+      form_data.append("title", workoutTitle);
+      form_data.append("description", workoutDescription);
+      form_data.append("visibility", workoutVisibility);
+      form_data.append("cycles", workoutCycles);
+      console.log(data)
+      if(workoutImage!=''){
+        form_data.append("thumbnail", workoutImage, workoutImage.name);
+      }
+      axios
+      .post(global.config.url +  "workouts/plans/", form_data, {
+                  method: 'POST',
+                  headers: {
+                  "Content-Type": "multipart/form-data",
+                  'Authorization': "Bearer " +token
+                  },
+              }).then((resp) => {
+                  workoutId= resp.data.id
+                  data.forEach((obj) =>{
+                    obj.workout = workoutId
+                  })
+                  fetch(global.config.url +  "workouts/upload/", {
+                    method: 'POST',
+                      body: JSON.stringify({
+                        workout_for_update_id: workoutId,
+                        exercises: data,
+                        
+                    }), 
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: "Bearer " +token
+                    },
+                  })
+                    .then((res) => {
+                      if (res.ok) {
+                        return res.json();
+                      } else {
+                        return res.json().then((data) => {
+                          let errorMessage = 'Wrong username or password!';
+                          throw new Error(errorMessage);
+                        });
+                      }
+                    })
+                    .then((data) => {
+                      setOrder(order+1)
+                      setDescription('')
+                      setSelectedOption('')
+                      setSeries(1)
+                      setRepeats(1)
+                      setTime(1)
+                      setStyleAlert(true);
+                      setAddAlert(true);
+                      setFlag(false)
+                    })
+                    .catch((err) => {
+                     
+                        if (exp<parseInt(Date.now()/1000)) {
+                          dispatch(authActions.logout())
+                          navigate('/', {replace: true});
+                        }
+                    });
+              }).catch((error) => {
+                  console.log(error.response)
+              })
+      /*fetch(global.config.url +  "workouts/upload/", {
         method: 'POST',
           body: JSON.stringify({
             workout_to_create: {
@@ -273,7 +319,7 @@ export default function AddExerciseToWork() {
               dispatch(authActions.logout())
               navigate('/', {replace: true});
             }
-        });
+        });*/
 
   };}
 
@@ -293,7 +339,8 @@ export default function AddExerciseToWork() {
         "exercise": index,
         "order": order,
         "series": series,
-        "repeats": repeats
+        "repeats": repeats,
+        "workout": workoutId
       }
 
     setTable([...table, exerciseToAdd])
@@ -320,7 +367,8 @@ export default function AddExerciseToWork() {
       "exercise": index,
       "order": order,
       "series": series,
-      "repeats": repeats
+      "repeats": repeats,
+      "workout": workoutId
     }
 
     setTable([...table, exerciseToAdd])
