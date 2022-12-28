@@ -18,7 +18,7 @@ class _CustomSwitchState extends State<CustomSwitch> {
       (Set<MaterialState> states) {
         // Track color when the switch is selected.
         if (states.contains(MaterialState.selected)) {
-          return Color.fromARGB(255, 118, 151, 212);
+          return const Color.fromARGB(255, 118, 151, 212);
         }
         // Otherwise return null to set default track color
         // for remaining states such as when the switch is
@@ -31,7 +31,7 @@ class _CustomSwitchState extends State<CustomSwitch> {
       (Set<MaterialState> states) {
         // Material color when switch is selected.
         if (states.contains(MaterialState.selected)) {
-          return Color.fromARGB(255, 118, 151, 212).withOpacity(0.54);
+          return const Color.fromARGB(255, 118, 151, 212).withOpacity(0.54);
         }
         // Material color when switch is disabled.
         if (states.contains(MaterialState.disabled)) {
@@ -46,15 +46,15 @@ class _CustomSwitchState extends State<CustomSwitch> {
 
     return Column(
       children: [
-      RichText(text: TextSpan(text: 'Visibility', style: TextStyle(color: Colors.white)),),
+      RichText(text: const TextSpan(text: 'Visibility', style: TextStyle(color: Colors.white)),),
       Transform.scale(
       scale: 1,
       child: CupertinoSwitch(
       // This bool value toggles the switch.
       value: light,
-      trackColor: Color.fromARGB(255, 95, 93, 96).withOpacity(0.64),
+      trackColor: const Color.fromARGB(255, 95, 93, 96).withOpacity(0.64),
       thumbColor: CupertinoColors.systemBlue,
-      activeColor: Color.fromARGB(255, 155, 96, 185).withOpacity(0.64),
+      activeColor: const Color.fromARGB(255, 155, 96, 185).withOpacity(0.64),
       onChanged: (bool value) {
         // This is called when the user toggles the switch.
         setState(() {

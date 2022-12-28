@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gymshare/settings/colors.dart';
 
 class AppBarBack extends StatefulWidget {
   final String appBarTitle;

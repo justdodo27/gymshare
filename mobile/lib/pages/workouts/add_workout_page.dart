@@ -48,8 +48,6 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
     }
   }
 
-  bool _buttonDisabled = false;
-
   @override
   void dispose() {
     _scrollController.dispose();

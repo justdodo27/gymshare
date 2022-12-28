@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:gymshare/api/models/workout.dart';
 import 'package:gymshare/components/widgets/seamless_pattern.dart';
 import 'package:gymshare/pages/accounts/profile_page.dart';
 import 'package:gymshare/pages/statistics/statistics_page.dart';
