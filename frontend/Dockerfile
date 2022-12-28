@@ -8,6 +8,6 @@ RUN npm install
 
 RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
 
-EXPOSE 3000
+RUN npm run build
 
-CMD ["npm", "start"]
+RUN npm install -g serve
