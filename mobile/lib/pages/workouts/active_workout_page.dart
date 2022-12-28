@@ -221,8 +221,7 @@ class _ExerciseTileState extends State<ExerciseTile> {
           createPageRoute(
             ActiveExercisePage(exerciseInWorkout: widget.exercise)
           )
-        );
-        widget.updateStats();
+        ).then((value) => widget.updateStats());
       },
       child: Container(
         color: surface2,
