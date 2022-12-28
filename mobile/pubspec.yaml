@@ -23,6 +23,7 @@ dependencies:
   fl_chart: ^0.55.2
   image_picker: ^0.8.6
   image_cropper: ^3.0.1
+  flutter_time_picker_spinner: ^2.0.0
 
 dev_dependencies:
   flutter_test:

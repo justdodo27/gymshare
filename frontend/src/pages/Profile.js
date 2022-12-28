@@ -48,7 +48,7 @@ export default function Profile() {
 
   const fetchData = () => {
 
-    fetch(global.config.url + "accounts/profiles/" +userId, {
+    fetch("http://localhost:1337/accounts/profiles/" +userId, {
       headers: {
         Authorization: "Bearer " +token
       },
@@ -72,7 +72,7 @@ export default function Profile() {
 
   const fetchWorkout = () => {
 
-    fetch(global.config.url+ "workouts/plans/", {
+    fetch("http://localhost:1337/workouts/plans/", {
       headers: {
         Authorization: "Bearer " +token
       },

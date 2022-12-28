@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gymshare/components/utils/requests.dart';
@@ -41,22 +42,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final token = await getJWT();
     final userId = token.decodedAccessToken['user_id'];
 
-    http.MultipartRequest request = http.MultipartRequest(
-      'PATCH',
+    final response = await http.patch(
       Uri.parse(buildUrl('accounts/profiles/$userId/')),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ${token.accessToken}',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'first_name': _firstNameController.text,
+        'last_name': _lastNameController.text,
+        if (_weightController.text.isNotEmpty) ...{
+          'weight': double.parse(_weightController.text),
+        },
+        if (_heightController.text.isNotEmpty) ...{
+          'height': int.parse(_heightController.text),
+        },
+      }),
     );
-    request.headers['Authorization'] = 'Bearer ${token.accessToken}';
-    request.fields['first_name'] = _firstNameController.text;
-    request.fields['last_name'] = _lastNameController.text;
-
-    if (_weightController.text.isNotEmpty) {
-      request.fields['weight'] = _weightController.text;
-    }
-    if (_heightController.text.isNotEmpty) {
-      request.fields['height'] = _heightController.text;
-    }
-
-    final response = await request.send();
 
     if (response.statusCode == 401) {
       await refreshToken(refresh: token.refreshToken);

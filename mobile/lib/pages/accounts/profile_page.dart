@@ -20,20 +20,12 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final backgroundHeight = 180.0;
   final profileSize = 120.0;
-
   late Future<Profile> _futureProfile;
-  late Profile _profile;
 
   @override
   void initState() {
     super.initState();
-    _getUserData();
-  }
-
-  void _getUserData() async {
     _futureProfile = fetchUserData(context, mounted);
-    _profile = await _futureProfile;
-    setState(() {});
   }
 
   Widget _buildTop() {
@@ -64,8 +56,8 @@ class _ProfilePageState extends State<ProfilePage> {
         future: _futureProfile,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            // final profile = snapshot.data!;
-            if (_profile.profilePictureUrl != null) {
+            final profile = snapshot.data!;
+            if (profile.profilePictureUrl != null) {
               return Container(
                 height: profileSize,
                 width: profileSize,
@@ -73,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: tertiaryColor,
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                    image: NetworkImage(_profile.profilePictureUrl!),
+                    image: NetworkImage(profile.profilePictureUrl!),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -159,7 +151,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 ),
                               )
-                              .then((value) => _getUserData()),
+                              .then((value) => fetchUserData(context, mounted)),
                         ),
                         _buildButton(
                           icon: Icons.password,

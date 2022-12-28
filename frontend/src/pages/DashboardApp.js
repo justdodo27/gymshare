@@ -74,7 +74,7 @@ export default function DashboardApp() {
   const fetchExercises = useCallback(async () => {
     
     try {
-      const response = await fetch(global.config.url+ "stats/stats_exercise/", {
+      const response = await fetch("http://localhost:1337/stats/stats_exercise/", {
       method: 'GET',
       headers: {
       Authorization: "Bearer " +token
@@ -143,7 +143,7 @@ export default function DashboardApp() {
   const fetchMoviesHandler = useCallback(async () => {
     
     try {
-      const response = await fetch(global.config.url + "stats/stats_calories/", {
+      const response = await fetch("http://localhost:1337/stats/stats_calories/", {
       method: 'GET',
       headers: {
       Authorization: "Bearer " +token

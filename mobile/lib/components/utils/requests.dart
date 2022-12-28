@@ -136,32 +136,6 @@ Future<ApiResponse> searchWorkouts(BuildContext context, String query,
   }
 }
 
-Future<ApiResponse> searchFavorites(BuildContext context, String query,
-    [bool mounted = true, String? next]) async {
-  final token = await getJWT();
-  final response = await http.get(
-    Uri.parse(next ?? buildUrl('workouts/favorites/?search=$query')),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer ${token.accessToken}',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    return ApiResponse.fromJson(jsonDecode(response.body));
-  } else if (response.statusCode == 401) {
-    if (await refreshToken(refresh: token.refreshToken)) {
-      if (mounted) return getWorkouts(context, mounted);
-      throw Exception('Widget not mounted.');
-    } else {
-      if (mounted) logOut(context);
-      throw Exception('Authorization failed.');
-    }
-  } else {
-    throw Exception('Workouts could not be fetched.');
-  }
-}
-
 Future<ApiResponse> searchCreated(BuildContext context, String query,
     [bool mounted = true, String? next]) async {
   final token = await getJWT();
@@ -473,6 +447,32 @@ Future<bool> editWorkout(Map<String, dynamic> data, BuildContext context,
     if (await refreshToken(refresh: token.refreshToken)) {
       if (mounted) return editWorkout(data, context, mounted);
       throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    return false;
+  }
+}
+
+Future<bool> sendStatistics(String data, BuildContext context, [bool mounted = true]) async {
+  final token = await getJWT();
+  final response = await http.post(
+    Uri.parse(buildUrl('stats/synchronize/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+    body: data
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return sendStatistics(data, context, mounted);
+        throw Exception('Widget not mounted.');
     } else {
       if (mounted) logOut(context);
       throw Exception('Authorization failed.');

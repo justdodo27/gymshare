@@ -164,6 +164,7 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: SeamlessPattern(
+        
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: secondaryColor,

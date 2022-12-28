@@ -57,7 +57,7 @@ const [photo, setPhoto] = useState(null)
 
 const fetchData = () => {
 
-  fetch(global.config.url + "accounts/profiles/" +userId, {
+  fetch("http://localhost:1337/accounts/profiles/" +userId, {
     headers: {
       Authorization: "Bearer " +token
     },

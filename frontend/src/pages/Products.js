@@ -142,7 +142,7 @@ export default function EcommerceShop() {
     }
     option = option + s
     console.log(arrow, sort, option)
-    fetch(global.config.url+ "workouts/plans/?visibility=Public&page=1&ordering="+option+"&search="+term, {
+    fetch("http://localhost:1337/workouts/plans/?visibility=Public&page=1&ordering="+option+"&search="+term, {
     })
 
       .then(response => {

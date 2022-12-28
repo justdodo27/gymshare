@@ -15,7 +15,6 @@ class ExerciseDetailPage extends StatelessWidget {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: secondaryColor,
             title: Text(
               exercise.title,
               style: const TextStyle(color: primaryTextColor, fontSize: 20),

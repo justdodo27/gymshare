@@ -156,7 +156,7 @@ export default function Exercises() {
   const fetchMoviesHandler = useCallback(async () => {
     
     try {
-      const response = await fetch(global.config.url+ "workouts/exercises/");
+      const response = await fetch("http://localhost:1337/workouts/exercises/");
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -214,7 +214,7 @@ export default function Exercises() {
 
 const handleClickDelete = (id) => {
   console.log(id)
-  fetch(global.config.url+ 'workouts/exercises/'+id, {
+  fetch('http://localhost:1337/workouts/exercises/'+id, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

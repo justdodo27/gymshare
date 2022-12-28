@@ -106,7 +106,7 @@ export default function AddExerciseToWork() {
 
   const fetchMoviesHandler = useCallback(async () => {
     try {
-      const response = await fetch(global.config.url + "workouts/exercises/?search=" + searchText);
+      const response = await fetch("http://localhost:1337/workouts/exercises/?search=" + searchText);
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }

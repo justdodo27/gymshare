@@ -37,10 +37,10 @@ class FavoriteWorkoutSearchDelegate extends SearchDelegate {
   void fetchFavorites(String query, Function(void Function()) setState,
       {bool next = false}) async {
     if (next && apiResponse.next != null || !next) {
-      apiResponse = await searchFavorites(
+      apiResponse = await searchWorkouts(
           context, query, mounted, next ? apiResponse.next : null);
       setState(() => favorites.addAll(List<Workout>.from(
-          apiResponse.results.map((w) => Workout.fromJson(w['workout'])))));
+          apiResponse.results.map((w) => Workout.fromJson(w)))));
     }
   }
 
@@ -234,7 +234,7 @@ class _FavoritesPageState extends State<FavoritesPage>
     return Scaffold(
       appBar: AppBar(
         title:
-            Text('Search ${_controller.index == 0 ? 'favorites' : 'created'}'),
+            Text('Search ${_controller.index == 0 ? 'workouts' : 'created'}'),
         actions: [
           IconButton(
             onPressed: () {
