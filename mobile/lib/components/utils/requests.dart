@@ -454,3 +454,29 @@ Future<bool> editWorkout(Map<String, dynamic> data, BuildContext context,
     return false;
   }
 }
+
+Future<bool> sendStatistics(String data, BuildContext context, [bool mounted = true]) async {
+  final token = await getJWT();
+  final response = await http.post(
+    Uri.parse(buildUrl('stats/synchronize/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+    body: data
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return sendStatistics(data, context, mounted);
+      throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else {
+    return false;
+  }
+}

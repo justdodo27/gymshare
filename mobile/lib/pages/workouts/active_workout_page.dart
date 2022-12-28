@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'dart:ui';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:gymshare/api/models/exercise.dart';
+import 'package:gymshare/api/models/statistic_synchronize_entry.dart';
 import 'package:gymshare/api/models/exercise_in_workout.dart';
+import 'package:gymshare/components/utils/requests.dart';
 import 'package:gymshare/components/utils/routes.dart';
 import 'package:gymshare/components/widgets/rounded_rectangle_button.dart';
 import 'package:gymshare/pages/workouts/active_exercise_page.dart';
@@ -13,7 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 class ActivityPage extends StatefulWidget {
-  const ActivityPage({super.key});
+  final Function callback;
+  const ActivityPage({super.key, required this.callback});
 
   @override
   State<ActivityPage> createState() => _ActivityPageState();
@@ -22,26 +24,55 @@ class ActivityPage extends StatefulWidget {
 class _ActivityPageState extends State<ActivityPage> {
   late Workout activeWorkout;
   final ScrollController scrollController = ScrollController();
+  List<StatisticEntry> exerciseStats = [];
 
-  Future<bool> loadWorkout() async {
+  void loadStats() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? exerciseStatsJSONString = prefs.getString('exercise_stats');
+    if (exerciseStatsJSONString is String) {
+      setState(() {
+        exerciseStats.clear();
+        exerciseStats.addAll(
+          List<StatisticEntry>.from(
+            jsonDecode(exerciseStatsJSONString).map((w) => StatisticEntry.fromJson(w))
+          )
+        );
+      });
+    }
+  }
+
+  Future<bool> loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? workoutJSONString = prefs.getString('active_workout');
     if (workoutJSONString is String) {
       setState(() {
         activeWorkout = Workout.fromJson(jsonDecode(workoutJSONString));
       });
+      loadStats();
+      
       return true;
     }
     return false;
   }
 
-  late final workoutLoaded;
+  int countCompleted() {
+    var countCompleted = 0;
+    activeWorkout.exercises?.forEach((exercise) {
+      var countSeries = exerciseStats.where((statistic) => statistic.exerciseId == exercise.exercise.id).length;
+      final exerciseSeries = exercise.series?.toInt() ?? 0;
+      if (exercise.series != null && countSeries >= exerciseSeries) {
+        countCompleted += 1;
+      }
+    });
+    return countCompleted;
+  }
 
+  late final Future<bool> dataLoaded;
 
   @override
   void initState() {
     super.initState();
-    workoutLoaded = loadWorkout();
+    dataLoaded = loadData();
   }
 
   @override
@@ -53,7 +84,7 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: workoutLoaded,
+      future: dataLoaded,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return Scaffold(
@@ -75,7 +106,7 @@ class _ActivityPageState extends State<ActivityPage> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 15.0),
                         child: Text(
-                          "Completed 0/0",
+                          "Completed ${activeWorkout.exercises?.length}/${countCompleted()}",
                           style: const TextStyle(fontSize: 20, color: primaryTextColor),
                         )
                       ),
@@ -87,7 +118,14 @@ class _ActivityPageState extends State<ActivityPage> {
                             controller: scrollController,
                             itemCount: activeWorkout.exercises!.length,
                             itemBuilder: (context, index){
-                              return ExerciseTile(exercise: activeWorkout.exercises![index]);
+                              return ExerciseTile(
+                                exercise: activeWorkout.exercises![index],
+                                updateStats: loadStats,
+                                seriesCount: exerciseStats.where(
+                                  (element) => element.exerciseId == activeWorkout.exercises![index].exercise.id).length,
+                                completed: exerciseStats.where(
+                                  (element) => element.exerciseId == activeWorkout.exercises![index].exercise.id).length >= activeWorkout.exercises![index].series!,
+                              );
                             },
                           ),
                         )
@@ -103,7 +141,9 @@ class _ActivityPageState extends State<ActivityPage> {
                                 backgroundColor: Colors.transparent,
                                 borderColor: primary,
                                 borderWidth: 2,
-                                onPress: () {  },
+                                onPress: () { 
+                                  showMyDialog(context, 'Finish Workout', 'Do you want to finish ${activeWorkout.title}?', true, widget.callback);
+                                 },
                                 child: Row(
                                   children: const [
                                     SizedBox(width: 20),
@@ -120,7 +160,9 @@ class _ActivityPageState extends State<ActivityPage> {
                                 backgroundColor: Colors.transparent,
                                 borderColor: tertiary60,
                                 borderWidth: 2,
-                                onPress: () {  },
+                                onPress: () { 
+                                  showMyDialog(context, 'Stop Workout', 'Do you want to stop ${activeWorkout.title}? You have ${exerciseStats.length} unsaved records.', false, widget.callback);
+                                 },
                                 child: Row(
                                   children: const [
                                     SizedBox(width: 20),
@@ -150,10 +192,16 @@ class _ActivityPageState extends State<ActivityPage> {
 
 class ExerciseTile extends StatefulWidget {
   final ExerciseInWorkout exercise;
+  final Function() updateStats;
+  final bool completed;
+  final int seriesCount;
 
   const ExerciseTile({
     Key? key,
     required this.exercise,
+    required this.updateStats,
+    required this.completed,
+    required this.seriesCount
   }) : super(key: key);
 
   @override
@@ -169,12 +217,13 @@ class _ExerciseTileState extends State<ExerciseTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         Navigator.of(context).push(
           createPageRoute(
             ActiveExercisePage(exerciseInWorkout: widget.exercise)
           )
         );
+        widget.updateStats();
       },
       child: Container(
         color: surface2,
@@ -209,7 +258,7 @@ class _ExerciseTileState extends State<ExerciseTile> {
                     ),
                     const SizedBox(height: 5.0,),
                     Text(
-                      "Series: ${widget.exercise.series}",
+                      "Series: ${widget.exercise.series}${widget.seriesCount - widget.exercise.series! > 0 ? " + ${widget.seriesCount - widget.exercise.series!}": ""}",
                       style: const TextStyle(
                         fontSize: 12.0,
                         color: onSurfaceVariant
@@ -221,7 +270,7 @@ class _ExerciseTileState extends State<ExerciseTile> {
               Checkbox(
                 checkColor: onPrimary,
                 fillColor: MaterialStateProperty.resolveWith((states) => primary),
-                value: true,
+                value: widget.completed,
                 onChanged: null
               )
             ],
@@ -230,4 +279,63 @@ class _ExerciseTileState extends State<ExerciseTile> {
       )
     );
   }
+}
+
+showMyDialog(BuildContext context, String title, String msg, bool save, Function callback) {
+  SimpleDialog dialog = SimpleDialog(
+    title: Text(title),
+    // titlePadding: EdgeInsets.fromLTRB(12, 12, 12, 0),
+    contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+    backgroundColor: surface3,
+    titleTextStyle: const TextStyle(color: onSurface, fontSize: 20),
+    children: <Widget>[
+      Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(
+          msg,
+          textAlign: TextAlign.start,
+          style: const TextStyle(fontSize: 16, color: onSurfaceVariant),
+        ),
+      ),
+      SimpleDialogOption(
+        onPressed: () { Navigator.pop(context, true); },
+        child: const Text('Ok', style: TextStyle(color: primary),),
+      ),
+      SimpleDialogOption(
+        onPressed: () { Navigator.pop(context, false); },
+        child: const Text('Cancel', style: TextStyle(color: primary),),
+      ),
+    ],
+  );
+
+  Future dialogValue = showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return dialog;
+    }
+  );
+
+  Future<bool> unloadWorkout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('exercise_stats');
+    await prefs.remove('active_workout');
+    return true;
+  }
+
+  void saveStatistics(String data) {
+    sendStatistics(data, context);
+  }
+
+  dialogValue.then((value) async {
+    if (value == true){
+      if (save) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String? exerciseStatsJSONString = prefs.getString('exercise_stats');
+        if (exerciseStatsJSONString != null) {
+          saveStatistics(exerciseStatsJSONString);
+        }
+      }
+      await unloadWorkout().then((value) => callback());
+    }
+  });
 }

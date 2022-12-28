@@ -85,7 +85,7 @@ class _TrainingPageState extends State<TrainingPage> {
                   child: TextField(
                     controller: _controller,
                     onChanged: (value) {
-                      if (value.length != 0){
+                      if (value.isNotEmpty){
                         fetchWorkouts(query: value);
                       } else {
                         setState(() {
@@ -176,7 +176,7 @@ showMyDialog(BuildContext context, Workout workout, Function callback) {
   SimpleDialog dialog = SimpleDialog(
     title: Text('You are about to start ${workout.title}'),
     backgroundColor: surface3,
-    titleTextStyle: TextStyle(color: onSurface, fontSize: 20),
+    titleTextStyle: const TextStyle(color: onSurface, fontSize: 20),
     children: <Widget>[
       SimpleDialogOption(
         onPressed: () { Navigator.pop(context, true); },

@@ -32,6 +32,11 @@ class _DashboardPageState extends State<DashboardPage> {
         currentPageIdx = 5,
         currentPage = 2
       });
+    } else if (currentPageIdx == 5) {
+      setState(() => {
+        currentPageIdx = 2,
+        currentPage = 2
+      });
     }
   }
 
@@ -69,7 +74,7 @@ class _DashboardPageState extends State<DashboardPage> {
       TrainingPage(callback: () => runTraining()),
       const StatisticsPage(),
       const ProfilePage(),
-      const ActivityPage(),
+      ActivityPage(callback: () => runTraining()),
     ];
     super.initState();
   }
