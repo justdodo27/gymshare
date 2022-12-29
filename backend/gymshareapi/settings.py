@@ -29,7 +29,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'django_filters',
     'drf_yasg',
     'rest_framework',
@@ -131,10 +133,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = "/media/"
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': "dxij36qxe",
+    'API_KEY': "861968532563354",
+    'API_SECRET': "2c6yDpqbGp5aVg2fg3f6Xdah8Y0"
+}
 
 
 # Default primary key field type
