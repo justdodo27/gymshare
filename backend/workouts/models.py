@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from cloudinary_storage.storage import VideoMediaCloudinaryStorage
+from cloudinary_storage.validators import validate_video
 
 
 class Exercise(models.Model):
@@ -19,7 +21,8 @@ class Exercise(models.Model):
     difficulty = models.PositiveIntegerField()
     calories_burn_rate = models.FloatField(validators=[MinValueValidator(0)])
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
-    video = models.FileField(upload_to='videos/', null=True, blank=True)
+    video = models.FileField(upload_to='videos/', null=True, blank=True, storage=VideoMediaCloudinaryStorage(),
+                              validators=[validate_video])
     exercise_type = models.CharField(max_length=30, choices=EXERCISE_TYPES, default=WITH_A_WEIGHT)
 
     def __str__(self) -> str:
