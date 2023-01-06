@@ -499,8 +499,7 @@ class _WorkoutDetailPageState extends State<WorkoutDetailPage> {
                 style: const TextStyle(color: primaryTextColor, fontSize: 15),
               ),
             if (editExercises) ...{
-              const SizedBox(width: 10),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+              const SizedBox(width: 40),
               IconButton(
                   onPressed: () =>
                       setState(() => exercisesToSave.removeAt(order - 1)),

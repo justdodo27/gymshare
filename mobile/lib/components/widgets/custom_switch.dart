@@ -13,37 +13,6 @@ class _CustomSwitchState extends State<CustomSwitch> {
 
   @override
   Widget build(BuildContext context) {
-    final MaterialStateProperty<Color?> trackColor =
-        MaterialStateProperty.resolveWith<Color?>(
-      (Set<MaterialState> states) {
-        // Track color when the switch is selected.
-        if (states.contains(MaterialState.selected)) {
-          return const Color.fromARGB(255, 118, 151, 212);
-        }
-        // Otherwise return null to set default track color
-        // for remaining states such as when the switch is
-        // hovered, focused, or disabled.
-        return null;
-      },
-    );
-    final MaterialStateProperty<Color?> overlayColor =
-        MaterialStateProperty.resolveWith<Color?>(
-      (Set<MaterialState> states) {
-        // Material color when switch is selected.
-        if (states.contains(MaterialState.selected)) {
-          return const Color.fromARGB(255, 118, 151, 212).withOpacity(0.54);
-        }
-        // Material color when switch is disabled.
-        if (states.contains(MaterialState.disabled)) {
-          return Colors.grey.shade400;
-        }
-        // Otherwise return null to set default material color
-        // for remaining states such as when the switch is
-        // hovered, or focused.
-        return null;
-      },
-    );
-
     return Column(
       children: [
       RichText(text: const TextSpan(text: 'Visibility', style: TextStyle(color: Colors.white)),),
