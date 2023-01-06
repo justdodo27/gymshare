@@ -3,6 +3,9 @@
 
 
 // // Uncomment to use localhost on a web browser as a server
-const String serverUrlPrefix = 'http://localhost:1337/';
+// const String serverUrlPrefix = 'http://localhost:1337/';
+
+// Uncomment to use production server
+const String serverUrlPrefix = 'https://gymshare-production.up.railway.app/';
 
 String buildUrl(String endpointName) => '$serverUrlPrefix$endpointName';
