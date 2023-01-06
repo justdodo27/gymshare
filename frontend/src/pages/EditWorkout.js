@@ -110,7 +110,7 @@ export default function EditWorkout() {
   const fetchWorkout = useCallback(async () => {
     
     try {
-      const response = await fetch("http://localhost:1337/workouts/plans/" +workoutId +"/" , {
+      const response = await fetch(global.config.url + "workouts/plans/" +workoutId +"/" , {
       method: 'GET',
       headers: {
       Authorization: "Bearer " +token
@@ -159,7 +159,7 @@ export default function EditWorkout() {
 
   const fetchMoviesHandler = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:1337/workouts/exercises/?search=" + searchText);
+      const response = await fetch(global.config.url + "workouts/exercises/?search=" + searchText);
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -182,7 +182,7 @@ export default function EditWorkout() {
 
   const test = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:1337/workouts/exercises/?search=" + selectedOption);
+      const response = await fetch(global.config.url + "workouts/exercises/?search=" + selectedOption);
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -259,7 +259,7 @@ export default function EditWorkout() {
 
   const end = (event) => {
     if(flag){
-      fetch("http://localhost:1337/workouts/plans/upload/", {
+      fetch(global.config.url + "workouts/plans/upload/", {
         method: 'POST',
           body: JSON.stringify({
             workout_for_update_id: workoutId,

@@ -51,7 +51,7 @@ export default function EditProfile() {
   
 
   const fetchData = () => {
-  fetch("http://localhost:1337/accounts/profiles/" +userId, {
+  fetch(global.config.url + "accounts/profiles/" +userId, {
       headers: {
         Authorization: "Bearer " +token
       },

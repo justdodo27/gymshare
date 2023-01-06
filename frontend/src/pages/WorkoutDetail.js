@@ -158,7 +158,7 @@ export default function WorkoutDetail() {
   };
 
   const handleClickDelete = () => {
-    fetch('http://localhost:1337/workouts/plans/' + workoutId, {
+    fetch(global.config.url + 'workouts/plans/' + workoutId, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -172,7 +172,7 @@ export default function WorkoutDetail() {
   const handleClickRate = (newRate) => {
     setRate(newRate)
     console.log(newRate)
-    fetch('http://localhost:1337/workouts/ratings/', {
+    fetch(global.config.url + 'workouts/ratings/', {
       method: 'POST',
       body: JSON.stringify({
         rate: newRate,
@@ -188,7 +188,7 @@ export default function WorkoutDetail() {
           return res.json();
         } else {
           return res.json().then((data) => {
-            fetch('http://localhost:1337/workouts/ratings/update/', {
+            fetch(global.config.url + 'workouts/ratings/update/', {
               method: 'PUT',
               body: JSON.stringify({
                 rate: newRate,
@@ -227,7 +227,7 @@ export default function WorkoutDetail() {
     if (token) {
       head = "Bearer " + token
     }
-    fetch("http://localhost:1337/workouts/plans/" + workoutId, {
+    fetch(global.config.url + "workouts/plans/" + workoutId, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: head
@@ -273,7 +273,7 @@ export default function WorkoutDetail() {
 
   const handleClickSave = () => {
     if (saved) {
-      fetch('http://localhost:1337/workouts/favorites/delete/', {
+      fetch(global.config.url + 'workouts/favorites/delete/', {
         method: 'DELETE',
         body: JSON.stringify({
           workout: workoutId
@@ -289,7 +289,7 @@ export default function WorkoutDetail() {
 
     }
     else {
-      fetch('http://localhost:1337/workouts/favorites/', {
+      fetch(global.config.url + 'workouts/favorites/', {
         method: 'POST',
         body: JSON.stringify({
           workout: workoutId,

@@ -83,7 +83,7 @@ export default function Login() {
     const username = data.get('username')
     console.log(password, username);
 
-    fetch("http://localhost:1337/api/token/", {
+    fetch(global.config.url + "api/token/", {
       method: 'POST',
       body: JSON.stringify({
         password: password,
