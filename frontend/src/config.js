@@ -1,3 +1,3 @@
 module.exports = global.config = {
-    url: "http://localhost:1337/",
+    url: "https://gymshare-production.up.railway.app/",
 };
