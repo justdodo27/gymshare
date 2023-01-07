@@ -8,7 +8,7 @@ Color theme from MUI: [Blue Grey 800](https://material.io/resources/color/#!/?vi
 - Build images ```docker-compose build```
 - Run the containers ```docker-compose up```
 - To delete containers ```docker-compose down -v```
-- Server is running on [localhost:1337](http://localhost:1337)
+- Server is running on [localhost:1337](http://localhost:1337).
 
 TODO:
 - [ ] Add dark/light theme switch.
