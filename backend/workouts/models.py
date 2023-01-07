@@ -43,7 +43,7 @@ class Workout(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=80)
-    description = models.TextField(max_length=300, null=True, blank=True)
+    description = models.TextField(max_length=10000, null=True, blank=True)
     visibility = models.CharField(max_length=20, choices=VISIBILITIES, default=PUBLIC)
     cycles = models.PositiveIntegerField()
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
