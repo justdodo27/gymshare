@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:gymshare/api/models/rating.dart';
 import 'package:gymshare/api/models/statistic_synchronize_entry.dart';
 import 'package:gymshare/api/models/exercise_in_workout.dart';
 import 'package:gymshare/components/utils/requests.dart';
@@ -10,6 +12,7 @@ import 'package:gymshare/pages/workouts/active_exercise_page.dart';
 import 'package:gymshare/settings/colors.dart';
 import 'package:gymshare/api/models/workout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 
 class ActivityPage extends StatefulWidget {
@@ -141,7 +144,13 @@ class _ActivityPageState extends State<ActivityPage> {
                                 borderColor: primary,
                                 borderWidth: 2,
                                 onPress: () { 
-                                  showMyDialog(context, 'Finish Workout', 'Do you want to finish ${activeWorkout.title}?', true, widget.callback);
+                                  showMyDialog(
+                                    context,
+                                    'Finish Workout',
+                                    'Do you want to finish ${activeWorkout.title}?',
+                                    true,
+                                    widget.callback
+                                  );
                                  },
                                 child: Row(
                                   children: const [
@@ -160,7 +169,14 @@ class _ActivityPageState extends State<ActivityPage> {
                                 borderColor: tertiary60,
                                 borderWidth: 2,
                                 onPress: () { 
-                                  showMyDialog(context, 'Stop Workout', 'Do you want to stop ${activeWorkout.title}? You have ${exerciseStats.length} unsaved records.', false, widget.callback);
+                                  showMyDialog(
+                                    context,
+                                    'Stop Workout',
+                                    'Do you want to stop ${activeWorkout.title}? You have ${exerciseStats.length} unsaved records.',
+                                    false,
+                                    widget.callback
+                                  );
+
                                  },
                                 child: Row(
                                   children: const [
@@ -279,7 +295,7 @@ class _ExerciseTileState extends State<ExerciseTile> {
   }
 }
 
-showMyDialog(BuildContext context, String title, String msg, bool save, Function callback) {
+showMyDialog(BuildContext context, String title, String msg, bool save, Function callback) async {
   SimpleDialog dialog = SimpleDialog(
     title: Text(title),
     // titlePadding: EdgeInsets.fromLTRB(12, 12, 12, 0),
@@ -313,11 +329,19 @@ showMyDialog(BuildContext context, String title, String msg, bool save, Function
     }
   );
 
-  Future<bool> unloadWorkout() async {
+  Future<int> unloadWorkout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? workoutJSONString = prefs.getString('active_workout');
+    Workout? activeWorkout;
+    if (workoutJSONString is String) {
+      activeWorkout = Workout.fromJson(jsonDecode(workoutJSONString));
+    } 
     await prefs.remove('exercise_stats');
     await prefs.remove('active_workout');
-    return true;
+    if (activeWorkout != null){
+      return activeWorkout.id;
+    }
+    return 0;
   }
 
   void saveStatistics(String data) {
@@ -326,6 +350,7 @@ showMyDialog(BuildContext context, String title, String msg, bool save, Function
 
   dialogValue.then((value) async {
     if (value == true){
+      
       if (save) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? exerciseStatsJSONString = prefs.getString('exercise_stats');
@@ -333,7 +358,76 @@ showMyDialog(BuildContext context, String title, String msg, bool save, Function
           saveStatistics(exerciseStatsJSONString);
         }
       }
-      await unloadWorkout().then((value) => callback());
+      await unloadWorkout().then((value) => showRatingDialog(context, value, callback));
     }
+  });
+}
+
+showRatingDialog(BuildContext context, int id, Function callback) {
+  Future dialogValue = showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      double ratingValue = 3.0;
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return SimpleDialog(
+                  title: const Text("Rate workout"),
+                  contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+                  backgroundColor: surface3,
+                  titleTextStyle: const TextStyle(color: onSurface, fontSize: 20),
+                  children: <Widget>[
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: Text(
+                          "Current rate: $ratingValue",
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(fontSize: 16, color: onSurfaceVariant),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: RatingBar.builder(
+                          initialRating: 3,
+                          minRating: 1,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          itemBuilder: (context, _) => const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: (rating) {
+                            setState(() {
+                              ratingValue = rating;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () { Navigator.pop(context, [true, ratingValue]); },
+                      child: const Text('Ok', style: TextStyle(color: primary),),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () { Navigator.pop(context, [false, 0]); },
+                      child: const Text('Cancel', style: TextStyle(color: primary),),
+                    ),
+                  ],
+                );
+        }
+      );
+    }
+  );
+
+  dialogValue.then((value) async {
+    if (value[0] == true && id > 0) {
+      Rating data = Rating(rate: value[1], workout: id);
+      await sendRating(jsonEncode(data.toJSON()), context);
+    }
+    await callback();
   });
 }
