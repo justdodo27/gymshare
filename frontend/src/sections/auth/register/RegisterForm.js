@@ -232,7 +232,7 @@ export default function SignUp() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
-                  helperText="Password should be at least 8 characters"
+                  helperText="Password should have at least 8 characters, one capital letter, one lowercase letter and one number"
                 />
               </Grid>}
               <Grid item xs={12}>
