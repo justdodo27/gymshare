@@ -17,7 +17,7 @@ class Exercise(models.Model):
     ]
 
     title = models.CharField(max_length=80)
-    description = models.TextField(max_length=300, null=True, blank=True)
+    description = models.TextField(max_length=10000, null=True, blank=True)
     difficulty = models.PositiveIntegerField()
     calories_burn_rate = models.FloatField(validators=[MinValueValidator(0)])
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
