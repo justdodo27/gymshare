@@ -78,4 +78,4 @@ User can download workout to phone and edit it (changes will be local).
 - FK Exercise
 - Repeats - Optional
 - Time - Optional if type series
-- Weight
+- Weight 
