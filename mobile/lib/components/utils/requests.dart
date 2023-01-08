@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:gymshare/api/models/api_response.dart';
 import 'package:gymshare/api/models/exercise_in_workout.dart';
+import 'package:gymshare/api/models/rating.dart';
 import 'package:gymshare/api/models/statistic_calories.dart';
 import 'package:gymshare/api/models/statistic_exercise.dart';
 import 'package:gymshare/api/models/token.dart';
@@ -477,6 +478,47 @@ Future<bool> sendStatistics(String data, BuildContext context, [bool mounted = t
       if (mounted) logOut(context);
       throw Exception('Authorization failed.');
     }
+  } else {
+    return false;
+  }
+}
+
+Future<bool> sendRating(String data, BuildContext context, [bool mounted = true]) async {
+  final token = await getJWT();
+  final response = await http.post(
+    Uri.parse(buildUrl('workouts/ratings/')),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ${token.accessToken}',
+    },
+    body: data
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else if (response.statusCode == 401) {
+    if (await refreshToken(refresh: token.refreshToken)) {
+      if (mounted) return sendStatistics(data, context, mounted);
+        throw Exception('Widget not mounted.');
+    } else {
+      if (mounted) logOut(context);
+      throw Exception('Authorization failed.');
+    }
+  } else if (response.statusCode == 400) {
+    Rating ratingData = Rating.fromJson(jsonDecode(data));
+    final responseEdit = await http.put(
+      Uri.parse(buildUrl('workouts/ratings/${ratingData.workout}/')),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ${token.accessToken}',
+      },
+      body: data
+    );
+
+    if (responseEdit.statusCode == 200) {
+      return true;
+    }
+    return false;
   } else {
     return false;
   }

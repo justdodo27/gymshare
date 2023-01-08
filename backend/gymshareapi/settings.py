@@ -165,7 +165,7 @@ REST_FRAMEWORK = {
 }
 
 # CSRF Trusted origins
-CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:1337"]
+CSRF_TRUSTED_ORIGINS = ["https://*.up.railway.app"]
 
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': 'http://localhost:8000/',

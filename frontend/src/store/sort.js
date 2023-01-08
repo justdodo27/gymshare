@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialSortState = {
   term: '',
   arrow: false,
-  sort: { value: 'id', label: 'Newest' }
+  sort: { value: 'id', label: 'Order' }
 };
 
 const sortSlice = createSlice({
