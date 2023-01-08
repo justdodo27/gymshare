@@ -11,7 +11,7 @@ Color theme from MUI: [Blue Grey 800](https://material.io/resources/color/#!/?vi
 - Server is running on [localhost:1337](http://localhost:1337).
 
 TODO:
-- [ ] Add dark/light theme switch.
+- [ ] Add dark/light theme switch
 
 ## Functionality
 - [x] U Create account
