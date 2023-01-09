@@ -13,7 +13,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Fragment} from 'react';
 import { blueGrey, indigo } from '@mui/material/colors';
-import icon from '../../../pictures/icon.jpg'
+import icon from '../../../pictures/gymIcon.svg'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
@@ -162,7 +162,7 @@ export default function SignUp() {
           }}
         >
           <Link component={RouterLink} to='/' variant="body2">
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
+          <Avatar sx={{ m: 1, bgcolor: 'background.main', width: 200, height: 100 }} variant="rounded" alt="logo" src={icon}>
           </Avatar>
           </Link>
           <Typography component="h1" variant="h5">
