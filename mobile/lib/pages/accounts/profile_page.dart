@@ -20,20 +20,32 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final backgroundHeight = 180.0;
   final profileSize = 120.0;
-
+  
   late Future<Profile> _futureProfile;
-  late Profile _profile;
+
+  Profile profile = Profile(
+    id: -1,
+    user: User(
+      id: -1,
+      username: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      dateJoined: DateTime.now(),
+    ),
+    likes: 0,
+  );
+
+  void getUserData() async {
+    _futureProfile = fetchUserData(context, mounted);
+    final p = await _futureProfile;
+    setState(() => profile = p);
+  }
 
   @override
   void initState() {
     super.initState();
-    _getUserData();
-  }
-
-  void _getUserData() async {
-    _futureProfile = fetchUserData(context, mounted);
-    _profile = await _futureProfile;
-    setState(() {});
+    getUserData();
   }
 
   Widget _buildTop() {
@@ -64,8 +76,8 @@ class _ProfilePageState extends State<ProfilePage> {
         future: _futureProfile,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            // final profile = snapshot.data!;
-            if (_profile.profilePictureUrl != null) {
+            final profile = snapshot.data!;
+            if (profile.profilePictureUrl != null) {
               return Container(
                 height: profileSize,
                 width: profileSize,
@@ -73,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: tertiaryColor,
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                    image: NetworkImage(_profile.profilePictureUrl!),
+                    image: NetworkImage(profile.profilePictureUrl!),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -100,94 +112,78 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: EdgeInsets.only(top: profileSize * 0.7),
       child: Center(
-        child: FutureBuilder<Profile>(
-          future: _futureProfile,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final profile = snapshot.data!;
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  (profile.user.firstName.isNotEmpty ||
-                          profile.user.lastName.isNotEmpty)
-                      ? Text(
-                          '${profile.user.firstName} ${profile.user.lastName}',
-                          style: const TextStyle(
-                              color: primaryTextColor,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : Text(
-                          profile.user.username,
-                          style: const TextStyle(
-                              color: primaryTextColor,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold),
-                        ),
-                  const SizedBox(height: 10),
-                  const Divider(thickness: 1, color: secondaryColor),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildTile(
-                          text: 'Height',
-                          value: '${profile.height ?? '???'}cm'),
-                      _buildTile(
-                          text: 'Weight',
-                          value: '${profile.weight ?? '???'}kg'),
-                      _buildTile(text: 'Likes', value: '${profile.likes} ❤'),
-                    ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            (profile.user.firstName.isNotEmpty ||
+                    profile.user.lastName.isNotEmpty)
+                ? Text(
+                    '${profile.user.firstName} ${profile.user.lastName}',
+                    style: const TextStyle(
+                        color: primaryTextColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold),
+                  )
+                : Text(
+                    profile.user.username,
+                    style: const TextStyle(
+                        color: primaryTextColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold),
                   ),
-                  const Divider(thickness: 1, color: secondaryColor),
-                  Container(
-                    width: size.width * 0.9,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        _buildButton(
-                          icon: Icons.edit,
-                          label: 'Edit profile',
-                          onPress: () => Navigator.of(context)
-                              .push(
-                                createLeftToRightRouteAnimation(
-                                  EditProfilePage(
-                                    firstName: profile.user.firstName,
-                                    lastName: profile.user.lastName,
-                                    weight: profile.weight,
-                                    height: profile.height,
-                                  ),
-                                ),
-                              )
-                              .then((value) => _getUserData()),
-                        ),
-                        _buildButton(
-                          icon: Icons.password,
-                          label: 'Change password',
-                          onPress: () => Navigator.of(context).push(
-                            createLeftToRightRouteAnimation(
-                              const ChangePasswordPage(),
+            const SizedBox(height: 10),
+            const Divider(thickness: 1, color: secondaryColor),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildTile(
+                    text: 'Height', value: '${profile.height ?? '???'}cm'),
+                _buildTile(
+                    text: 'Weight', value: '${profile.weight ?? '???'}kg'),
+                _buildTile(text: 'Likes', value: '${profile.likes} ❤'),
+              ],
+            ),
+            const Divider(thickness: 1, color: secondaryColor),
+            Container(
+              width: size.width * 0.9,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _buildButton(
+                    icon: Icons.edit,
+                    label: 'Edit profile',
+                    onPress: () => Navigator.of(context)
+                        .push(
+                          createLeftToRightRouteAnimation(
+                            EditProfilePage(
+                              firstName: profile.user.firstName,
+                              lastName: profile.user.lastName,
+                              weight: profile.weight,
+                              height: profile.height,
                             ),
                           ),
-                        ),
-                        _buildButton(
-                          icon: Icons.logout,
-                          label: 'Logout',
-                          onPress: () => logOut(context),
-                        ),
-                      ],
+                        )
+                        .then((value) => getUserData()),
+                  ),
+                  _buildButton(
+                    icon: Icons.password,
+                    label: 'Change password',
+                    onPress: () => Navigator.of(context).push(
+                      createLeftToRightRouteAnimation(
+                        const ChangePasswordPage(),
+                      ),
                     ),
-                  )
+                  ),
+                  _buildButton(
+                    icon: Icons.logout,
+                    label: 'Logout',
+                    onPress: () => logOut(context),
+                  ),
                 ],
-              );
-            }
-            return SizedBox(
-              height: size.height * 0.4,
-              child: const Center(
-                child: CircularProgressIndicator(color: tertiaryColor),
               ),
-            );
-          },
+            )
+          ],
         ),
       ),
     );

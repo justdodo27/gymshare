@@ -5,7 +5,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import account from '../../../_mock/account';
 
 export default function AppWidgetProfile({ name, last, height, weight, photo, color = 'primary', sx, ...other }) {
-  let src = global.config.url
+  let src = global.config.url + ''
   if(photo){
     src = photo
     console.log(src)

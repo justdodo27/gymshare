@@ -40,8 +40,10 @@ class _AppBarBackState extends State<AppBarBack> {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: const Text('Next page'),
-    );
+    return  AppBar(
+                      title: const Text('Next page'),
+                    );
   }
 }
+
+

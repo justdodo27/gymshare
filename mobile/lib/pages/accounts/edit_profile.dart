@@ -52,6 +52,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (_weightController.text.isNotEmpty) {
       request.fields['weight'] = _weightController.text;
     }
+
     if (_heightController.text.isNotEmpty) {
       request.fields['height'] = _heightController.text;
     }

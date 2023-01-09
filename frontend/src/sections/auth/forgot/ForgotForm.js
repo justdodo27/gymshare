@@ -53,7 +53,7 @@ export default function ResetPassword() {
     
 
     
-    fetch(global.config.url+ "api/password-reset/", {
+    fetch(global.config.url + "api/password-reset/", {
       method: 'POST',
         body: JSON.stringify({
           email: email

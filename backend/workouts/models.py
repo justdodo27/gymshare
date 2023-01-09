@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from cloudinary_storage.storage import VideoMediaCloudinaryStorage
+from cloudinary_storage.validators import validate_video
 
 
 class Exercise(models.Model):
@@ -15,11 +17,12 @@ class Exercise(models.Model):
     ]
 
     title = models.CharField(max_length=80)
-    description = models.TextField(max_length=300, null=True, blank=True)
+    description = models.TextField(max_length=10000, null=True, blank=True)
     difficulty = models.PositiveIntegerField()
     calories_burn_rate = models.FloatField(validators=[MinValueValidator(0)])
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
-    video = models.FileField(upload_to='videos/', null=True, blank=True)
+    video = models.FileField(upload_to='videos/', null=True, blank=True, storage=VideoMediaCloudinaryStorage(),
+                              validators=[validate_video])
     exercise_type = models.CharField(max_length=30, choices=EXERCISE_TYPES, default=WITH_A_WEIGHT)
 
     def __str__(self) -> str:
@@ -40,7 +43,7 @@ class Workout(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=80)
-    description = models.TextField(max_length=300, null=True, blank=True)
+    description = models.TextField(max_length=10000, null=True, blank=True)
     visibility = models.CharField(max_length=20, choices=VISIBILITIES, default=PUBLIC)
     cycles = models.PositiveIntegerField()
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)

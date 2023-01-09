@@ -31,4 +31,15 @@ class Exercise {
       exerciseType: json['exercise_type'],
     );
   }
+
+  Map<String, dynamic> toJSON() => {
+    'id': id,
+    'thumbnail': thumbnailUrl,
+    'video': videoUrl,
+    'title': title,
+    'description': description,
+    'difficulty': difficulty,
+    'calories_burn_rate': caloriesBurnRate,
+    'exercise_type': exerciseType
+  };
 }

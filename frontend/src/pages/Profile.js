@@ -72,7 +72,7 @@ export default function Profile() {
 
   const fetchWorkout = () => {
 
-    fetch(global.config.url+ "workouts/plans/", {
+    fetch(global.config.url + "workouts/plans/", {
       headers: {
         Authorization: "Bearer " +token
       },

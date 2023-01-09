@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'django_filters',
     'drf_yasg',
     'rest_framework',
@@ -81,14 +84,16 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'aiograbddpxtkzyt')
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+DATABASE_URL = os.getenv("DATABASE_URL", None)
+
 DATABASES = {
-    'default': {
+    'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=1800) if DATABASE_URL else {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': 5432,
+        'NAME': os.environ.get('PGDATABASE'),
+        'USER': os.environ.get('PGUSER'),
+        'PASSWORD': os.environ.get('PGPASSWORD'),
+        'HOST': os.environ.get('PGHOST'),
+        'PORT': os.environ.get('PGPORT'),
     }
 }
 
@@ -128,10 +133,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = "/media/"
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': "dxij36qxe",
+    'API_KEY': "861968532563354",
+    'API_SECRET': "2c6yDpqbGp5aVg2fg3f6Xdah8Y0"
+}
 
 
 # Default primary key field type
@@ -152,7 +165,7 @@ REST_FRAMEWORK = {
 }
 
 # CSRF Trusted origins
-CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:1337"]
+CSRF_TRUSTED_ORIGINS = ["https://*.up.railway.app"]
 
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': 'http://localhost:8000/',

@@ -182,7 +182,7 @@ export default function EditWorkout() {
 
   const test = useCallback(async () => {
     try {
-      const response = await fetch(global.config.url+ "workouts/exercises/?search=" + selectedOption);
+      const response = await fetch(global.config.url + "workouts/exercises/?search=" + selectedOption);
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -259,7 +259,7 @@ export default function EditWorkout() {
 
   const end = (event) => {
     if(flag){
-      fetch(global.config.url+"workouts/plans/upload/", {
+      fetch(global.config.url + "workouts/plans/upload/", {
         method: 'POST',
           body: JSON.stringify({
             workout_for_update_id: workoutId,

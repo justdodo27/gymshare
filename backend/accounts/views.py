@@ -56,8 +56,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         queryset = models.Profile.objects.all()
         profile = get_object_or_404(queryset, user__id=pk)
-        serializer = serializers.ProfileSerializer(
-            profile, context=self.get_serializer_context())
+        serializer = serializers.ProfileSerializer(profile, context=self.get_serializer_context())
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
@@ -68,16 +67,13 @@ class ProfileViewSet(viewsets.ModelViewSet):
             raise NotAuthenticated("No Token Provided")
 
         if serializer.is_valid():
-            profile_object = models.Profile.objects.get(
-                user__id=user_object.id)
+            profile_object = models.Profile.objects.get(user__id=user_object.id)
             profile_object.height = serializer.validated_data.get('height')
             profile_object.weight = serializer.validated_data.get('weight')
-            if serializer.validated_data.get('profile_picture'):
-                profile_object.profile_picture = serializer.validated_data['profile_picture']
+            profile_object.profile_picture = serializer.validated_data.get('profile_picture')
             profile_object.save()
 
-            user_object.first_name = serializer.validated_data.get(
-                'first_name')
+            user_object.first_name = serializer.validated_data.get('first_name')
             user_object.last_name = serializer.validated_data.get('last_name')
             user_object.save()
 

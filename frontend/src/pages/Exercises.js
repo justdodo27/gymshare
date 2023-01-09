@@ -156,7 +156,7 @@ export default function Exercises() {
     let next = true
     
     try {
-      const response = await fetch(global.config.url+ "workouts/exercises/");
+      const response = await fetch(global.config.url + "workouts/exercises/");
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -242,7 +242,7 @@ export default function Exercises() {
   };
 
 const handleClickDelete = (id) => {
-  fetch(global.config.url+ 'workouts/exercises/'+id, {
+  fetch(global.config.url + 'workouts/exercises/'+id, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
