@@ -101,7 +101,6 @@ export default function Exercises() {
   let exp = useSelector(state => state.auth.exp);
   let is_staff = useSelector(state => state.auth.is_staff);
   let token = useSelector(state => state.auth.token);
-  console.log(is_staff)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -154,6 +153,7 @@ export default function Exercises() {
 
 
   const fetchMoviesHandler = useCallback(async () => {
+    let next = true
     
     try {
       const response = await fetch(global.config.url + "workouts/exercises/");
@@ -161,7 +161,6 @@ export default function Exercises() {
         throw new Error('Something went wrong!');
       }
       const data = await response.json();
-      console.log(data.results[0].id)
 
       const users = [...Array(data.results.length)].map((_, index) => ({
         id: data.results[index].id,
@@ -174,14 +173,44 @@ export default function Exercises() {
         video: data.results[index].video,
       }));
 
-      console.log(users)
+      next = data.next
+
       setArray(users)
 
-      
+      while(next!=null){
+        try {
+          const response = await fetch(next);
+          if (!response.ok) {
+            throw new Error('Something went wrong!');
+          }
+          const data = await response.json();
+
+          const added = []
+          data.results.forEach(exercise => added.push({id: exercise.id,
+            avatarUrl: exercise.thumbnail ,
+            title: exercise.title,
+            type: exercise.exercise_type,
+            calories_burn_rate: exercise.calories_burn_rate,
+            difficulty: exercise.difficulty,
+            description: exercise.description,
+            video: exercise.video,}))
+    
+          next = data.next
+
+    
+          console.log(added)
+          setArray(array => [...array, ...added])
+    
+        } catch (error) {
+          return<p>Error</p>;
+        }
+      }
 
     } catch (error) {
       return<p>Error</p>;
     }
+
+
     ;
   }, []);
 
@@ -213,7 +242,6 @@ export default function Exercises() {
   };
 
 const handleClickDelete = (id) => {
-  console.log(id)
   fetch(global.config.url + 'workouts/exercises/'+id, {
         method: 'DELETE',
         headers: {
@@ -235,7 +263,6 @@ const handleClickDelete = (id) => {
   };
 
   const handleClick = (exercise) => {
-    console.log(exercise)
     if(exercise[5] === ""){
       exercise[5] = nophotoicon
     }
