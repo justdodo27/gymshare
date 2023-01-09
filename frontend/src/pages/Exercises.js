@@ -178,6 +178,7 @@ export default function Exercises() {
       setArray(users)
 
       while(next!=null){
+        next = next.substring(0,4) + "s" + next.substring(4,next.length)
         try {
           const response = await fetch(next);
           if (!response.ok) {
@@ -196,6 +197,7 @@ export default function Exercises() {
             video: exercise.video,}))
     
           next = data.next
+
 
     
           console.log(added)
