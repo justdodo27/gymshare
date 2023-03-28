@@ -22,8 +22,8 @@ class Command(BaseCommand):
                     "calories_burn_rate": randint(1,90) / randint(100, 3000),
                     "exercise_type": choice([Exercise.WITH_OWN_BODY_WEIGHT, Exercise.WITH_A_WEIGHT, Exercise.WITH_TIME]),
                 }
-                thumbnail = choice(['/backend/mediafiles/thumbnails/deadlift.png', '/backend/mediafiles/thumbnails/running-treadmill.png', '/backend/mediafiles/thumbnails/pushups.png', None])
-                video = choice(['/backend/mediafiles/videos/push-ups.mp4', '/backend/mediafiles/videos/deadlift.mp4', '/backend/mediafiles/videos/running.mp4', None])
+                thumbnail = choice(['/backend/mediafiles/thumbnails/deadlift.png', '/backend/mediafiles/thumbnails/running-treadmill.png', '/backend/mediafiles/thumbnails/pushups.png', None, None, None])
+                video = choice(['/backend/mediafiles/videos/push-ups.mp4', '/backend/mediafiles/videos/deadlift.mp4', '/backend/mediafiles/videos/running.mp4', None, None, None])
                 print(f"Creating exercise {exercise_kwargs}")
                 exercise = Exercise.objects.create(**exercise_kwargs)
                 if thumbnail:
@@ -33,6 +33,7 @@ class Command(BaseCommand):
                     with open(video, 'rb') as video_file:
                         exercise.video.save(video.split('/')[-1], File(video_file), save=True)
                 exercise.save()
+            print('Done exercises')
         else:
             print('exercises already created.')
 
