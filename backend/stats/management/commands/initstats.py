@@ -80,7 +80,7 @@ class Command(BaseCommand):
                 month_last_date = monthrange(month.year, month.month)[1]
                 for day in range(month_last_date):
                     month = month.replace(day=day+1)
-                    for i in random.randint(3, 8):
+                    for i in range(random.randint(3, 8)):
                         exercise = random.choice(exercises)
                         stat_ex_kwargs = {
                             'date': json.dumps(month, default=date_handler).strip('"'),
