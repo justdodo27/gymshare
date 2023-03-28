@@ -16,80 +16,80 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        if StatisticCalories.objects.count() == 0:
-            for statistic_calories in STATISTIC_CALORIES:
+        if StatisticCalories.objects.count() < 500:
+            users = User.objects.all()
+            for user in users:
                 month = dt.datetime.now().replace(day=1)
-                month = month.replace(month=11)
+                month = month.replace(month=4)
                 month_last_date = monthrange(month.year, month.month)[1]
                 for day in range(month_last_date):
                     month = month.replace(day=day+1)
 
                     stat_cal_kwargs = {
                         'date': month.strftime('%Y-%m-%d'),
-                        'calories': statistic_calories.get('calories') * random.randint(1, 20),
+                        'calories': random.randint(20, 50) * random.randint(1, 20),
                     }
-                    user = User.objects.get(id=statistic_calories.get('user'))
                     print(f"Creating statistic calories {stat_cal_kwargs}")
                     stat_cal = StatisticCalories.objects.create(**stat_cal_kwargs, user=user)
                     stat_cal.save()
                 month = month.replace(day=1)
-                month = month.replace(month=10)
+                month = month.replace(month=5)
                 month_last_date = monthrange(month.year, month.month)[1]
                 for day in range(month_last_date):
                     month = month.replace(day=day+1)
 
                     stat_cal_kwargs = {
                         'date': month.strftime('%Y-%m-%d'),
-                        'calories': statistic_calories.get('calories') * random.randint(1, 20),
+                        'calories': random.randint(20, 50) * random.randint(1, 20),
                     }
-                    user = User.objects.get(id=statistic_calories.get('user'))
                     print(f"Creating statistic calories {stat_cal_kwargs}")
                     stat_cal = StatisticCalories.objects.create(**stat_cal_kwargs, user=user)
                     stat_cal.save()
         else:
             print('Statistic Calories already created.')
 
-        if StatisticExercise.objects.count() == 0:
-            date_handler = lambda obj: (
-                obj.isoformat()
-                if isinstance(obj, (dt.datetime, dt.date))
-                else None
-            )
-            
-            month = dt.datetime.now().replace(day=1)
-            month = month.replace(month=11)
-            month_last_date = monthrange(month.year, month.month)[1]
-            for day in range(month_last_date):
-                month = month.replace(day=day+1)
-                for statistic_exercise in STATISTIC_EXERCISE:
-                    stat_ex_kwargs = {
-                        'date': json.dumps(month, default=date_handler).strip('"'),
-                        'repeats': statistic_exercise.get('repeats'),
-                        'time': statistic_exercise.get('time'),
-                        'weight': statistic_exercise.get('weight'),
-                    }
-                    exercise = Exercise.objects.get(id=statistic_exercise.get('exercise'))
-                    user = User.objects.get(id=statistic_exercise.get('user'))
-                    print(f"Creating statistic exercise {stat_ex_kwargs}")
-                    stat_ex = StatisticExercise.objects.create(**stat_ex_kwargs, user=user, exercise=exercise)
-                    stat_ex.save()
-            month = dt.datetime.now().replace(day=1)
-            month = month.replace(month=10)
-            month_last_date = monthrange(month.year, month.month)[1]
-            for day in range(month_last_date):
-                month = month.replace(day=day+1)
-                for statistic_exercise in STATISTIC_EXERCISE:
-                    stat_ex_kwargs = {
-                        'date': json.dumps(month, default=date_handler).strip('"'),
-                        'repeats': statistic_exercise.get('repeats'),
-                        'time': statistic_exercise.get('time'),
-                        'weight': statistic_exercise.get('weight'),
-                    }
-                    exercise = Exercise.objects.get(id=statistic_exercise.get('exercise'))
-                    user = User.objects.get(id=statistic_exercise.get('user'))
-                    print(f"Creating statistic exercise {stat_ex_kwargs}")
-                    stat_ex = StatisticExercise.objects.create(**stat_ex_kwargs, user=user, exercise=exercise)
-                    stat_ex.save()
+        if StatisticExercise.objects.count() < 50:
+            users = User.objects.all()
+            exercises = Exercise.objects.all()
+            for user in users:
+                date_handler = lambda obj: (
+                    obj.isoformat()
+                    if isinstance(obj, (dt.datetime, dt.date))
+                    else None
+                )
+                
+                month = dt.datetime.now().replace(day=1)
+                month = month.replace(month=4)
+                month_last_date = monthrange(month.year, month.month)[1]
+                for day in range(month_last_date):
+                    month = month.replace(day=day+1)
+                    for i in random.randint(3, 8):
+                        exercise = random.choice(exercises)
+                        stat_ex_kwargs = {
+                            'date': json.dumps(month, default=date_handler).strip('"'),
+                            'repeats': random.randint(2, 10) if exercise.exercise_type != Exercise.WITH_TIME else None,
+                            'time': random.randint(10, 3600) if exercise.exercise_type == Exercise.WITH_TIME else None,
+                            'weight': random.randint(1, 3) if exercise.exercise_type != Exercise.WITH_TIME else None
+                        }
+                        print(f"Creating statistic exercise {stat_ex_kwargs}")
+                        stat_ex = StatisticExercise.objects.create(**stat_ex_kwargs, user=user, exercise=exercise)
+                        stat_ex.save()
+                month = dt.datetime.now().replace(day=1)
+                month = month.replace(month=5)
+                month_last_date = monthrange(month.year, month.month)[1]
+                for day in range(month_last_date):
+                    month = month.replace(day=day+1)
+                    for i in random.randint(3, 8):
+                        exercise = random.choice(exercises)
+                        stat_ex_kwargs = {
+                            'date': json.dumps(month, default=date_handler).strip('"'),
+                            'repeats': random.randint(2, 10) if exercise.exercise_type != Exercise.WITH_TIME else None,
+                            'time': random.randint(10, 3600) if exercise.exercise_type == Exercise.WITH_TIME else None,
+                            'weight': random.randint(1, 3) if exercise.exercise_type != Exercise.WITH_TIME else None
+                        }
+                        print(f"Creating statistic exercise {stat_ex_kwargs}")
+                        stat_ex = StatisticExercise.objects.create(**stat_ex_kwargs, user=user, exercise=exercise)
+                        stat_ex.save()
         else:
             print('Statistic Exercise already created.')
         
