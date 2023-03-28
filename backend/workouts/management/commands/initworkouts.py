@@ -31,6 +31,7 @@ class Command(BaseCommand):
                         with open(thumbnail, 'rb') as img_file:
                             workout_obj.thumbnail.save(thumbnail.split('/')[-1], File(img_file), save=True)
                     workout_obj.save()
+            print("Done workouts")
         else:
             print('Workout already created')
 
