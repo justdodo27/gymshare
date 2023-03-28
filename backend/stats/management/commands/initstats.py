@@ -45,6 +45,7 @@ class Command(BaseCommand):
                     print(f"Creating statistic calories {stat_cal_kwargs}")
                     stat_cal = StatisticCalories.objects.create(**stat_cal_kwargs, user=user)
                     stat_cal.save()
+            print('Done stats calories')
         else:
             print('Statistic Calories already created.')
 
@@ -90,6 +91,7 @@ class Command(BaseCommand):
                         print(f"Creating statistic exercise {stat_ex_kwargs}")
                         stat_ex = StatisticExercise.objects.create(**stat_ex_kwargs, user=user, exercise=exercise)
                         stat_ex.save()
+            print('Done stats exercises')
         else:
             print('Statistic Exercise already created.')
         
