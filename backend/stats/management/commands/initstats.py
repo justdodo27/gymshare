@@ -48,7 +48,7 @@ class Command(BaseCommand):
         else:
             print('Statistic Calories already created.')
 
-        if StatisticExercise.objects.count() < 50:
+        if StatisticExercise.objects.count() < 500:
             users = User.objects.all()
             exercises = Exercise.objects.all()
             for user in users:

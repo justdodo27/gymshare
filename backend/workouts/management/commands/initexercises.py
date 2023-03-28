@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if Exercise.objects.count() < 200:
-            for i in range(20):
+            for i in range(200):
 
                 exercise_kwargs = {
                     'title': f'Exercise {i}',

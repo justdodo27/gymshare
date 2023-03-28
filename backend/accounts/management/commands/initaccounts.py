@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if User.objects.count() < 500:
-            for i in range(50):
+            for i in range(500):
                 username = f"user{i}"
                 email = f"user{i}@test.com"
                 password = f"Strong2137"
