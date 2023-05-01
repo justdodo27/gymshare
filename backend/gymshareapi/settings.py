@@ -78,8 +78,8 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('EMAIL', 'dominik.gymshare@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'aiograbddpxtkzyt')
+EMAIL_HOST_USER = os.environ.get('EMAIL', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -141,9 +141,9 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': "dxij36qxe",
-    'API_KEY': "861968532563354",
-    'API_SECRET': "2c6yDpqbGp5aVg2fg3f6Xdah8Y0"
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
 }
 
 
