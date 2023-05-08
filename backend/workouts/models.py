@@ -41,10 +41,10 @@ class Workout(models.Model):
         (HIDDEN, 'Hidden')
     ]
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True) # index
+    author = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
     title = models.CharField(max_length=80)
     description = models.TextField(max_length=10000, null=True, blank=True)
-    visibility = models.CharField(max_length=20, choices=VISIBILITIES, default=PUBLIC, db_index=True) # index
+    visibility = models.CharField(max_length=20, choices=VISIBILITIES, default=PUBLIC) # index
     cycles = models.PositiveIntegerField()
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
 
@@ -56,8 +56,8 @@ class Workout(models.Model):
 
 
 class FavoriteWorkout(models.Model):
-    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, db_index=True) # index
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True) # index
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, db_index=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -65,8 +65,8 @@ class FavoriteWorkout(models.Model):
 
 
 class ExcerciseInWorkout(models.Model):
-    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, db_index=True) # index
-    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, db_index=True) # index
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, db_index=True)
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, db_index=True)
     order = models.PositiveIntegerField()
     repeats = models.PositiveIntegerField(null=True, blank=True)
     time = models.FloatField(null=True, blank=True)
@@ -80,8 +80,8 @@ class ExcerciseInWorkout(models.Model):
 
 
 class Rating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, db_index=True) # index
-    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, db_index=True) # index
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, db_index=True)
     rate = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
 
     def __str__(self) -> str:
