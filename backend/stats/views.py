@@ -32,7 +32,7 @@ class StatisticExerciseList(ListAPIView):
     queryset = StatisticExercise.objects.all()
     serializer_class = StatisticExerciseGetSerializer
     ordering_fields = ['date', '-date', 'repeats', '-repeats', 'time', '-time', 'weight', '-weight']
-    # pagination_class = DefaultPagination
+    pagination_class = None
 
     def get_queryset(self):
         day = self.kwargs.get('day')
@@ -77,7 +77,7 @@ class StatisticCaloriesList(ListAPIView):
     serializer_class = StatisticCaloriesSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = ['date', ]
-    # pagination_class = DefaultPagination
+    pagination_class = None
 
     def get_queryset(self):
         month = self.kwargs.get('month')
