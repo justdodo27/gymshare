@@ -51,9 +51,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     queryset = models.Workout.objects.all()
     serializer_class = serializers.WorkoutSerializer
     parser_classes = (MultiPartParser, FormParser)
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    search_fields = ['title', 'description', 'author__username']
-    filterset_fields = ['visibility', 'author__id']
+    # filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    # search_fields = ['title', 'description', 'author__username']
+    # filterset_fields = ['visibility', 'author__id']
     pagination_class = DefaultPagination
 
     def get_serializer_context(self):
