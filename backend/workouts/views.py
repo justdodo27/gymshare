@@ -83,10 +83,10 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         qs = models.Workout.objects.from_raw(
         """
         SELECT w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail,
-        avg(coalesce(e.difficulty, 0.0)) as "calc_difficulty",
-        sum(coalesce(ew.time, ew.repeats * 5.0, 0.0)) as "calc_time",
-        sum(coalesce(ew.time / 60.0, ew.repeats * 5.0/60, 0.0) * 65.0 * e.calories_burn_rate) as "calc_calories",
-        avg(coalesce(r.rate, 0.0)) as "calc_rating"
+        avg(coalesce(e.difficulty, 0.0)) as "difficulty",
+        sum(coalesce(ew.time, ew.repeats * 5.0, 0.0)) as "avg_time",
+        sum(coalesce(ew.time / 60.0, ew.repeats * 5.0/60, 0.0) * 65.0 * e.calories_burn_rate) as "sum_of_cb",
+        avg(coalesce(r.rate, 0.0)) as "avg_rating"
         FROM workouts_workout w
         LEFT JOIN workouts_excerciseinworkout ew ON ew.workout_id = w.id
         LEFT JOIN workouts_exercise e ON ew.exercise_id = e.id
