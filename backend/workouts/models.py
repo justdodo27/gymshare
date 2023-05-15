@@ -50,6 +50,7 @@ class Workout(models.Model):
     visibility = models.CharField(max_length=20, choices=VISIBILITIES, default=PUBLIC) # index
     cycles = models.PositiveIntegerField()
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
+    avg_time = models.FloatField()
 
     objects = RawManager()
 
