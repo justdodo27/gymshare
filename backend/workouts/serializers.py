@@ -177,7 +177,7 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
             workout=workout, user=context_user).exists()
 
     def get_avg_rating(self, workout):  # todo give this to singals
-        return round(99.0, 2)
+        return round(workout.avg_rating, 2)
 
     def get_ratings_count(self, workout):
         return models.Rating.objects.filter(
@@ -185,13 +185,13 @@ class WorkoutSerializerWithAuthor(serializers.ModelSerializer):
         ).count()
 
     def get_avg_time(self, workout):
-        return round(69.0, 2)
+        return round(workout.avg_time, 2)
 
     def get_difficulty(self, workout):
-        return round(123.0, 2)
+        return round(workout.difficulty, 2)
 
     def get_sum_of_cb(self, workout):
-        return round(33.0, 2)
+        return round(workout.sum_of_cb, 2)
 
     class Meta:
         model = models.Workout

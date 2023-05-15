@@ -70,66 +70,66 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        # queryset_for_hidden = (
-        #     Q(visibility=models.Workout.HIDDEN) & Q(author=self.request.user))
-        # queryset_for_public = Q(visibility=models.Workout.PUBLIC)
+        queryset_for_hidden = (
+            Q(visibility=models.Workout.HIDDEN) & Q(author=self.request.user))
+        queryset_for_public = Q(visibility=models.Workout.PUBLIC)
 
-        # if self.request.user.is_anonymous:
-        #     qs = self.queryset.filter(queryset_for_public)
-        # else:
-        #     qs = self.queryset.filter(
-        #         queryset_for_public | queryset_for_hidden)
+        if self.request.user.is_anonymous:
+            qs = self.queryset.filter(queryset_for_public)
+        else:
+            qs = self.queryset.filter(
+                queryset_for_public | queryset_for_hidden)
         
-        qs = models.Workout.objects.from_raw(
-        """
-        SELECT w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail,
-        avg(coalesce(e.difficulty, 0.0)) as "difficulty",
-        sum(coalesce(ew.time, ew.repeats * 5.0, 0.0)) as "avg_time",
-        sum(coalesce(ew.time / 60.0, ew.repeats * 5.0/60, 0.0) * 65.0 * e.calories_burn_rate) as "sum_of_cb",
-        avg(coalesce(r.rate, 0.0)) as "avg_rating"
-        FROM workouts_workout w
-        LEFT JOIN workouts_excerciseinworkout ew ON ew.workout_id = w.id
-        LEFT JOIN workouts_exercise e ON ew.exercise_id = e.id
-        LEFT JOIN workouts_rating r ON r.workout_id = w.id
-        WHERE w.visibility = 'Public'
-        GROUP BY w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail
-        """
-        )
+        # qs = models.Workout.objects.from_raw(
+        # """
+        # SELECT w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail,
+        # avg(coalesce(e.difficulty, 0.0)) as "difficulty",
+        # sum(coalesce(ew.time, ew.repeats * 5.0, 0.0)) as "avg_time",
+        # sum(coalesce(ew.time / 60.0, ew.repeats * 5.0/60, 0.0) * 65.0 * e.calories_burn_rate) as "sum_of_cb",
+        # avg(coalesce(r.rate, 0.0)) as "avg_rating"
+        # FROM workouts_workout w
+        # LEFT JOIN workouts_excerciseinworkout ew ON ew.workout_id = w.id
+        # LEFT JOIN workouts_exercise e ON ew.exercise_id = e.id
+        # LEFT JOIN workouts_rating r ON r.workout_id = w.id
+        # WHERE w.visibility = 'Public'
+        # GROUP BY w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail
+        # """
+        # )
 
-        # difficulty_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
-        #     calc_difficulty=Func(Coalesce('exercise__difficulty', Value(
-        #         0.0), output_field=FloatField()), function="Avg")
-        # ).order_by('calc_difficulty')
-        # time_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
-        #     calc_time=Func(Coalesce('time', F('repeats') * Value(5.0),
-        #                    Value(0.0), output_field=FloatField()), function="Sum")
-        # ).order_by('calc_time')
-        # calories_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
-        #     calc_calories=Func(Coalesce(
-        #         Coalesce(
-        #             F('time') / Value(60.0), F('repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
-        #         ) * get_user_weight(self.request.user) * F('exercise__calories_burn_rate'), Value(0.0)
-        #     ), function="Sum")
-        # ).order_by('calc_calories')
-        # rating_subq = models.Rating.objects.filter(workout=OuterRef('id')).annotate(
-        #     calc_rating=Func(Coalesce('rate', Value(
-        #         0.0), output_field=FloatField()), function="Avg")
-        # ).order_by('calc_rating')
+        difficulty_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_difficulty=Func(Coalesce('exercise__difficulty', Value(
+                0.0), output_field=FloatField()), function="Avg")
+        ).order_by('calc_difficulty')
+        time_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_time=Func(Coalesce('time', F('repeats') * Value(5.0),
+                           Value(0.0), output_field=FloatField()), function="Sum")
+        ).order_by('calc_time')
+        calories_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
+            calc_calories=Func(Coalesce(
+                Coalesce(
+                    F('time') / Value(60.0), F('repeats') * 5.0 / 60, Value(0.0), output_field=FloatField()
+                ) * get_user_weight(self.request.user) * F('exercise__calories_burn_rate'), Value(0.0)
+            ), function="Sum")
+        ).order_by('calc_calories')
+        rating_subq = models.Rating.objects.filter(workout=OuterRef('id')).annotate(
+            calc_rating=Func(Coalesce('rate', Value(
+                0.0), output_field=FloatField()), function="Avg")
+        ).order_by('calc_rating')
 
-        # qs = qs.annotate(difficulty=Coalesce(Subquery(difficulty_subq.values(
-        #     'calc_difficulty')[:1]), Value(0.0), output_field=FloatField()))
-        # qs = qs.annotate(avg_time=Coalesce(Subquery(time_subq.values(
-        #     'calc_time')[:1]), Value(0.0), output_field=FloatField()))
-        # qs = qs.annotate(sum_of_cb=Coalesce(Subquery(calories_subq.values(
-        #     'calc_calories')[:1]), Value(0.0), output_field=FloatField()))
-        # qs = qs.annotate(avg_rating=Coalesce(Subquery(rating_subq.values(
-        #     'calc_rating')[:1]), Value(0.0), output_field=FloatField()))
+        qs = qs.annotate(difficulty=Coalesce(Subquery(difficulty_subq.values(
+            'calc_difficulty')[:1]), Value(0.0), output_field=FloatField()))
+        qs = qs.annotate(avg_time=Coalesce(Subquery(time_subq.values(
+            'calc_time')[:1]), Value(0.0), output_field=FloatField()))
+        qs = qs.annotate(sum_of_cb=Coalesce(Subquery(calories_subq.values(
+            'calc_calories')[:1]), Value(0.0), output_field=FloatField()))
+        qs = qs.annotate(avg_rating=Coalesce(Subquery(rating_subq.values(
+            'calc_rating')[:1]), Value(0.0), output_field=FloatField()))
 
-        # if self.action == 'list' and (ordering := self.request.query_params.get('ordering')) in \
-        #     ['id', '-id', 'title', '-title', 'difficulty', '-difficulty', 'avg_time', '-avg_time',
-        #      'sum_of_cb', '-sum_of_cb', 'avg_rating', '-avg_rating']:
+        if self.action == 'list' and (ordering := self.request.query_params.get('ordering')) in \
+            ['id', '-id', 'title', '-title', 'difficulty', '-difficulty', 'avg_time', '-avg_time',
+             'sum_of_cb', '-sum_of_cb', 'avg_rating', '-avg_rating']:
 
-        #     qs = qs.order_by(ordering)
+            qs = qs.order_by(ordering)
 
         return qs
 
