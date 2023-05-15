@@ -80,19 +80,19 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         #     qs = self.queryset.filter(
         #         queryset_for_public | queryset_for_hidden)
         
-        qs = models.Workout.objects.raw(
+        qs = models.Workout.objects.from_raw(
         """
-        SELECT w.id, w.author, w.title, w.description, w.visibility, w.cycles, w.thumbnail,
-        avg(coalesce(ew.difficulty, 0.0)) as "calc_difficulty",
+        SELECT w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail,
+        avg(coalesce(e.difficulty, 0.0)) as "calc_difficulty",
         sum(coalesce(ew.time, ew.repeats * 5.0, 0.0)) as "calc_time",
         sum(coalesce(ew.time / 60.0, ew.repeats * 5.0/60, 0.0) * 65.0 * e.calories_burn_rate) as "calc_calories",
-        avg(coalesce(r.rating, 0.0)) as "calc_rating"
+        avg(coalesce(r.rate, 0.0)) as "calc_rating"
         FROM workouts_workout w
         LEFT JOIN workouts_excerciseinworkout ew ON ew.workout_id = w.id
         LEFT JOIN workouts_exercise e ON ew.exercise_id = e.id
         LEFT JOIN workouts_rating r ON r.workout_id = w.id
-        WHERE w.visibility = Public
-        GROUP BY w.id, w.author, w.title, w.description, w.visibility, w.cycles, w.thumbnail
+        WHERE w.visibility = 'Public'
+        GROUP BY w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail
         """
         )
 

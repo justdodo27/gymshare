@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from cloudinary_storage.storage import VideoMediaCloudinaryStorage
 from cloudinary_storage.validators import validate_video
+from raw_sugar import RawManager
 
 
 class Exercise(models.Model):
@@ -24,6 +25,8 @@ class Exercise(models.Model):
     video = models.FileField(upload_to='videos/', null=True, blank=True, storage=VideoMediaCloudinaryStorage(),
                               validators=[validate_video])
     exercise_type = models.CharField(max_length=30, choices=EXERCISE_TYPES, default=WITH_A_WEIGHT)
+
+    objects = RawManager()
 
     def __str__(self) -> str:
         return self.title
@@ -48,6 +51,8 @@ class Workout(models.Model):
     cycles = models.PositiveIntegerField()
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
 
+    objects = RawManager()
+
     def __str__(self) -> str:
         return f'{self.title} by {self.author}'
 
@@ -59,6 +64,8 @@ class FavoriteWorkout(models.Model):
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE, db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
     date = models.DateTimeField(auto_now_add=True)
+
+    objects = RawManager()
 
     class Meta:
         unique_together = ['user', 'workout']
@@ -72,6 +79,8 @@ class ExcerciseInWorkout(models.Model):
     time = models.FloatField(null=True, blank=True)
     series = models.PositiveIntegerField(null=True, blank=True)
 
+    objects = RawManager()
+
     def __str__(self) -> str:
         return f'{self.exercise} in {self.workout}'
 
@@ -83,6 +92,8 @@ class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE, db_index=True)
     rate = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+
+    objects = RawManager()
 
     def __str__(self) -> str:
         return f'{self.workout} rating'
