@@ -79,22 +79,6 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         else:
             qs = self.queryset.filter(
                 queryset_for_public | queryset_for_hidden)
-        
-        # qs = models.Workout.objects.from_raw(
-        # """
-        # SELECT w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail,
-        # avg(coalesce(e.difficulty, 0.0)) as "difficulty",
-        # sum(coalesce(ew.time, ew.repeats * 5.0, 0.0)) as "avg_time",
-        # sum(coalesce(ew.time / 60.0, ew.repeats * 5.0/60, 0.0) * 65.0 * e.calories_burn_rate) as "sum_of_cb",
-        # avg(coalesce(r.rate, 0.0)) as "avg_rating"
-        # FROM workouts_workout w
-        # LEFT JOIN workouts_excerciseinworkout ew ON ew.workout_id = w.id
-        # LEFT JOIN workouts_exercise e ON ew.exercise_id = e.id
-        # LEFT JOIN workouts_rating r ON r.workout_id = w.id
-        # WHERE w.visibility = 'Public'
-        # GROUP BY w.id, w.author_id, w.title, w.description, w.visibility, w.cycles, w.thumbnail
-        # """
-        # )
 
         difficulty_subq = models.ExcerciseInWorkout.objects.filter(workout=OuterRef('id')).annotate(
             calc_difficulty=Func(Coalesce('exercise__difficulty', Value(
@@ -133,9 +117,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
         return qs
 
-    # @method_decorator(cache_page(60*60*2))
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
+    @method_decorator(cache_page(60*60*2))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
@@ -207,9 +191,9 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
 
         return qs
 
-    # @method_decorator(cache_page(60*60*2))
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
+    @method_decorator(cache_page(60*60*2))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
