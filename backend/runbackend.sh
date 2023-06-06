@@ -1,2 +1,2 @@
 #!/bin/bash
-python manage.py migrate & python manage.py initstats & gunicorn gymshareapi.wsgi:application -w 2
+python manage.py migrate & python manage.py initstats & gunicorn gymshareapi.wsgi:application -w 100
