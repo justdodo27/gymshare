@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Avatar, TextField, Box, Grid, Button, Container, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import icon from "../pictures/icon.jpg"
+import icon from "../pictures/gymIcon.svg"
 import { useNavigate} from 'react-router-dom';
 import { useState } from 'react';
 import { useSelector} from 'react-redux';
@@ -84,7 +84,7 @@ export default function ChangePassword() {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }} alt="logo" src={icon}>
+          <Avatar sx={{ m: 1, bgcolor: 'background.main', width: 200, height: 100  }} variant="rounded" alt="logo" src={icon}>
           </Avatar>
           <Typography component="h1" variant="h5">
             Change Password

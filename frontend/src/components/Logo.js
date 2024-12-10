@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import Avatar from '@mui/material/Avatar';
-import icon from "../pictures/icon.jpg"
+import icon from "../pictures/gymIcon.svg"
 
 // ----------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ Logo.propTypes = {
 
 export default function Logo({ disabledLink = false, sx }) {
   
-  const logo = <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 70, height: 70, marginLeft: 10, marginTop: 4 }} alt="logo" src={icon}/>
+  const logo = <Avatar sx={{ m: 1, bgcolor: 'background.main', width: 200, height: 100 , marginLeft: 2, marginTop: 4 }} variant="rounded" alt="logo" src={icon}/>
 
 
 

@@ -7,6 +7,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Value, FloatField, F, OuterRef, Subquery, Func, Prefetch
 from django.db.models.functions import Coalesce
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 
 from gymshareapi.pagination import DefaultPagination
@@ -115,6 +117,10 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
         return qs
 
+    @method_decorator(cache_page(60*60*2))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
             return serializers.WorkoutCreateSerializer
@@ -184,6 +190,10 @@ class FavoriteWorkoutViewSet(viewsets.ModelViewSet):
             qs = qs.order_by(ordering)
 
         return qs
+
+    @method_decorator(cache_page(60*60*2))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):

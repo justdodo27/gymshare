@@ -18,7 +18,6 @@ class StatisticCaloriesSerializer(serializers.ModelSerializer):
         return value
 
     def get_calories(self, obj):
-        print(obj)
         return round(obj.calories)
 
 

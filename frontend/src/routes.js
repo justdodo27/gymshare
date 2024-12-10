@@ -21,6 +21,7 @@ import AddExerciseToWork from './pages/AddExerciseToWork';
 import Logout from './pages/Logout';
 import WorkoutDetail from './pages/WorkoutDetail';
 import EditWorkout from './pages/EditWorkout';
+import Privacy from './pages/Privacy';
 
 
 // ----------------------------------------------------------------------
@@ -67,6 +68,7 @@ export default function Router() {
       children: [
         { path: '/', element: <Navigate to="/gymshare/app" /> },
         { path: '404', element: <NotFound /> },
+        { path: 'privacy-policy', element: <Privacy /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
     },

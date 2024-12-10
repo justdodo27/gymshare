@@ -8,6 +8,7 @@ from django.db.models.functions import JSONObject
 from django.db.models import OuterRef
 
 from .models import StatisticExercise, StatisticCalories
+from gymshareapi.pagination import DefaultPagination
 from .serializers import ExerciseDataSerializer, StatisticCaloriesSerializer, StatisticExerciseGetSerializer, StatisticExerciseSerializer
 from workouts.models import Exercise
 
@@ -31,6 +32,7 @@ class StatisticExerciseList(ListAPIView):
     queryset = StatisticExercise.objects.all()
     serializer_class = StatisticExerciseGetSerializer
     ordering_fields = ['date', '-date', 'repeats', '-repeats', 'time', '-time', 'weight', '-weight']
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         day = self.kwargs.get('day')
@@ -75,6 +77,7 @@ class StatisticCaloriesList(ListAPIView):
     serializer_class = StatisticCaloriesSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = ['date', ]
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         month = self.kwargs.get('month')

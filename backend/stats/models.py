@@ -6,7 +6,7 @@ from workouts.models import Exercise
 class StatisticCalories(models.Model):
     date = models.DateField()
     calories = models.FloatField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
 
     def __str__(self) -> str:
         return f'{self.user.username} : {self.date} - {self.calories}'
@@ -17,8 +17,8 @@ class StatisticCalories(models.Model):
 
 class StatisticExercise(models.Model):
     date = models.DateTimeField()
-    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, db_index=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
     repeats = models.IntegerField(null=True, blank=True)
     time = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
     weight = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
